@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f6b5c">
+  <title>Keto Plan</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Plan redukcji</p>
+        <h1>Keto Plan</h1>
+      </div>
+      <button class="icon-btn" id="installBtn" type="button" title="Zainstaluj aplikacje" hidden>+</button>
+    </header>
+
+    <main>
+      <section class="status-band" aria-label="Status dnia">
+        <div>
+          <span class="label">Dzisiaj</span>
+          <strong id="dayName">Dzien 1</strong>
+        </div>
+        <div>
+          <span class="label">Woda</span>
+          <strong><span id="waterCount">0</span>/10</strong>
+        </div>
+        <div>
+          <span class="label">Posilki</span>
+          <strong><span id="mealCount">0</span>/4</strong>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Widoki">
+        <button class="tab active" type="button" data-tab="today">Dzisiaj</button>
+        <button class="tab" type="button" data-tab="week">Tydzien</button>
+        <button class="tab" type="button" data-tab="water">Woda</button>
+        <button class="tab" type="button" data-tab="settings">Ustawienia</button>
+      </nav>
+
+      <section class="panel active" id="todayPanel" aria-label="Dzisiejszy jadlospis">
+        <div class="day-switch">
+          <button id="prevDay" type="button">Poprzedni</button>
+          <select id="daySelect" aria-label="Wybierz dzien"></select>
+          <button id="nextDay" type="button">Nastepny</button>
+        </div>
+        <div id="mealsList" class="meal-list"></div>
+      </section>
+
+      <section class="panel" id="weekPanel" aria-label="Jadlospis tygodniowy">
+        <div id="weekList" class="week-list"></div>
+      </section>
+
+      <section class="panel" id="waterPanel" aria-label="Plan picia wody">
+        <div class="water-card">
+          <h2>Woda na dzisiaj</h2>
+          <p>Cel startowy: 2,5 litra dziennie, czyli 10 porcji po 250 ml. Przy upale lub poceniu dolej 1-2 porcje.</p>
+          <div class="water-grid" id="waterGrid"></div>
+          <button id="resetWater" type="button">Reset wody</button>
+        </div>
+        <div class="tips">
+          <h2>Wazne</h2>
+          <ul>
+            <li>Nie pij duzo naraz przed snem.</li>
+            <li>Przy Piramilu nie bierz potasu w suplementach bez lekarza.</li>
+            <li>Jesli masz zawroty glowy lub bardzo niskie cisnienie, skontaktuj sie z lekarzem.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel" id="settingsPanel" aria-label="Ustawienia">
+        <div class="settings-grid">
+          <label>Posilek 1 <input id="mealTime0" type="time"></label>
+          <label>Posilek 2 <input id="mealTime1" type="time"></label>
+          <label>Obiad <input id="mealTime2" type="time"></label>
+          <label>Kolacja <input id="mealTime3" type="time"></label>
+          <label>Start wody <input id="waterStart" type="time"></label>
+          <label>Koniec wody <input id="waterEnd" type="time"></label>
+        </div>
+        <div class="button-row">
+          <button id="saveSettings" type="button">Zapisz godziny</button>
+          <button id="enableNotifications" type="button">Wlacz powiadomienia</button>
+        </div>
+        <div class="tips">
+          <h2>Objawy alarmowe</h2>
+          <p>Silny bol w klatce, dusznosc, zimny pot, oslabienie, mdlosci inne niz zwykle albo bol idacy do lewej reki/szczeki to powod do pilnej pomocy medycznej.</p>
+        </div>
+        <div class="tips">
+          <h2>Na telefonie</h2>
+          <p>Otworz adres aplikacji w telefonie, wybierz w menu przegladarki opcje dodania do ekranu glownego, potem wejdz w Ustawienia i wlacz powiadomienia.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

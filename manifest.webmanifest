@@ -1,0 +1,17 @@
+{
+  "name": "Keto Plan",
+  "short_name": "Keto Plan",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#1f6b5c",
+  "description": "Jadlospis keto, woda i przypomnienia.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
