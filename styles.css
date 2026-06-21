@@ -107,7 +107,7 @@ h2 {
 
 .tabs {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
   margin-bottom: 14px;
 }
@@ -123,7 +123,7 @@ button {
 }
 
 .tab {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .tab.active,
@@ -158,13 +158,15 @@ button.primary {
 }
 
 .meal-list,
-.week-list {
+.week-list,
+.shopping-list {
   display: grid;
   gap: 10px;
 }
 
 .meal,
 .week-day,
+.shopping-category,
 .water-card,
 .tips {
   background: var(--panel);
@@ -228,6 +230,58 @@ button.primary {
 
 .week-day li + li {
   margin-top: 6px;
+}
+
+.shopping-head {
+  display: grid;
+  grid-template-columns: 1fr 88px;
+  align-items: start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.shopping-head p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.shopping-category h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+
+.shopping-item {
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.shopping-item:first-of-type {
+  border-top: 0;
+}
+
+.shopping-item button {
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  color: var(--primary);
+  font-weight: 900;
+}
+
+.shopping-item.done span {
+  text-decoration: line-through;
+  color: #84908a;
+}
+
+.shopping-item strong {
+  color: var(--primary-dark);
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .water-grid {
@@ -321,6 +375,10 @@ button.primary {
   }
 
   .meal-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shopping-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

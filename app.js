@@ -43,6 +43,50 @@ const mealPlan = [
   ]
 ];
 
+const shoppingPlan = [
+  {
+    category: "Bialko",
+    items: [
+      ["Jajka", "24 szt."],
+      ["Kurczak albo indyk", "2 kg"],
+      ["Dorsz, mintaj albo losos", "0,8-1 kg"],
+      ["Tunczyk w sosie wlasnym", "3-4 puszki"]
+    ]
+  },
+  {
+    category: "Nabial",
+    items: [
+      ["Skyr naturalny", "5-7 szt."],
+      ["Kefir naturalny", "2-3 butelki"],
+      ["Twarog poltlusty", "4 kostki"],
+      ["Serek wiejski", "4-5 szt."],
+      ["Jogurt naturalny", "1 op."]
+    ]
+  },
+  {
+    category: "Warzywa",
+    items: [
+      ["Brokul mrozony", "1-1,5 kg"],
+      ["Fasolka szparagowa mrozona", "1 kg"],
+      ["Cukinia", "4-6 szt."],
+      ["Ogorki", "5-7 szt."],
+      ["Salata", "1-2 szt."],
+      ["Szpinak albo mieszanka warzyw", "0,5-1 kg"],
+      ["Marchew", "mala paczka"]
+    ]
+  },
+  {
+    category: "Dodatki",
+    items: [
+      ["Oliwa", "1 butelka"],
+      ["Orzechy", "mala paczka"],
+      ["Awokado", "2 szt. opcjonalnie"],
+      ["Woda niegazowana", "wedlug potrzeby"],
+      ["Sol, lagodne ziola", "do smaku"]
+    ]
+  }
+];
+
 const defaultSettings = {
   mealTimes: ["07:00", "10:30", "14:30", "18:30"],
   waterStart: "07:30",
@@ -58,6 +102,7 @@ const tabs = document.querySelectorAll(".tab");
 const panels = {
   today: document.getElementById("todayPanel"),
   week: document.getElementById("weekPanel"),
+  shopping: document.getElementById("shoppingPanel"),
   water: document.getElementById("waterPanel"),
   settings: document.getElementById("settingsPanel")
 };
@@ -83,6 +128,14 @@ function getWater() {
 
 function setWater(value) {
   localStorage.setItem(storageKey("water"), String(value));
+}
+
+function getShoppingDone() {
+  return JSON.parse(localStorage.getItem("shoppingDone") || "[]");
+}
+
+function setShoppingDone(done) {
+  localStorage.setItem("shoppingDone", JSON.stringify(done));
 }
 
 function showToast(message) {
@@ -146,6 +199,40 @@ function renderWeek() {
     card.innerHTML = `<h3>Dzien ${index + 1}</h3><ol>${items}</ol>`;
     list.append(card);
   });
+}
+
+function renderShopping() {
+  const list = document.getElementById("shoppingList");
+  const done = getShoppingDone();
+  list.innerHTML = "";
+
+  shoppingPlan.forEach((group, groupIndex) => {
+    const card = document.createElement("article");
+    card.className = "shopping-category";
+    const rows = group.items.map((item, itemIndex) => {
+      const key = `${groupIndex}-${itemIndex}`;
+      const isDone = done.includes(key);
+      return `
+        <div class="shopping-item ${isDone ? "done" : ""}">
+          <button type="button" data-key="${key}" aria-label="Odhacz produkt">${isDone ? "OK" : ""}</button>
+          <span>${item[0]}</span>
+          <strong>${item[1]}</strong>
+        </div>
+      `;
+    }).join("");
+    card.innerHTML = `<h3>${group.category}</h3>${rows}`;
+    card.querySelectorAll("button[data-key]").forEach(button => {
+      button.addEventListener("click", () => toggleShopping(button.dataset.key));
+    });
+    list.append(card);
+  });
+}
+
+function toggleShopping(key) {
+  const done = getShoppingDone();
+  const next = done.includes(key) ? done.filter(item => item !== key) : [...done, key];
+  setShoppingDone(next);
+  renderShopping();
 }
 
 function renderWater() {
@@ -261,6 +348,11 @@ function bindEvents() {
     renderWater();
   });
 
+  document.getElementById("resetShopping").addEventListener("click", () => {
+    setShoppingDone([]);
+    renderShopping();
+  });
+
   document.getElementById("saveSettings").addEventListener("click", saveSettings);
   document.getElementById("enableNotifications").addEventListener("click", enableNotifications);
 
@@ -284,6 +376,7 @@ function boot() {
   renderSettings();
   renderMeals();
   renderWeek();
+  renderShopping();
   renderWater();
   bindEvents();
   if ("serviceWorker" in navigator) {

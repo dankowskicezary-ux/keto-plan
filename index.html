@@ -37,6 +37,7 @@
       <nav class="tabs" aria-label="Widoki">
         <button class="tab active" type="button" data-tab="today">Dzisiaj</button>
         <button class="tab" type="button" data-tab="week">Tydzien</button>
+        <button class="tab" type="button" data-tab="shopping">Zakupy</button>
         <button class="tab" type="button" data-tab="water">Woda</button>
         <button class="tab" type="button" data-tab="settings">Ustawienia</button>
       </nav>
@@ -52,6 +53,17 @@
 
       <section class="panel" id="weekPanel" aria-label="Jadlospis tygodniowy">
         <div id="weekList" class="week-list"></div>
+      </section>
+
+      <section class="panel" id="shoppingPanel" aria-label="Lista zakupow">
+        <div class="shopping-head">
+          <div>
+            <h2>Lista na 7 dni</h2>
+            <p>Ilosci sa pod plan keto bez pieczywa. Kup mrozonki i proste bialko, zeby gotowanie trwalo kilka minut.</p>
+          </div>
+          <button id="resetShopping" type="button">Reset</button>
+        </div>
+        <div id="shoppingList" class="shopping-list"></div>
       </section>
 
       <section class="panel" id="waterPanel" aria-label="Plan picia wody">
