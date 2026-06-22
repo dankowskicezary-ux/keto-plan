@@ -534,7 +534,7 @@ function renderMeals() {
       </div>
       <p>${item.text}</p>
       <p class="macro">${macroLine(item, portion)}</p>
-      <p class="hint">Zjedz: ${scaledPortionText(item, grams)} (${grams} g). 1 porcja: ${portionText(item)}.</p>
+      <p class="hint">Zjedz: ${scaledPortionText(item, grams)}.</p>
     `;
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
     card.querySelector(".meal-type").addEventListener("change", event => updateMealType(slotIndex, event.target.value));
