@@ -641,18 +641,33 @@ function changeWeight(slotIndex, step) {
 
 function suggestDayPlan() {
   const plan = getPlan();
-  const lightChoices = ["3 jajka + ogorek", "Skyr + orzechy", "Twarog + jajko", "Tunczyk + jajko", "Jajka + skyr"];
-  const dinnerChoices = ["Kurczak + brokul", "Dorsz + warzywa", "Indyk + fasolka", "Pomidorowa + omlet", "Kantyna: kurczak bez dodatku", "Kantyna: ryba bez panierki"];
+  const used = new Set();
+  const lightBySlot = [
+    ["3 jajka + ogorek", "Omlet prosty", "Pasta jajeczna", "Jajka na miekko"],
+    ["Skyr + orzechy", "Twarog 150 g", "Serek proteinowy", "Bialy ser na slono"],
+    ["Tunczyk + jajko", "Ryba lekka", "Kurczak lekki", "Resztki obiadu"],
+    ["Twarog + jajko", "Serek wiejski", "Jajka + skyr", "Pasta tunczykowa"]
+  ];
+  const dinnerBySlot = [
+    ["Pomidorowa + omlet", "Rosol bez makaronu", "Zupa krem", "Kalafiorowa"],
+    ["Kantyna: kurczak bez dodatku", "Kurczak + brokul", "Indyk + fasolka", "Kantyna: mieso w sosie"],
+    ["Dorsz + warzywa", "Kantyna: ryba bez panierki", "Losos + brokul", "Krewetki + warzywa"],
+    ["Gulasz bez kaszy", "Leczo bez cukru", "Bigos keto", "Kotlet bez panierki"]
+  ];
 
   slotNames.forEach((_, slotIndex) => {
     const type = plan.mealTypes?.[slotIndex] || "any";
-    const preferred = type === "dinner" ? dinnerChoices : lightChoices;
+    const preferred = type === "dinner" ? dinnerBySlot[slotIndex] : lightBySlot[slotIndex];
     const options = getMealOptions(slotIndex, plan);
-    const foundIndex = preferred
-      .map(name => options.findIndex(item => item.name === name))
+    let foundIndex = preferred
+      .map(name => options.findIndex(item => item.name === name && !used.has(item.name)))
       .find(index => index >= 0);
+    if (foundIndex === undefined) {
+      foundIndex = options.findIndex(item => !used.has(item.name));
+    }
     plan.selected[slotIndex] = foundIndex >= 0 ? foundIndex : 0;
     const item = options[plan.selected[slotIndex]] || options[0];
+    used.add(item.name);
     plan.weights[slotIndex] = baseGrams(item);
   });
 
