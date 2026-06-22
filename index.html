@@ -75,6 +75,10 @@
           <h2>Praca zmianowa</h2>
           <p>Wybierz zmiane w Ustawieniach albo ustaw typ posilku recznie. Na 6:00 i 14:00 posilek 2 i 3 sa obiadowe. Na 22:00 posilek 1 i 2 sa obiadowe.</p>
         </div>
+        <div class="button-row day-actions">
+          <button id="fitLimit" type="button">Dopasuj reszte do limitu</button>
+          <button id="resetDay" type="button">Reset dnia</button>
+        </div>
         <section class="custom-card" aria-label="Wlasne danie">
           <h2>Wlasne danie</h2>
           <div class="custom-grid">
@@ -97,7 +101,6 @@
         <section class="drink-section" aria-label="Napoje">
           <div class="section-head">
             <h2>Napoje</h2>
-            <button id="resetDay" type="button">Reset dnia</button>
           </div>
           <div id="drinkList" class="drink-list"></div>
         </section>
@@ -137,6 +140,10 @@
 
       <section class="panel" id="settingsPanel" aria-label="Ustawienia">
         <div class="settings-grid">
+          <label>Limit kcal <input id="targetKcal" type="number" inputmode="numeric"></label>
+          <label>Bialko g <input id="targetProtein" type="number" inputmode="numeric"></label>
+          <label>Tluszcz g <input id="targetFat" type="number" inputmode="numeric"></label>
+          <label>Wegle g <input id="targetCarbs" type="number" inputmode="numeric"></label>
           <label>Nootri <input id="drinkTime" type="time"></label>
           <label>Posilek 1 <input id="mealTime0" type="time"></label>
           <label>Posilek 2 <input id="mealTime1" type="time"></label>

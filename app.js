@@ -1,4 +1,4 @@
-const targets = {
+const defaultTargets = {
   kcal: 2000,
   protein: 150,
   carbs: 60,
@@ -241,6 +241,7 @@ const shoppingPlan = [
 const defaultSettings = {
   mealTimes: ["07:00", "10:30", "14:30", "18:30"],
   mealTypes: ["light", "dinner", "dinner", "light"],
+  targets: defaultTargets,
   drinkTime: "08:00",
   waterStart: "07:30",
   waterEnd: "20:30",
@@ -256,6 +257,7 @@ const shiftPresets = {
 let selectedDay = Number(localStorage.getItem("selectedDay") || "0");
 let settings = JSON.parse(localStorage.getItem("settings") || JSON.stringify(defaultSettings));
 settings = { ...defaultSettings, ...settings };
+settings.targets = { ...defaultTargets, ...(settings.targets || {}) };
 let deferredInstallPrompt = null;
 
 const tabs = document.querySelectorAll(".tab");
@@ -325,6 +327,10 @@ function showToast(message) {
 
 function round(value) {
   return Math.round(value);
+}
+
+function getTargets() {
+  return { ...defaultTargets, ...(settings.targets || {}) };
 }
 
 function macroLine(item, portion = 1) {
@@ -420,6 +426,10 @@ function calculateTotals(plan = getPlan()) {
   return totals;
 }
 
+function mealKcal(item, grams) {
+  return item.kcal * portionFromGrams(item, grams);
+}
+
 function renderDayOptions() {
   const select = document.getElementById("daySelect");
   select.innerHTML = "";
@@ -434,6 +444,7 @@ function renderDayOptions() {
 
 function renderSummary() {
   const plan = getPlan();
+  const targets = getTargets();
   const totals = calculateTotals(plan);
   const remaining = targets.kcal - totals.kcal;
   const doneMeals = plan.done.length;
@@ -566,6 +577,7 @@ function bindMealChoiceButtons(card, slotIndex) {
 }
 
 function suggestMaxPortion(slotIndex, plan) {
+  const targets = getTargets();
   const selected = Number(plan.selected[slotIndex] || 0);
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   const currentPortion = portionFromGrams(item, plan.weights?.[slotIndex]);
@@ -614,6 +626,46 @@ function changeWeight(slotIndex, step) {
   plan.weights[slotIndex] = Math.min(1000, Math.max(30, current + step));
   setPlan(plan);
   renderMeals();
+}
+
+function fitRemainingMealsToLimit() {
+  const plan = getPlan();
+  const targets = getTargets();
+  const adjustable = slotNames
+    .map((_, slotIndex) => slotIndex)
+    .filter(slotIndex => !plan.done.includes(slotIndex));
+
+  const slots = adjustable.length ? adjustable : slotNames.map((_, slotIndex) => slotIndex);
+  const fixedKcal = slotNames.reduce((sum, _, slotIndex) => {
+    if (slots.includes(slotIndex)) return sum;
+    const options = getMealOptions(slotIndex, plan);
+    const item = options[plan.selected[slotIndex] || 0] || options[0];
+    return sum + mealKcal(item, plan.weights?.[slotIndex]);
+  }, 0);
+
+  const adjustableKcal = slots.reduce((sum, slotIndex) => {
+    const options = getMealOptions(slotIndex, plan);
+    const item = options[plan.selected[slotIndex] || 0] || options[0];
+    return sum + mealKcal(item, plan.weights?.[slotIndex]);
+  }, 0);
+
+  const room = Math.max(0, targets.kcal - fixedKcal);
+  if (!adjustableKcal || !room) {
+    showToast("Brak kalorii do rozdzielenia na pozostale posilki.");
+    return;
+  }
+
+  const factor = room / adjustableKcal;
+  slots.forEach(slotIndex => {
+    const options = getMealOptions(slotIndex, plan);
+    const item = options[plan.selected[slotIndex] || 0] || options[0];
+    const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
+    plan.weights[slotIndex] = Math.min(1000, Math.max(30, Math.round(current * factor / 10) * 10));
+  });
+
+  setPlan(plan);
+  renderMeals();
+  showToast("Dopasowano gramatury do limitu.");
 }
 
 function toggleMeal(index) {
@@ -802,6 +854,11 @@ function renderWater() {
 }
 
 function renderSettings() {
+  const targets = getTargets();
+  document.getElementById("targetKcal").value = targets.kcal;
+  document.getElementById("targetProtein").value = targets.protein;
+  document.getElementById("targetFat").value = targets.fat;
+  document.getElementById("targetCarbs").value = targets.carbs;
   settings.mealTimes.forEach((time, index) => {
     document.getElementById(`mealTime${index}`).value = time;
   });
@@ -813,6 +870,12 @@ function renderSettings() {
 function saveSettings() {
   settings = {
     ...settings,
+    targets: {
+      kcal: Number(document.getElementById("targetKcal").value || defaultTargets.kcal),
+      protein: Number(document.getElementById("targetProtein").value || defaultTargets.protein),
+      fat: Number(document.getElementById("targetFat").value || defaultTargets.fat),
+      carbs: Number(document.getElementById("targetCarbs").value || defaultTargets.carbs)
+    },
     mealTimes: [0, 1, 2, 3].map(index => document.getElementById(`mealTime${index}`).value || defaultSettings.mealTimes[index]),
     drinkTime: document.getElementById("drinkTime").value || defaultSettings.drinkTime,
     waterStart: document.getElementById("waterStart").value || defaultSettings.waterStart,
@@ -823,6 +886,8 @@ function saveSettings() {
   plan.mealTimes = [...settings.mealTimes];
   setPlan(plan);
   renderMeals();
+  renderWeek();
+  renderShopping();
   showToast("Godziny zapisane.");
 }
 
@@ -931,6 +996,8 @@ function bindEvents() {
     renderMeals();
     showToast("Dzien zresetowany.");
   });
+
+  document.getElementById("fitLimit").addEventListener("click", fitRemainingMealsToLimit);
 
   document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
 
