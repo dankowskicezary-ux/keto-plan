@@ -163,8 +163,29 @@ function setCustomMeals(meals) {
   localStorage.setItem("customMeals", JSON.stringify(meals));
 }
 
-function getMealOptions() {
+function allMealOptions() {
   return foodCatalog.concat(getCustomMeals());
+}
+
+function mealKind(item) {
+  const text = `${item.name} ${item.text}`.toLowerCase();
+  const dinnerWords = ["kantyna", "zupa", "rosol", "barszcz", "zurek", "flaki", "kurczak", "indyk", "dorsz", "losos", "ryba", "schab", "mielony", "karkowka", "gulasz", "leczo", "bigos", "golab", "wolowina", "wieprzowina", "pizza", "burger", "makaron", "kasza", "ryz", "ziemniaki", "pierogi"];
+  return dinnerWords.some(word => text.includes(word)) ? "dinner" : "light";
+}
+
+function typeLabel(type) {
+  return { light: "lekki", dinner: "obiadowy", any: "dowolny" }[type] || "dowolny";
+}
+
+function getMealOptions(slotIndex, plan = null) {
+  const type = plan?.mealTypes?.[slotIndex] || settings.mealTypes?.[slotIndex] || "any";
+  const options = allMealOptions();
+  if (type === "any") return options;
+  return options.slice().sort((a, b) => {
+    const aMatch = mealKind(a) === type ? 0 : 1;
+    const bMatch = mealKind(b) === type ? 0 : 1;
+    return aMatch - bMatch || a.name.localeCompare(b.name, "pl");
+  });
 }
 
 const drinks = [
@@ -219,6 +240,7 @@ const shoppingPlan = [
 
 const defaultSettings = {
   mealTimes: ["07:00", "10:30", "14:30", "18:30"],
+  mealTypes: ["light", "dinner", "dinner", "light"],
   drinkTime: "08:00",
   waterStart: "07:30",
   waterEnd: "20:30",
@@ -226,9 +248,9 @@ const defaultSettings = {
 };
 
 const shiftPresets = {
-  first: { label: "1 zmiana", mealTimes: ["05:30", "09:00", "14:30", "18:30"], drinkTime: "06:00", waterStart: "05:30", waterEnd: "20:30" },
-  second: { label: "2 zmiana", mealTimes: ["09:00", "12:30", "17:00", "21:00"], drinkTime: "09:30", waterStart: "09:00", waterEnd: "22:30" },
-  night: { label: "Nocka", mealTimes: ["18:00", "22:00", "02:00", "06:30"], drinkTime: "21:30", waterStart: "18:00", waterEnd: "07:00" }
+  first: { label: "6:00", mealTimes: ["05:30", "10:30", "14:30", "18:30"], mealTypes: ["light", "dinner", "dinner", "light"], drinkTime: "06:00", waterStart: "05:30", waterEnd: "20:30" },
+  second: { label: "14:00", mealTimes: ["09:00", "12:30", "17:00", "21:00"], mealTypes: ["light", "dinner", "dinner", "light"], drinkTime: "09:30", waterStart: "09:00", waterEnd: "22:30" },
+  night: { label: "22:00", mealTimes: ["18:00", "22:00", "02:00", "06:30"], mealTypes: ["dinner", "dinner", "light", "light"], drinkTime: "21:30", waterStart: "18:00", waterEnd: "07:00" }
 };
 
 let selectedDay = Number(localStorage.getItem("selectedDay") || "0");
@@ -248,19 +270,29 @@ const panels = {
 const toast = document.getElementById("toast");
 
 function storageKey(type) {
+  return storageKeyForDay(type, selectedDay);
+}
+
+function storageKeyForDay(type, day) {
   const date = new Date().toISOString().slice(0, 10);
-  return `${type}:${date}:day${selectedDay}`;
+  return `${type}:${date}:day${day}`;
 }
 
 function getPlan() {
+  return getPlanForDay(selectedDay);
+}
+
+function getPlanForDay(day) {
   const fallback = {
     selected: [0, 0, 0, 0],
     portions: [1, 1, 1, 1],
     weights: null,
+    mealTimes: settings.mealTimes || defaultSettings.mealTimes,
+    mealTypes: settings.mealTypes || defaultSettings.mealTypes,
     done: [],
     drinks: { nootri: 1, blackCoffee: 0 }
   };
-  return backfillWeights({ ...fallback, ...JSON.parse(localStorage.getItem(storageKey("plan")) || "{}") });
+  return backfillWeights({ ...fallback, ...JSON.parse(localStorage.getItem(storageKeyForDay("plan", day)) || "{}") });
 }
 
 function setPlan(plan) {
@@ -316,9 +348,15 @@ function gramsFromPortion(item, portion) {
 }
 
 function backfillWeights(plan) {
+  if (!plan.mealTypes || plan.mealTypes.length !== slotNames.length) {
+    plan.mealTypes = settings.mealTypes || defaultSettings.mealTypes;
+  }
+  if (!plan.mealTimes || plan.mealTimes.length !== slotNames.length) {
+    plan.mealTimes = settings.mealTimes || defaultSettings.mealTimes;
+  }
   if (plan.weights && plan.weights.length === slotNames.length) return plan;
   const weights = slotNames.map((_, slotIndex) => {
-    const options = getMealOptions(slotIndex);
+    const options = getMealOptions(slotIndex, plan);
     const item = options[plan.selected[slotIndex] || 0] || options[0];
     return gramsFromPortion(item, plan.portions?.[slotIndex] || 1);
   });
@@ -344,7 +382,7 @@ function optionMarkup(options, selected, query = "") {
 function calculateTotals(plan = getPlan()) {
   const totals = { kcal: 0, protein: 0, fat: 0, carbs: 0 };
   plan.selected.forEach((optionIndex, slotIndex) => {
-    const item = getMealOptions(slotIndex)[optionIndex] || getMealOptions(slotIndex)[0];
+    const item = getMealOptions(slotIndex, plan)[optionIndex] || getMealOptions(slotIndex, plan)[0];
     const portion = portionFromGrams(item, plan.weights?.[slotIndex]);
     totals.kcal += item.kcal * portion;
     totals.protein += item.protein * portion;
@@ -397,7 +435,7 @@ function renderMeals() {
   document.getElementById("daySelect").value = String(selectedDay);
 
   slotNames.forEach((_, slotIndex) => {
-    const options = getMealOptions(slotIndex);
+    const options = getMealOptions(slotIndex, plan);
     const selected = Number(plan.selected[slotIndex] || 0);
     const item = options[selected] || options[0];
     const grams = Number(plan.weights?.[slotIndex] || baseGrams(item));
@@ -409,10 +447,17 @@ function renderMeals() {
     card.className = `meal ${isDone ? "done" : ""}`;
     card.innerHTML = `
       <div class="meal-head">
-        <span class="time">${settings.mealTimes[slotIndex]}</span>
-        <h3>${slotNames[slotIndex]}</h3>
+        <span class="time">${plan.mealTimes?.[slotIndex] || settings.mealTimes[slotIndex]}</span>
+        <h3>${slotNames[slotIndex]} <small>${typeLabel(plan.mealTypes?.[slotIndex])}</small></h3>
         <button class="check" type="button" aria-label="Odhacz posilek">${isDone ? "OK" : ""}</button>
       </div>
+      <label class="choice-label">Typ posilku
+        <select class="meal-type" data-slot="${slotIndex}">
+          <option value="light" ${plan.mealTypes?.[slotIndex] === "light" ? "selected" : ""}>lekki</option>
+          <option value="dinner" ${plan.mealTypes?.[slotIndex] === "dinner" ? "selected" : ""}>obiadowy</option>
+          <option value="any" ${plan.mealTypes?.[slotIndex] === "any" ? "selected" : ""}>dowolny</option>
+        </select>
+      </label>
       <label class="choice-label">Co jesz?
         <input class="meal-search" type="search" data-slot="${slotIndex}" placeholder="Szukaj, np. p, zupa, kurczak">
         <select class="meal-choice" data-slot="${slotIndex}">
@@ -429,6 +474,7 @@ function renderMeals() {
       <p class="hint">Baza: ${baseGrams(item)} g. Przy obecnym limicie mozesz zjesc do ok. ${maxPortion} g tego dania.</p>
     `;
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
+    card.querySelector(".meal-type").addEventListener("change", event => updateMealType(slotIndex, event.target.value));
     card.querySelector(".meal-choice").addEventListener("change", event => updateMealChoice(slotIndex, Number(event.target.value)));
     card.querySelector(".meal-search").addEventListener("input", event => filterMealOptions(slotIndex, Number(plan.selected[slotIndex] || 0), event.target.value, card));
     card.querySelector(".weight-input").addEventListener("change", event => updateWeight(slotIndex, Number(event.target.value)));
@@ -440,6 +486,8 @@ function renderMeals() {
 
   renderDrinks();
   renderSummary();
+  renderShopping();
+  renderWeek();
 }
 
 function addCustomMeal(meal) {
@@ -483,7 +531,7 @@ function clearCustomForm() {
 
 function filterMealOptions(slotIndex, selected, query, card) {
   const select = card.querySelector(".meal-choice");
-  select.innerHTML = optionMarkup(getMealOptions(slotIndex), selected, query);
+  select.innerHTML = optionMarkup(getMealOptions(slotIndex, getPlan()), selected, query);
   if (!select.querySelector(`option[value="${selected}"]`)) {
     select.selectedIndex = 0;
   }
@@ -491,7 +539,7 @@ function filterMealOptions(slotIndex, selected, query, card) {
 
 function suggestMaxPortion(slotIndex, plan) {
   const selected = Number(plan.selected[slotIndex] || 0);
-  const item = getMealOptions(slotIndex)[selected] || getMealOptions(slotIndex)[0];
+  const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   const currentPortion = portionFromGrams(item, plan.weights?.[slotIndex]);
   const totals = calculateTotals(plan);
   const kcalWithoutThis = totals.kcal - item.kcal * currentPortion;
@@ -502,7 +550,22 @@ function suggestMaxPortion(slotIndex, plan) {
 function updateMealChoice(slotIndex, optionIndex) {
   const plan = getPlan();
   plan.selected[slotIndex] = optionIndex;
-  const item = getMealOptions(slotIndex)[optionIndex] || getMealOptions(slotIndex)[0];
+  const item = getMealOptions(slotIndex, plan)[optionIndex] || getMealOptions(slotIndex, plan)[0];
+  plan.weights[slotIndex] = baseGrams(item);
+  setPlan(plan);
+  renderMeals();
+}
+
+function updateMealType(slotIndex, type) {
+  const plan = getPlan();
+  const oldOptions = getMealOptions(slotIndex, plan);
+  const oldItem = oldOptions[plan.selected[slotIndex] || 0];
+  plan.mealTypes = [...(plan.mealTypes || settings.mealTypes || defaultSettings.mealTypes)];
+  plan.mealTypes[slotIndex] = type;
+  const newOptions = getMealOptions(slotIndex, plan);
+  const sameIndex = newOptions.findIndex(item => oldItem && item.name === oldItem.name);
+  plan.selected[slotIndex] = sameIndex >= 0 ? sameIndex : 0;
+  const item = newOptions[plan.selected[slotIndex]] || newOptions[0];
   plan.weights[slotIndex] = baseGrams(item);
   setPlan(plan);
   renderMeals();
@@ -518,7 +581,7 @@ function updateWeight(slotIndex, grams) {
 function changeWeight(slotIndex, step) {
   const plan = getPlan();
   const selected = Number(plan.selected[slotIndex] || 0);
-  const item = getMealOptions(slotIndex)[selected] || getMealOptions(slotIndex)[0];
+  const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
   plan.weights[slotIndex] = Math.min(1000, Math.max(30, current + step));
   setPlan(plan);
@@ -570,14 +633,21 @@ function changeDrink(id, step) {
 function renderWeek() {
   const list = document.getElementById("weekList");
   list.innerHTML = "";
-  slotNames.forEach((slotName, index) => {
-    const options = getMealOptions(index);
+  for (let day = 0; day < 7; day += 1) {
+    const plan = getPlanForDay(day);
     const card = document.createElement("article");
     card.className = "week-day";
-    const items = options.map(option => `<li>${option.name}: ${option.text} <span>${macroLine(option)}</span></li>`).join("");
-    card.innerHTML = `<h3>${slotName}: wybieraj dowolnie</h3><ol>${items}</ol>`;
+    const totals = calculateTotals(plan);
+    const items = plan.selected.map((optionIndex, slotIndex) => {
+      const options = getMealOptions(slotIndex, plan);
+      const item = options[optionIndex] || options[0];
+      const grams = Number(plan.weights?.[slotIndex] || baseGrams(item));
+      const portion = portionFromGrams(item, grams);
+      return `<li>${plan.mealTimes?.[slotIndex] || ""} ${slotNames[slotIndex]} (${typeLabel(plan.mealTypes?.[slotIndex])}): ${item.name} <span>${grams} g | ${macroLine(item, portion)}</span></li>`;
+    }).join("");
+    card.innerHTML = `<h3>Dzien ${day + 1} <span>${round(totals.kcal)} kcal</span></h3><ol>${items}</ol>`;
     list.append(card);
-  });
+  }
 }
 
 function renderShopping() {
@@ -585,7 +655,7 @@ function renderShopping() {
   const done = getShoppingDone();
   list.innerHTML = "";
 
-  shoppingPlan.forEach((group, groupIndex) => {
+  buildDynamicShoppingPlan().forEach((group, groupIndex) => {
     const card = document.createElement("article");
     card.className = "shopping-category";
     const rows = group.items.map((item, itemIndex) => {
@@ -605,6 +675,63 @@ function renderShopping() {
     });
     list.append(card);
   });
+}
+
+function buildDynamicShoppingPlan() {
+  const menuItems = [];
+  const products = new Map();
+
+  function addProduct(name, amount) {
+    if (!products.has(name)) products.set(name, []);
+    products.get(name).push(amount);
+  }
+
+  for (let day = 0; day < 7; day += 1) {
+    const plan = getPlanForDay(day);
+    plan.selected.forEach((optionIndex, slotIndex) => {
+      const options = getMealOptions(slotIndex, plan);
+      const item = options[optionIndex] || options[0];
+      const grams = Number(plan.weights?.[slotIndex] || baseGrams(item));
+      menuItems.push([`D${day + 1} ${slotNames[slotIndex]}`, `${item.name} (${grams} g)`]);
+      suggestProducts(item, grams, addProduct);
+    });
+  }
+
+  const productItems = Array.from(products.entries()).map(([name, amounts]) => [name, amounts.join(" + ")]);
+  return [
+    { category: "Menu tygodnia", items: menuItems },
+    { category: "Zakupy z wybranych dan", items: productItems.length ? productItems : [["Brak", "Uloz menu w zakladce Dzisiaj/Tydzien"]] },
+    { category: "Stale zapasy", items: [["Nootri", "jesli pijesz codziennie"], ["Woda niegazowana", "min. 2,5 l dziennie"], ["Lagodne przyprawy", "bez ostrego"], ["Oliwa", "do odmierzania lyzka"]] }
+  ];
+}
+
+function suggestProducts(item, grams, addProduct) {
+  const text = `${item.name} ${item.text}`.toLowerCase();
+  const amount = `${grams} g`;
+  if (text.includes("kantyna")) {
+    addProduct("Posilki w kantynie", item.name);
+    return;
+  }
+  if (text.includes("jaj")) addProduct("Jajka", amount);
+  if (text.includes("kurczak")) addProduct("Kurczak", amount);
+  if (text.includes("indyk")) addProduct("Indyk", amount);
+  if (text.includes("dorsz") || text.includes("mintaj") || text.includes("losos") || text.includes("ryba")) addProduct("Ryby", amount);
+  if (text.includes("tunczyk")) addProduct("Tunczyk", amount);
+  if (text.includes("twarog")) addProduct("Twarog", amount);
+  if (text.includes("skyr")) addProduct("Skyr", amount);
+  if (text.includes("serek")) addProduct("Serek wiejski/proteinowy", amount);
+  if (text.includes("kefir")) addProduct("Kefir", amount);
+  if (text.includes("jogurt")) addProduct("Jogurt naturalny", amount);
+  if (text.includes("brokul")) addProduct("Brokul", amount);
+  if (text.includes("cukinia")) addProduct("Cukinia", amount);
+  if (text.includes("fasolka")) addProduct("Fasolka szparagowa", amount);
+  if (text.includes("ogorek") || text.includes("ogork")) addProduct("Ogorki", amount);
+  if (text.includes("salata") || text.includes("surowka")) addProduct("Salata/surowka", amount);
+  if (text.includes("makaron")) addProduct("Makaron lub paski z omletu", item.name);
+  if (text.includes("ziemniaki")) addProduct("Ziemniaki", "mala porcja");
+  if (text.includes("ryz")) addProduct("Ryz", "mala porcja");
+  if (text.includes("kasza")) addProduct("Kasza", "mala porcja");
+  if (text.includes("zupa") || text.includes("rosol") || text.includes("barszcz") || text.includes("zurek")) addProduct("Skladniki na zupe", item.name);
 }
 
 function toggleShopping(key) {
@@ -650,6 +777,9 @@ function saveSettings() {
     waterEnd: document.getElementById("waterEnd").value || defaultSettings.waterEnd
   };
   localStorage.setItem("settings", JSON.stringify(settings));
+  const plan = getPlan();
+  plan.mealTimes = [...settings.mealTimes];
+  setPlan(plan);
   renderMeals();
   showToast("Godziny zapisane.");
 }
@@ -658,6 +788,15 @@ function applyShiftPreset(presetId) {
   const preset = shiftPresets[presetId];
   settings = { ...settings, ...preset };
   localStorage.setItem("settings", JSON.stringify(settings));
+  const plan = getPlan();
+  plan.mealTypes = [...preset.mealTypes];
+  plan.mealTimes = [...preset.mealTimes];
+  slotNames.forEach((_, slotIndex) => {
+    const options = getMealOptions(slotIndex, plan);
+    const item = options[plan.selected[slotIndex] || 0] || options[0];
+    plan.weights[slotIndex] = plan.weights[slotIndex] || baseGrams(item);
+  });
+  setPlan(plan);
   renderSettings();
   renderMeals();
   showToast(`Ustawiono: ${preset.label}.`);
@@ -688,10 +827,11 @@ function notificationLoop() {
   const stamp = new Date().toISOString().slice(0, 10);
   const plan = getPlan();
 
-  settings.mealTimes.forEach((time, index) => {
+  const times = plan.mealTimes || settings.mealTimes;
+  times.forEach((time, index) => {
     const key = `notify:meal:${stamp}:${index}`;
     if (settings.notifications && Notification.permission === "granted" && isCurrentMinute(time) && !localStorage.getItem(key)) {
-      const options = getMealOptions(index);
+      const options = getMealOptions(index, plan);
       const item = options[plan.selected[index] || 0] || options[0];
       new Notification("Czas na posilek", { body: item.text });
       localStorage.setItem(key, "1");

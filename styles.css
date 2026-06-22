@@ -225,6 +225,14 @@ button.primary {
   font-size: 17px;
 }
 
+.meal h3 small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .meal p,
 .drink-card p,
 .water-card p,
@@ -366,6 +374,11 @@ button.primary {
   font-size: 13px;
   font-weight: 800;
   margin-top: 2px;
+}
+
+.week-day h3 span {
+  display: inline;
+  margin-left: 6px;
 }
 
 .week-day li + li {
