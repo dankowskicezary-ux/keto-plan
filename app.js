@@ -380,6 +380,20 @@ function optionMarkup(options, selected, query = "") {
   )).join("");
 }
 
+function mealChoiceListMarkup(options, selected, query = "") {
+  const matched = options
+    .map((option, optionIndex) => ({ option, optionIndex }))
+    .filter(item => optionMatches(item.option, query));
+  const visible = (matched.length ? matched : options.map((option, optionIndex) => ({ option, optionIndex }))).slice(0, 24);
+  return visible.map(({ option, optionIndex }) => `
+    <button class="meal-option ${optionIndex === selected ? "selected" : ""}" type="button" data-option="${optionIndex}">
+      <strong>${option.name}</strong>
+      <span>${option.text}</span>
+      <em>${macroLine(option)}</em>
+    </button>
+  `).join("");
+}
+
 function optionCount(options, query = "") {
   const normalized = query.trim();
   if (!normalized) return options.length;
@@ -467,10 +481,10 @@ function renderMeals() {
       </label>
       <label class="choice-label">Co jesz? <em class="option-count">${options.length} dan</em>
         <input class="meal-search" type="search" data-slot="${slotIndex}" placeholder="Szukaj, np. p, zupa, kurczak">
-        <select class="meal-choice" data-slot="${slotIndex}">
-          ${optionMarkup(options, selected)}
-        </select>
       </label>
+      <div class="meal-choice-list" data-slot="${slotIndex}">
+        ${mealChoiceListMarkup(options, selected)}
+      </div>
       <div class="portion-row weight-row">
         <button type="button" data-step="-50" data-slot="${slotIndex}">-</button>
         <label><span>Gramatura</span><input class="weight-input" type="number" inputmode="numeric" min="30" max="1000" step="10" value="${grams}" data-slot="${slotIndex}"></label>
@@ -482,8 +496,8 @@ function renderMeals() {
     `;
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
     card.querySelector(".meal-type").addEventListener("change", event => updateMealType(slotIndex, event.target.value));
-    card.querySelector(".meal-choice").addEventListener("change", event => updateMealChoice(slotIndex, Number(event.target.value)));
     card.querySelector(".meal-search").addEventListener("input", event => filterMealOptions(slotIndex, Number(plan.selected[slotIndex] || 0), event.target.value, card));
+    bindMealChoiceButtons(card, slotIndex);
     card.querySelector(".weight-input").addEventListener("change", event => updateWeight(slotIndex, Number(event.target.value)));
     card.querySelectorAll("button[data-step]").forEach(button => {
       button.addEventListener("click", () => changeWeight(slotIndex, Number(button.dataset.step)));
@@ -537,14 +551,18 @@ function clearCustomForm() {
 }
 
 function filterMealOptions(slotIndex, selected, query, card) {
-  const select = card.querySelector(".meal-choice");
   const options = getMealOptions(slotIndex, getPlan());
-  select.innerHTML = optionMarkup(options, selected, query);
+  const list = card.querySelector(".meal-choice-list");
+  list.innerHTML = mealChoiceListMarkup(options, selected, query);
   const count = optionCount(options, query);
   card.querySelector(".option-count").textContent = query.trim() ? `${count} pasuje` : `${options.length} dan`;
-  if (!select.querySelector(`option[value="${selected}"]`)) {
-    select.selectedIndex = 0;
-  }
+  bindMealChoiceButtons(card, slotIndex);
+}
+
+function bindMealChoiceButtons(card, slotIndex) {
+  card.querySelectorAll(".meal-option").forEach(button => {
+    button.addEventListener("click", () => updateMealChoice(slotIndex, Number(button.dataset.option)));
+  });
 }
 
 function suggestMaxPortion(slotIndex, plan) {

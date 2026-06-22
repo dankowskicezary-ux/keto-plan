@@ -271,6 +271,48 @@ button.primary {
   background: #fdfdfb;
 }
 
+.meal-choice-list {
+  display: grid;
+  gap: 8px;
+  max-height: 360px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  margin-top: 10px;
+  padding-right: 2px;
+}
+
+.meal-option {
+  display: grid;
+  gap: 4px;
+  min-height: 0;
+  padding: 10px;
+  text-align: left;
+  background: white;
+}
+
+.meal-option.selected {
+  border-color: var(--primary);
+  background: var(--soft);
+}
+
+.meal-option strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.meal-option span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.meal-option em {
+  color: var(--primary-dark);
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .portion-row,
 .drink-stepper,
 .preset-row,
