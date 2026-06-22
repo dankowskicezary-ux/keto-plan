@@ -79,7 +79,7 @@ h2 {
 
 .status-band {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin: 8px 0 14px;
 }
@@ -101,7 +101,7 @@ h2 {
 .status-band strong {
   display: block;
   margin-top: 4px;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.1;
 }
 
@@ -159,7 +159,8 @@ button.primary {
 
 .meal-list,
 .week-list,
-.shopping-list {
+.shopping-list,
+.drink-list {
   display: grid;
   gap: 10px;
 }
@@ -167,6 +168,8 @@ button.primary {
 .meal,
 .week-day,
 .shopping-category,
+.summary-card,
+.drink-card,
 .water-card,
 .tips {
   background: var(--panel);
@@ -177,6 +180,31 @@ button.primary {
 
 .meal.done {
   background: var(--done);
+}
+
+.summary-card {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.summary-card > div {
+  min-width: 0;
+}
+
+.summary-card strong {
+  display: block;
+  color: var(--primary-dark);
+  font-size: 17px;
+  margin-top: 3px;
+}
+
+.summary-card p {
+  grid-column: 1 / -1;
+  margin: 6px 0 0;
+  color: var(--accent);
+  font-weight: 800;
 }
 
 .meal-head {
@@ -197,11 +225,91 @@ button.primary {
 }
 
 .meal p,
+.drink-card p,
 .water-card p,
 .tips p {
   color: var(--muted);
   margin: 8px 0 0;
   line-height: 1.45;
+}
+
+.choice-label {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.choice-label select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  padding: 0 10px;
+}
+
+.portion-row,
+.drink-stepper,
+.preset-row,
+.section-head {
+  display: grid;
+  gap: 8px;
+  align-items: center;
+}
+
+.portion-row {
+  grid-template-columns: 46px 1fr 46px;
+  margin-top: 10px;
+}
+
+.portion-row strong,
+.drink-stepper strong {
+  text-align: center;
+  color: var(--primary-dark);
+}
+
+.macro {
+  color: var(--primary-dark) !important;
+  font-weight: 800;
+}
+
+.hint {
+  font-size: 13px;
+}
+
+.drink-section {
+  margin-top: 12px;
+}
+
+.section-head {
+  grid-template-columns: 1fr 104px;
+  margin: 6px 0 10px;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+.drink-card {
+  display: grid;
+  grid-template-columns: 1fr 112px;
+  gap: 10px;
+  align-items: center;
+}
+
+.drink-card h3 {
+  margin: 0;
+}
+
+.drink-stepper {
+  grid-template-columns: 34px 1fr 34px;
+}
+
+.drink-stepper button {
+  min-height: 34px;
 }
 
 .check {
@@ -226,6 +334,14 @@ button.primary {
   margin: 0;
   padding-left: 22px;
   color: var(--muted);
+}
+
+.week-day span {
+  display: block;
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 800;
+  margin-top: 2px;
 }
 
 .week-day li + li {
@@ -349,6 +465,11 @@ button.primary {
   margin-top: 12px;
 }
 
+.preset-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 10px;
+}
+
 .toast {
   position: fixed;
   left: 14px;
@@ -380,5 +501,37 @@ button.primary {
 
   .shopping-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  .app-shell {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .tabs {
+    gap: 4px;
+  }
+
+  .tab {
+    font-size: 12px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .status-band,
+  .summary-card {
+    gap: 6px;
+  }
+
+  .status-band > div,
+  .summary-card {
+    padding: 10px 8px;
+  }
+
+  .status-band strong,
+  .summary-card strong {
+    font-size: 14px;
   }
 }

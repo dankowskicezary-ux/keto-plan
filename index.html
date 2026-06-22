@@ -25,6 +25,10 @@
           <strong id="dayName">Dzien 1</strong>
         </div>
         <div>
+          <span class="label">Kalorie</span>
+          <strong id="kcalCount">0/2000</strong>
+        </div>
+        <div>
           <span class="label">Woda</span>
           <strong><span id="waterCount">0</span>/10</strong>
         </div>
@@ -48,7 +52,33 @@
           <select id="daySelect" aria-label="Wybierz dzien"></select>
           <button id="nextDay" type="button">Nastepny</button>
         </div>
+        <section class="summary-card" aria-label="Podsumowanie kalorii">
+          <div>
+            <span class="label">Kalorie</span>
+            <strong id="todayKcal">0 kcal</strong>
+          </div>
+          <div>
+            <span class="label">Bialko</span>
+            <strong id="todayProtein">0 g</strong>
+          </div>
+          <div>
+            <span class="label">Tluszcz</span>
+            <strong id="todayFat">0 g</strong>
+          </div>
+          <div>
+            <span class="label">Wegle</span>
+            <strong id="todayCarbs">0 g</strong>
+          </div>
+          <p id="remainingKcal">2000 kcal zostalo</p>
+        </section>
         <div id="mealsList" class="meal-list"></div>
+        <section class="drink-section" aria-label="Napoje">
+          <div class="section-head">
+            <h2>Napoje</h2>
+            <button id="resetDay" type="button">Reset dnia</button>
+          </div>
+          <div id="drinkList" class="drink-list"></div>
+        </section>
       </section>
 
       <section class="panel" id="weekPanel" aria-label="Jadlospis tygodniowy">
@@ -85,6 +115,7 @@
 
       <section class="panel" id="settingsPanel" aria-label="Ustawienia">
         <div class="settings-grid">
+          <label>Nootri <input id="drinkTime" type="time"></label>
           <label>Posilek 1 <input id="mealTime0" type="time"></label>
           <label>Posilek 2 <input id="mealTime1" type="time"></label>
           <label>Obiad <input id="mealTime2" type="time"></label>
@@ -95,6 +126,15 @@
         <div class="button-row">
           <button id="saveSettings" type="button">Zapisz godziny</button>
           <button id="enableNotifications" type="button">Wlacz powiadomienia</button>
+        </div>
+        <div class="preset-row">
+          <button type="button" data-preset="first">1 zmiana</button>
+          <button type="button" data-preset="second">2 zmiana</button>
+          <button type="button" data-preset="night">Nocka</button>
+        </div>
+        <div class="tips">
+          <h2>Nootri</h2>
+          <p>W planie Nootri jest liczona jako 1 porcja 6 g z woda: ok. 20 kcal, 45 mg kofeiny, MCT i inulina. Jesli nasila zgage albo bol brzucha, zmniejsz do 0 albo pij po jedzeniu.</p>
         </div>
         <div class="tips">
           <h2>Objawy alarmowe</h2>
