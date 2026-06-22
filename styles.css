@@ -267,7 +267,7 @@ button.primary {
 }
 
 .portion-row {
-  grid-template-columns: 46px 1fr 46px;
+  grid-template-columns: 46px minmax(0, 1fr) 46px;
   margin-top: 10px;
 }
 
@@ -275,6 +275,24 @@ button.primary {
 .drink-stepper strong {
   text-align: center;
   color: var(--primary-dark);
+}
+
+.weight-row label {
+  display: grid;
+  gap: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.weight-row input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  text-align: center;
+  color: var(--primary-dark);
+  font-weight: 800;
 }
 
 .macro {

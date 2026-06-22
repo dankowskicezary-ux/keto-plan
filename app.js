@@ -256,10 +256,11 @@ function getPlan() {
   const fallback = {
     selected: [0, 0, 0, 0],
     portions: [1, 1, 1, 1],
+    weights: null,
     done: [],
     drinks: { nootri: 1, blackCoffee: 0 }
   };
-  return { ...fallback, ...JSON.parse(localStorage.getItem(storageKey("plan")) || "{}") };
+  return backfillWeights({ ...fallback, ...JSON.parse(localStorage.getItem(storageKey("plan")) || "{}") });
 }
 
 function setPlan(plan) {
@@ -297,6 +298,33 @@ function macroLine(item, portion = 1) {
   return `${round(item.kcal * portion)} kcal | B ${round(item.protein * portion)} g | T ${round(item.fat * portion)} g | W ${round(item.carbs * portion)} g`;
 }
 
+function baseGrams(item) {
+  if (item.grams) return item.grams;
+  const text = `${item.name} ${item.text}`.toLowerCase();
+  if (text.includes("zupa") || text.includes("rosol") || text.includes("barszcz") || text.includes("zurek") || text.includes("bulion")) return 400;
+  if (text.includes("skyr") || text.includes("twarog") || text.includes("serek") || text.includes("jogurt")) return 170;
+  if (text.includes("jajka") || text.includes("jajko") || text.includes("tunczyk")) return 200;
+  return 250;
+}
+
+function portionFromGrams(item, grams) {
+  return Math.max(0.1, Number(grams || baseGrams(item)) / baseGrams(item));
+}
+
+function gramsFromPortion(item, portion) {
+  return Math.round(baseGrams(item) * Number(portion || 1));
+}
+
+function backfillWeights(plan) {
+  if (plan.weights && plan.weights.length === slotNames.length) return plan;
+  const weights = slotNames.map((_, slotIndex) => {
+    const options = getMealOptions(slotIndex);
+    const item = options[plan.selected[slotIndex] || 0] || options[0];
+    return gramsFromPortion(item, plan.portions?.[slotIndex] || 1);
+  });
+  return { ...plan, weights };
+}
+
 function optionMatches(option, query) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return true;
@@ -317,7 +345,7 @@ function calculateTotals(plan = getPlan()) {
   const totals = { kcal: 0, protein: 0, fat: 0, carbs: 0 };
   plan.selected.forEach((optionIndex, slotIndex) => {
     const item = getMealOptions(slotIndex)[optionIndex] || getMealOptions(slotIndex)[0];
-    const portion = Number(plan.portions[slotIndex] || 1);
+    const portion = portionFromGrams(item, plan.weights?.[slotIndex]);
     totals.kcal += item.kcal * portion;
     totals.protein += item.protein * portion;
     totals.fat += item.fat * portion;
@@ -372,7 +400,8 @@ function renderMeals() {
     const options = getMealOptions(slotIndex);
     const selected = Number(plan.selected[slotIndex] || 0);
     const item = options[selected] || options[0];
-    const portion = Number(plan.portions[slotIndex] || 1);
+    const grams = Number(plan.weights?.[slotIndex] || baseGrams(item));
+    const portion = portionFromGrams(item, grams);
     const isDone = plan.done.includes(slotIndex);
     const maxPortion = suggestMaxPortion(slotIndex, plan);
 
@@ -390,20 +419,21 @@ function renderMeals() {
           ${optionMarkup(options, selected)}
         </select>
       </label>
-      <div class="portion-row">
-        <button type="button" data-step="-0.5" data-slot="${slotIndex}">-</button>
-        <strong>${portion}x porcji</strong>
-        <button type="button" data-step="0.5" data-slot="${slotIndex}">+</button>
+      <div class="portion-row weight-row">
+        <button type="button" data-step="-50" data-slot="${slotIndex}">-</button>
+        <label><span>Gramatura</span><input class="weight-input" type="number" inputmode="numeric" min="30" max="1000" step="10" value="${grams}" data-slot="${slotIndex}"></label>
+        <button type="button" data-step="50" data-slot="${slotIndex}">+</button>
       </div>
       <p>${item.text}</p>
       <p class="macro">${macroLine(item, portion)}</p>
-      <p class="hint">Przy obecnym limicie mozesz dac do ok. ${maxPortion}x tej porcji.</p>
+      <p class="hint">Baza: ${baseGrams(item)} g. Przy obecnym limicie mozesz zjesc do ok. ${maxPortion} g tego dania.</p>
     `;
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
     card.querySelector(".meal-choice").addEventListener("change", event => updateMealChoice(slotIndex, Number(event.target.value)));
     card.querySelector(".meal-search").addEventListener("input", event => filterMealOptions(slotIndex, Number(plan.selected[slotIndex] || 0), event.target.value, card));
+    card.querySelector(".weight-input").addEventListener("change", event => updateWeight(slotIndex, Number(event.target.value)));
     card.querySelectorAll("button[data-step]").forEach(button => {
-      button.addEventListener("click", () => changePortion(slotIndex, Number(button.dataset.step)));
+      button.addEventListener("click", () => changeWeight(slotIndex, Number(button.dataset.step)));
     });
     list.append(card);
   });
@@ -420,7 +450,8 @@ function addCustomMeal(meal) {
     kcal: Number(meal.kcal || 0),
     protein: Number(meal.protein || 0),
     fat: Number(meal.fat || 0),
-    carbs: Number(meal.carbs || 0)
+    carbs: Number(meal.carbs || 0),
+    grams: Number(meal.grams || 250)
   };
   if (!nextMeal.kcal) {
     showToast("Wpisz przynajmniej kalorie.");
@@ -439,12 +470,13 @@ function readCustomForm() {
     kcal: document.getElementById("customKcal").value,
     protein: document.getElementById("customProtein").value,
     fat: document.getElementById("customFat").value,
-    carbs: document.getElementById("customCarbs").value
+    carbs: document.getElementById("customCarbs").value,
+    grams: document.getElementById("customGrams").value
   };
 }
 
 function clearCustomForm() {
-  ["customName", "customKcal", "customProtein", "customFat", "customCarbs"].forEach(id => {
+  ["customName", "customKcal", "customProtein", "customFat", "customCarbs", "customGrams"].forEach(id => {
     document.getElementById(id).value = "";
   });
 }
@@ -458,26 +490,37 @@ function filterMealOptions(slotIndex, selected, query, card) {
 }
 
 function suggestMaxPortion(slotIndex, plan) {
-  const currentPortion = Number(plan.portions[slotIndex] || 1);
   const selected = Number(plan.selected[slotIndex] || 0);
   const item = getMealOptions(slotIndex)[selected] || getMealOptions(slotIndex)[0];
+  const currentPortion = portionFromGrams(item, plan.weights?.[slotIndex]);
   const totals = calculateTotals(plan);
   const kcalWithoutThis = totals.kcal - item.kcal * currentPortion;
   const room = Math.max(0, targets.kcal - kcalWithoutThis);
-  return Math.max(0.5, Math.floor((room / item.kcal) * 2) / 2).toFixed(1);
+  return Math.max(30, Math.floor((room / item.kcal) * baseGrams(item) / 10) * 10);
 }
 
 function updateMealChoice(slotIndex, optionIndex) {
   const plan = getPlan();
   plan.selected[slotIndex] = optionIndex;
+  const item = getMealOptions(slotIndex)[optionIndex] || getMealOptions(slotIndex)[0];
+  plan.weights[slotIndex] = baseGrams(item);
   setPlan(plan);
   renderMeals();
 }
 
-function changePortion(slotIndex, step) {
+function updateWeight(slotIndex, grams) {
   const plan = getPlan();
-  const current = Number(plan.portions[slotIndex] || 1);
-  plan.portions[slotIndex] = Math.min(2, Math.max(0.5, current + step));
+  plan.weights[slotIndex] = Math.min(1000, Math.max(30, grams || 30));
+  setPlan(plan);
+  renderMeals();
+}
+
+function changeWeight(slotIndex, step) {
+  const plan = getPlan();
+  const selected = Number(plan.selected[slotIndex] || 0);
+  const item = getMealOptions(slotIndex)[selected] || getMealOptions(slotIndex)[0];
+  const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
+  plan.weights[slotIndex] = Math.min(1000, Math.max(30, current + step));
   setPlan(plan);
   renderMeals();
 }
@@ -711,10 +754,10 @@ function bindEvents() {
   document.querySelectorAll("button[data-estimate]").forEach(button => {
     button.addEventListener("click", () => {
       const estimate = {
-        small: { name: "Wlasne male danie", kcal: 300, protein: 25, fat: 15, carbs: 15 },
-        medium: { name: "Wlasne srednie danie", kcal: 500, protein: 35, fat: 25, carbs: 25 },
-        large: { name: "Wlasne duze danie", kcal: 750, protein: 45, fat: 40, carbs: 45 },
-        carbs: { name: "Wlasne z weglami", kcal: 600, protein: 30, fat: 20, carbs: 65 }
+        small: { name: "Wlasne male danie", kcal: 300, protein: 25, fat: 15, carbs: 15, grams: 250 },
+        medium: { name: "Wlasne srednie danie", kcal: 500, protein: 35, fat: 25, carbs: 25, grams: 350 },
+        large: { name: "Wlasne duze danie", kcal: 750, protein: 45, fat: 40, carbs: 45, grams: 500 },
+        carbs: { name: "Wlasne z weglami", kcal: 600, protein: 30, fat: 20, carbs: 65, grams: 400 }
       }[button.dataset.estimate];
       addCustomMeal(estimate);
     });
