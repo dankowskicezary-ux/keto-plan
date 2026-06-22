@@ -486,7 +486,6 @@ function renderMeals() {
     const grams = Number(plan.weights?.[slotIndex] || baseGrams(item));
     const portion = portionFromGrams(item, grams);
     const isDone = plan.done.includes(slotIndex);
-    const maxPortion = suggestMaxPortion(slotIndex, plan);
 
     const card = document.createElement("article");
     card.className = `meal ${isDone ? "done" : ""}`;
@@ -523,7 +522,7 @@ function renderMeals() {
       </div>
       <p>${item.text}</p>
       <p class="macro">${macroLine(item, portion)}</p>
-      <p class="hint">1 porcja: ${portionText(item)}. Przy obecnym limicie mozesz zjesc do ok. ${maxPortion} g tego dania.</p>
+      <p class="hint">Zjedz: ${grams} g. 1 porcja: ${portionText(item)}.</p>
     `;
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
     card.querySelector(".meal-type").addEventListener("change", event => updateMealType(slotIndex, event.target.value));
