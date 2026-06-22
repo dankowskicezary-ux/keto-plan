@@ -289,6 +289,7 @@ function getPlanForDay(day) {
     weights: null,
     mealTimes: settings.mealTimes || defaultSettings.mealTimes,
     mealTypes: settings.mealTypes || defaultSettings.mealTypes,
+    shift: null,
     done: [],
     drinks: { nootri: 1, blackCoffee: 0 }
   };
@@ -679,6 +680,7 @@ function renderShopping() {
 
 function buildDynamicShoppingPlan() {
   const menuItems = [];
+  const workMeals = [];
   const products = new Map();
 
   function addProduct(name, amount) {
@@ -693,6 +695,10 @@ function buildDynamicShoppingPlan() {
       const item = options[optionIndex] || options[0];
       const grams = Number(plan.weights?.[slotIndex] || baseGrams(item));
       menuItems.push([`D${day + 1} ${slotNames[slotIndex]}`, `${item.name} (${grams} g)`]);
+      if (isWorkMeal(day, plan.shift, slotIndex)) {
+        workMeals.push([`D${day + 1} ${slotNames[slotIndex]}`, `${item.name} (${grams} g)`]);
+        return;
+      }
       suggestProducts(item, grams, addProduct);
     });
   }
@@ -700,9 +706,18 @@ function buildDynamicShoppingPlan() {
   const productItems = Array.from(products.entries()).map(([name, amounts]) => [name, amounts.join(" + ")]);
   return [
     { category: "Menu tygodnia", items: menuItems },
+    { category: "Odliczone posilki w pracy", items: workMeals.length ? workMeals : [["Brak", "W dni robocze ustaw zmiane 6:00, 14:00 albo 22:00"]] },
     { category: "Zakupy z wybranych dan", items: productItems.length ? productItems : [["Brak", "Uloz menu w zakladce Dzisiaj/Tydzien"]] },
     { category: "Stale zapasy", items: [["Nootri", "jesli pijesz codziennie"], ["Woda niegazowana", "min. 2,5 l dziennie"], ["Lagodne przyprawy", "bez ostrego"], ["Oliwa", "do odmierzania lyzka"]] }
   ];
+}
+
+function isWorkMeal(day, shift, slotIndex) {
+  const isWeekend = day >= 5;
+  if (isWeekend || !shift) return false;
+  if (shift === "first" || shift === "second") return slotIndex === 1;
+  if (shift === "night") return slotIndex === 0;
+  return false;
 }
 
 function suggestProducts(item, grams, addProduct) {
@@ -791,6 +806,7 @@ function applyShiftPreset(presetId) {
   const plan = getPlan();
   plan.mealTypes = [...preset.mealTypes];
   plan.mealTimes = [...preset.mealTimes];
+  plan.shift = presetId;
   slotNames.forEach((_, slotIndex) => {
     const options = getMealOptions(slotIndex, plan);
     const item = options[plan.selected[slotIndex] || 0] || options[0];
