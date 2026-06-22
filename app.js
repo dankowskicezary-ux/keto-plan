@@ -9,8 +9,8 @@ const slotNames = ["Posilek 1", "Posilek 2", "Obiad", "Kolacja"];
 
 const mealOptions = [
   [
-    { name: "3 jajka + ogorek", text: "3 jajka na twardo + ogorek bez skorki", portion: "3 jajka ok. 150 g + ogorek 100 g", grams: 250, kcal: 230, protein: 19, fat: 15, carbs: 4 },
-    { name: "2 jajka + serek", text: "2 jajka + serek wiejski 180 g", portion: "2 jajka ok. 100 g + serek wiejski 180 g", grams: 280, kcal: 260, protein: 31, fat: 12, carbs: 7 },
+    { name: "3 jajka + ogorek", text: "3 jajka na twardo + ogorek bez skorki", portion: "3 jajka ok. 150 g + ogorek 100 g", grams: 250, components: [{ name: "jajka", amount: 3, unit: "szt." }, { name: "ogorek", grams: 100 }], kcal: 230, protein: 19, fat: 15, carbs: 4 },
+    { name: "2 jajka + serek", text: "2 jajka + serek wiejski 180 g", portion: "2 jajka ok. 100 g + serek wiejski 180 g", grams: 280, components: [{ name: "jajka", amount: 2, unit: "szt." }, { name: "serek wiejski", grams: 180 }], kcal: 260, protein: 31, fat: 12, carbs: 7 },
     { name: "Skyr + orzechy", text: "Skyr 170 g + 10 g orzechow", kcal: 170, protein: 23, fat: 6, carbs: 9 },
     { name: "Twarog jogurtowy", text: "Twarog poltlusty 180 g + 2 lyzki jogurtu", kcal: 270, protein: 34, fat: 12, carbs: 8 },
     { name: "Omlet prosty", text: "Omlet z 3 jajek bez maki + szpinak/cukinia", portion: "3 jajka ok. 150 g + warzywa 100 g", grams: 250, kcal: 280, protein: 24, fat: 19, carbs: 5 },
@@ -359,6 +359,18 @@ function portionText(item) {
   return item.portion || `porcja bazowa ok. ${baseGrams(item)} g`;
 }
 
+function scaledPortionText(item, grams) {
+  if (!item.components) return `${grams} g`;
+  const factor = grams / baseGrams(item);
+  return item.components.map(component => {
+    if (component.unit === "szt.") {
+      const amount = Math.max(1, Math.round(component.amount * factor));
+      return `${amount} ${component.name}`;
+    }
+    return `${component.name} ${Math.round(component.grams * factor)} g`;
+  }).join(" + ");
+}
+
 function portionFromGrams(item, grams) {
   return Math.max(0.1, Number(grams || baseGrams(item)) / baseGrams(item));
 }
@@ -522,7 +534,7 @@ function renderMeals() {
       </div>
       <p>${item.text}</p>
       <p class="macro">${macroLine(item, portion)}</p>
-      <p class="hint">Zjedz: ${grams} g. 1 porcja: ${portionText(item)}.</p>
+      <p class="hint">Zjedz: ${scaledPortionText(item, grams)} (${grams} g). 1 porcja: ${portionText(item)}.</p>
     `;
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
     card.querySelector(".meal-type").addEventListener("change", event => updateMealType(slotIndex, event.target.value));
