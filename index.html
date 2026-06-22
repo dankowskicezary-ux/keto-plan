@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1f6b5c">
   <title>Keto Plan</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=19">
+  <link rel="stylesheet" href="styles.css?v=20">
 </head>
 <body>
   <div class="app-shell">
@@ -42,6 +42,7 @@
         <button class="tab active" type="button" data-tab="today">Dzisiaj</button>
         <button class="tab" type="button" data-tab="week">Tydzien</button>
         <button class="tab" type="button" data-tab="shopping">Zakupy</button>
+        <button class="tab" type="button" data-tab="results">Wyniki</button>
         <button class="tab" type="button" data-tab="water">Woda</button>
         <button class="tab" type="button" data-tab="settings">Ustawienia</button>
       </nav>
@@ -122,6 +123,22 @@
         <div id="shoppingList" class="shopping-list"></div>
       </section>
 
+      <section class="panel" id="resultsPanel" aria-label="Wyniki">
+        <section class="custom-card">
+          <h2>Dodaj pomiar</h2>
+          <div class="custom-grid">
+            <input id="resultWeight" type="number" inputmode="decimal" placeholder="waga kg">
+            <input id="resultPressure" type="text" placeholder="cisnienie np. 130/80">
+            <input id="resultHeartburn" type="number" inputmode="numeric" min="0" max="10" placeholder="zgaga 0-10">
+            <input id="resultPain" type="number" inputmode="numeric" min="0" max="10" placeholder="bol 0-10">
+            <input id="resultNote" type="text" placeholder="notatka">
+          </div>
+          <button id="addResult" type="button">Zapisz pomiar</button>
+        </section>
+        <div id="resultsSummary" class="results-summary"></div>
+        <div id="resultsList" class="week-list"></div>
+      </section>
+
       <section class="panel" id="waterPanel" aria-label="Plan picia wody">
         <div class="water-card">
           <h2>Woda na dzisiaj</h2>
@@ -184,13 +201,13 @@
         </div>
         <div class="tips">
           <h2>Na telefonie</h2>
-          <p>Wersja: v19. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=19 w przegladarce i odswiez strone.</p>
+          <p>Wersja: v20. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=20 w przegladarce i odswiez strone.</p>
         </div>
       </section>
     </main>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=19"></script>
+  <script src="app.js?v=20"></script>
 </body>
 </html>

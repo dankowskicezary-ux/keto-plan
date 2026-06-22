@@ -107,7 +107,7 @@ h2 {
 
 .tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 6px;
   margin-bottom: 14px;
 }
@@ -564,6 +564,31 @@ button.primary {
   gap: 8px;
 }
 
+.results-summary {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.result-stat {
+  background: var(--primary);
+  color: white;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.result-stat span {
+  display: block;
+  opacity: .78;
+  font-size: 12px;
+}
+
+.result-stat strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 18px;
+}
+
 .custom-grid input {
   width: 100%;
   min-height: 40px;
@@ -692,7 +717,7 @@ button.primary {
   }
 
   .tab {
-    font-size: 12px;
+    font-size: 11px;
     padding-left: 2px;
     padding-right: 2px;
   }

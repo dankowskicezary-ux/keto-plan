@@ -265,6 +265,7 @@ const panels = {
   today: document.getElementById("todayPanel"),
   week: document.getElementById("weekPanel"),
   shopping: document.getElementById("shoppingPanel"),
+  results: document.getElementById("resultsPanel"),
   water: document.getElementById("waterPanel"),
   settings: document.getElementById("settingsPanel")
 };
@@ -316,6 +317,14 @@ function getShoppingDone() {
 
 function setShoppingDone(done) {
   localStorage.setItem("shoppingDone", JSON.stringify(done));
+}
+
+function getResults() {
+  return JSON.parse(localStorage.getItem("results") || "[]");
+}
+
+function setResults(results) {
+  localStorage.setItem("results", JSON.stringify(results));
 }
 
 function showToast(message) {
@@ -816,6 +825,64 @@ function renderShopping() {
   });
 }
 
+function renderResults() {
+  const results = getResults();
+  const summary = document.getElementById("resultsSummary");
+  const list = document.getElementById("resultsList");
+  summary.innerHTML = "";
+  list.innerHTML = "";
+
+  if (!results.length) {
+    summary.innerHTML = `<div class="result-stat"><span>Start</span><strong>Dodaj pierwszy pomiar</strong></div>`;
+    return;
+  }
+
+  const latest = results[0];
+  const oldest = results[results.length - 1];
+  const diff = Number(latest.weight || 0) && Number(oldest.weight || 0) ? Number(latest.weight) - Number(oldest.weight) : 0;
+  summary.innerHTML = `
+    <div class="result-stat"><span>Ostatnia waga</span><strong>${latest.weight || "-"} kg</strong></div>
+    <div class="result-stat"><span>Zmiana od startu</span><strong>${diff > 0 ? "+" : ""}${diff.toFixed(1)} kg</strong></div>
+    <div class="result-stat"><span>Ostatnie cisnienie</span><strong>${latest.pressure || "-"}</strong></div>
+  `;
+
+  results.slice(0, 20).forEach(result => {
+    const card = document.createElement("article");
+    card.className = "week-day";
+    card.innerHTML = `
+      <h3>${result.date}</h3>
+      <ol>
+        <li>Waga: ${result.weight || "-"} kg</li>
+        <li>Cisnienie: ${result.pressure || "-"}</li>
+        <li>Zgaga: ${result.heartburn || "0"}/10 | Bol: ${result.pain || "0"}/10</li>
+        <li>Notatka: ${result.note || "-"}</li>
+      </ol>
+    `;
+    list.append(card);
+  });
+}
+
+function addResult() {
+  const result = {
+    date: new Date().toLocaleDateString("pl-PL"),
+    weight: document.getElementById("resultWeight").value,
+    pressure: document.getElementById("resultPressure").value.trim(),
+    heartburn: document.getElementById("resultHeartburn").value,
+    pain: document.getElementById("resultPain").value,
+    note: document.getElementById("resultNote").value.trim()
+  };
+  if (!result.weight && !result.pressure && !result.note) {
+    showToast("Wpisz wage, cisnienie albo notatke.");
+    return;
+  }
+  setResults([result, ...getResults()].slice(0, 100));
+  ["resultWeight", "resultPressure", "resultHeartburn", "resultPain", "resultNote"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  renderResults();
+  showToast("Pomiar zapisany.");
+}
+
 function buildDynamicShoppingPlan() {
   const menuItems = [];
   const workMeals = [];
@@ -1060,6 +1127,7 @@ function bindEvents() {
   document.getElementById("suggestDay").addEventListener("click", suggestDayPlan);
 
   document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
+  document.getElementById("addResult").addEventListener("click", addResult);
 
   document.querySelectorAll("button[data-estimate]").forEach(button => {
     button.addEventListener("click", () => {
@@ -1101,6 +1169,7 @@ function boot() {
   renderMeals();
   renderWeek();
   renderShopping();
+  renderResults();
   renderWater();
   bindEvents();
   if ("serviceWorker" in navigator) {
