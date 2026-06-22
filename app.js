@@ -490,16 +490,18 @@ function renderMeals() {
           <option value="any" ${plan.mealTypes?.[slotIndex] === "any" ? "selected" : ""}>dowolny</option>
         </select>
       </label>
-      <label class="choice-label">Co jesz? <em class="option-count">${options.length} dan</em>
-        <input class="meal-search" type="search" data-slot="${slotIndex}" placeholder="Szukaj, np. p, zupa, kurczak">
-      </label>
       <button class="selected-meal" type="button" data-open-options="${slotIndex}">
         <strong>${item.name}</strong>
         <span>${item.text}</span>
         <em>Zmien danie</em>
       </button>
-      <div class="meal-choice-list collapsed" data-slot="${slotIndex}">
-        ${mealChoiceListMarkup(options, selected)}
+      <div class="meal-picker collapsed">
+        <label class="choice-label">Co jesz? <em class="option-count">${options.length} dan</em>
+          <input class="meal-search" type="search" data-slot="${slotIndex}" placeholder="Szukaj, np. p, zupa, kurczak">
+        </label>
+        <div class="meal-choice-list" data-slot="${slotIndex}">
+          ${mealChoiceListMarkup(options, selected)}
+        </div>
       </div>
       <div class="portion-row weight-row">
         <button type="button" data-step="-50" data-slot="${slotIndex}">-</button>
@@ -584,7 +586,7 @@ function bindMealChoiceButtons(card, slotIndex) {
 }
 
 function toggleMealChoiceList(card, open) {
-  card.querySelector(".meal-choice-list").classList.toggle("collapsed", !open);
+  card.querySelector(".meal-picker").classList.toggle("collapsed", !open);
 }
 
 function suggestMaxPortion(slotIndex, plan) {
@@ -603,8 +605,8 @@ function updateMealChoice(slotIndex, optionIndex) {
   plan.selected[slotIndex] = optionIndex;
   const item = getMealOptions(slotIndex, plan)[optionIndex] || getMealOptions(slotIndex, plan)[0];
   plan.weights[slotIndex] = baseGrams(item);
-  setPlan(plan);
-  renderMeals();
+  fitPlanToLimit(plan, [slotIndex]);
+  showToast("Wybrano danie i dopasowano reszte dnia.");
 }
 
 function updateMealType(slotIndex, type) {
@@ -625,8 +627,7 @@ function updateMealType(slotIndex, type) {
 function updateWeight(slotIndex, grams) {
   const plan = getPlan();
   plan.weights[slotIndex] = Math.min(1000, Math.max(30, grams || 30));
-  setPlan(plan);
-  renderMeals();
+  fitPlanToLimit(plan, [slotIndex]);
 }
 
 function changeWeight(slotIndex, step) {
@@ -635,18 +636,20 @@ function changeWeight(slotIndex, step) {
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
   plan.weights[slotIndex] = Math.min(1000, Math.max(30, current + step));
-  setPlan(plan);
-  renderMeals();
+  fitPlanToLimit(plan, [slotIndex]);
 }
 
 function fitRemainingMealsToLimit() {
-  const plan = getPlan();
+  fitPlanToLimit(getPlan(), []);
+}
+
+function fitPlanToLimit(plan, lockedSlots = []) {
   const targets = getTargets();
   const adjustable = slotNames
     .map((_, slotIndex) => slotIndex)
-    .filter(slotIndex => !plan.done.includes(slotIndex));
+    .filter(slotIndex => !plan.done.includes(slotIndex) && !lockedSlots.includes(slotIndex));
 
-  const slots = adjustable.length ? adjustable : slotNames.map((_, slotIndex) => slotIndex);
+  const slots = adjustable.length ? adjustable : slotNames.map((_, slotIndex) => slotIndex).filter(slotIndex => !lockedSlots.includes(slotIndex));
   const fixedKcal = slotNames.reduce((sum, _, slotIndex) => {
     if (slots.includes(slotIndex)) return sum;
     const options = getMealOptions(slotIndex, plan);
@@ -662,6 +665,8 @@ function fitRemainingMealsToLimit() {
 
   const room = Math.max(0, targets.kcal - fixedKcal);
   if (!adjustableKcal || !room) {
+    setPlan(plan);
+    renderMeals();
     showToast("Brak kalorii do rozdzielenia na pozostale posilki.");
     return;
   }

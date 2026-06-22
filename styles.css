@@ -271,6 +271,14 @@ button.primary {
   background: #fdfdfb;
 }
 
+.meal-picker {
+  margin-top: 10px;
+}
+
+.meal-picker.collapsed {
+  display: none;
+}
+
 .meal-choice-list {
   display: grid;
   gap: 8px;
@@ -279,10 +287,6 @@ button.primary {
   overscroll-behavior: contain;
   margin-top: 10px;
   padding-right: 2px;
-}
-
-.meal-choice-list.collapsed {
-  display: none;
 }
 
 .selected-meal {
