@@ -632,6 +632,16 @@ button.primary {
   margin: 0 0 12px;
 }
 
+.three-actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.three-actions button {
+  font-size: 13px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
 .preset-row {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 10px;

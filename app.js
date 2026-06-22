@@ -639,17 +639,39 @@ function changeWeight(slotIndex, step) {
   fitPlanToLimit(plan, [slotIndex]);
 }
 
+function suggestDayPlan() {
+  const plan = getPlan();
+  const lightChoices = ["3 jajka + ogorek", "Skyr + orzechy", "Twarog + jajko", "Tunczyk + jajko", "Jajka + skyr"];
+  const dinnerChoices = ["Kurczak + brokul", "Dorsz + warzywa", "Indyk + fasolka", "Pomidorowa + omlet", "Kantyna: kurczak bez dodatku", "Kantyna: ryba bez panierki"];
+
+  slotNames.forEach((_, slotIndex) => {
+    const type = plan.mealTypes?.[slotIndex] || "any";
+    const preferred = type === "dinner" ? dinnerChoices : lightChoices;
+    const options = getMealOptions(slotIndex, plan);
+    const foundIndex = preferred
+      .map(name => options.findIndex(item => item.name === name))
+      .find(index => index >= 0);
+    plan.selected[slotIndex] = foundIndex >= 0 ? foundIndex : 0;
+    const item = options[plan.selected[slotIndex]] || options[0];
+    plan.weights[slotIndex] = baseGrams(item);
+  });
+
+  fitPlanToLimit(plan, getWorkLockedSlots(plan));
+  showToast("Zaproponowano i zoptymalizowano dzien.");
+}
+
 function fitRemainingMealsToLimit() {
   fitPlanToLimit(getPlan(), []);
 }
 
 function fitPlanToLimit(plan, lockedSlots = []) {
   const targets = getTargets();
+  const locked = Array.from(new Set([...lockedSlots, ...getWorkLockedSlots(plan), ...(plan.done || [])]));
   const adjustable = slotNames
     .map((_, slotIndex) => slotIndex)
-    .filter(slotIndex => !plan.done.includes(slotIndex) && !lockedSlots.includes(slotIndex));
+    .filter(slotIndex => !locked.includes(slotIndex));
 
-  const slots = adjustable.length ? adjustable : slotNames.map((_, slotIndex) => slotIndex).filter(slotIndex => !lockedSlots.includes(slotIndex));
+  const slots = adjustable.length ? adjustable : slotNames.map((_, slotIndex) => slotIndex).filter(slotIndex => !locked.includes(slotIndex));
   const fixedKcal = slotNames.reduce((sum, _, slotIndex) => {
     if (slots.includes(slotIndex)) return sum;
     const options = getMealOptions(slotIndex, plan);
@@ -682,6 +704,12 @@ function fitPlanToLimit(plan, lockedSlots = []) {
   setPlan(plan);
   renderMeals();
   showToast("Dopasowano gramatury do limitu.");
+}
+
+function getWorkLockedSlots(plan) {
+  return slotNames
+    .map((_, slotIndex) => slotIndex)
+    .filter(slotIndex => isWorkMeal(selectedDay, plan.shift, slotIndex));
 }
 
 function toggleMeal(index) {
@@ -1014,6 +1042,7 @@ function bindEvents() {
   });
 
   document.getElementById("fitLimit").addEventListener("click", fitRemainingMealsToLimit);
+  document.getElementById("suggestDay").addEventListener("click", suggestDayPlan);
 
   document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
 
