@@ -430,6 +430,10 @@ button.primary {
   margin-top: 10px;
 }
 
+.inline-tip {
+  margin: 0 0 12px;
+}
+
 .tips ul {
   margin: 0;
   padding-left: 20px;
