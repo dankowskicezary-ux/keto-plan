@@ -9,11 +9,11 @@ const slotNames = ["Posilek 1", "Posilek 2", "Obiad", "Kolacja"];
 
 const mealOptions = [
   [
-    { name: "3 jajka + ogorek", text: "3 jajka na twardo + ogorek bez skorki", kcal: 230, protein: 19, fat: 15, carbs: 4 },
-    { name: "2 jajka + serek", text: "2 jajka + serek wiejski 250 g", kcal: 330, protein: 38, fat: 15, carbs: 8 },
+    { name: "3 jajka + ogorek", text: "3 jajka na twardo + ogorek bez skorki", portion: "3 jajka ok. 150 g + ogorek 100 g", grams: 250, kcal: 230, protein: 19, fat: 15, carbs: 4 },
+    { name: "2 jajka + serek", text: "2 jajka + serek wiejski 180 g", portion: "2 jajka ok. 100 g + serek wiejski 180 g", grams: 280, kcal: 260, protein: 31, fat: 12, carbs: 7 },
     { name: "Skyr + orzechy", text: "Skyr 170 g + 10 g orzechow", kcal: 170, protein: 23, fat: 6, carbs: 9 },
     { name: "Twarog jogurtowy", text: "Twarog poltlusty 180 g + 2 lyzki jogurtu", kcal: 270, protein: 34, fat: 12, carbs: 8 },
-    { name: "Omlet prosty", text: "Omlet z 3 jajek bez maki + szpinak/cukinia", kcal: 280, protein: 24, fat: 19, carbs: 5 },
+    { name: "Omlet prosty", text: "Omlet z 3 jajek bez maki + szpinak/cukinia", portion: "3 jajka ok. 150 g + warzywa 100 g", grams: 250, kcal: 280, protein: 24, fat: 19, carbs: 5 },
     { name: "Jajka + awokado", text: "2 jajka + pol awokado + ogorek", kcal: 330, protein: 16, fat: 27, carbs: 8 },
     { name: "Kefir + jajka", text: "Kefir 200 ml + 2 jajka", kcal: 240, protein: 20, fat: 14, carbs: 10 },
     { name: "Serek + losos", text: "Serek wiejski 150 g + losos wedzony 80 g", kcal: 300, protein: 34, fat: 16, carbs: 5 },
@@ -28,7 +28,7 @@ const mealOptions = [
     { name: "Skyr 170 g", text: "Skyr naturalny 170 g", kcal: 110, protein: 19, fat: 0, carbs: 8 },
     { name: "Kefir + skyr", text: "Kefir 200 ml + skyr 100 g", kcal: 170, protein: 18, fat: 4, carbs: 13 },
     { name: "2 jajka", text: "2 jajka na twardo", kcal: 150, protein: 13, fat: 10, carbs: 1 },
-    { name: "Twarog 150 g", text: "Twarog poltlusty 150 g", kcal: 210, protein: 29, fat: 9, carbs: 5 },
+    { name: "Twarog 150 g", text: "Twarog poltlusty 150 g", portion: "twarog 150 g", grams: 150, kcal: 210, protein: 29, fat: 9, carbs: 5 },
     { name: "Jogurt grecki", text: "Jogurt grecki naturalny 150 g", kcal: 165, protein: 14, fat: 9, carbs: 7 },
     { name: "Orzechy + skyr", text: "Skyr 120 g + orzechy 15 g", kcal: 180, protein: 17, fat: 9, carbs: 7 },
     { name: "Tunczyk mini", text: "Pol puszki tunczyka + ogorek", kcal: 120, protein: 25, fat: 1, carbs: 2 },
@@ -41,9 +41,9 @@ const mealOptions = [
     { name: "Bulion + jajko", text: "Bulion 300 ml + 2 jajka, lekko dla zoladka", kcal: 210, protein: 18, fat: 13, carbs: 3 }
   ],
   [
-    { name: "Kurczak + brokul", text: "Kurczak 220 g + brokul/cukinia 350 g + 1 lyzka oliwy", kcal: 550, protein: 70, fat: 23, carbs: 16 },
-    { name: "Indyk + fasolka", text: "Indyk 220 g + fasolka 350 g + 1 lyzka oliwy", kcal: 530, protein: 68, fat: 22, carbs: 18 },
-    { name: "Dorsz + warzywa", text: "Dorsz/mintaj 250 g + warzywa 400 g + 1 lyzka oliwy", kcal: 430, protein: 58, fat: 16, carbs: 18 },
+    { name: "Kurczak + brokul", text: "Kurczak 220 g + brokul/cukinia 350 g + 1 lyzka oliwy", portion: "kurczak 220 g + warzywa 350 g + oliwa 10 g", grams: 580, kcal: 550, protein: 70, fat: 23, carbs: 16 },
+    { name: "Indyk + fasolka", text: "Indyk 220 g + fasolka 350 g + 1 lyzka oliwy", portion: "indyk 220 g + fasolka 350 g + oliwa 10 g", grams: 580, kcal: 530, protein: 68, fat: 22, carbs: 18 },
+    { name: "Dorsz + warzywa", text: "Dorsz/mintaj 250 g + warzywa 400 g + 1 lyzka oliwy", portion: "ryba 250 g + warzywa 400 g + oliwa 10 g", grams: 660, kcal: 430, protein: 58, fat: 16, carbs: 18 },
     { name: "Losos + brokul", text: "Losos 180 g + brokul/cukinia 350 g", kcal: 520, protein: 45, fat: 30, carbs: 14 },
     { name: "Pulpeciki indyka", text: "Pulpeciki z indyka 250 g + cukinia/marchew 350 g", kcal: 560, protein: 62, fat: 26, carbs: 18 },
     { name: "Rosol bez makaronu", text: "Rosol 400 ml + mieso z kurczaka 150 g + warzywa", kcal: 300, protein: 35, fat: 14, carbs: 8 },
@@ -57,7 +57,7 @@ const mealOptions = [
     { name: "Salatka z kurczakiem", text: "Salatka: kurczak 180 g + warzywa + sos jogurtowy", kcal: 420, protein: 55, fat: 16, carbs: 12 },
     { name: "Jajka sadzone obiad", text: "3 jajka + warzywa na parze 350 g", kcal: 360, protein: 25, fat: 21, carbs: 18 },
     { name: "Zupa pomidorowa mala", text: "Pomidorowa 300 ml + mieso, bez ryzu lub z minimalnym makaronem", kcal: 260, protein: 20, fat: 12, carbs: 20 },
-    { name: "Pomidorowa + omlet", text: "Pomidorowa lagodna 350 ml + paski z cienkiego omletu z 1 jajka", kcal: 310, protein: 24, fat: 18, carbs: 16 },
+    { name: "Pomidorowa + omlet", text: "Pomidorowa lagodna 350 ml + paski z cienkiego omletu z 1 jajka", portion: "pomidorowa 350 ml + 1 jajko ok. 50 g", grams: 400, kcal: 310, protein: 24, fat: 18, carbs: 16 },
     { name: "Pomidorowa konjac", text: "Pomidorowa lagodna 350 ml + makaron konjac/shirataki 100 g + kurczak", kcal: 280, protein: 30, fat: 13, carbs: 14 },
     { name: "Pomidorowa bez makaronu", text: "Pomidorowa lagodna 400 ml + kurczak 150 g, bez makaronu", kcal: 300, protein: 38, fat: 12, carbs: 14 },
     { name: "Ogorkowa keto", text: "Ogorkowa 400 ml bez ziemniakow + mieso 120 g; uwaga na kwas", kcal: 320, protein: 30, fat: 18, carbs: 12 },
@@ -355,6 +355,10 @@ function baseGrams(item) {
   return 250;
 }
 
+function portionText(item) {
+  return item.portion || `porcja bazowa ok. ${baseGrams(item)} g`;
+}
+
 function portionFromGrams(item, grams) {
   return Math.max(0.1, Number(grams || baseGrams(item)) / baseGrams(item));
 }
@@ -519,7 +523,7 @@ function renderMeals() {
       </div>
       <p>${item.text}</p>
       <p class="macro">${macroLine(item, portion)}</p>
-      <p class="hint">Baza: ${baseGrams(item)} g. Przy obecnym limicie mozesz zjesc do ok. ${maxPortion} g tego dania.</p>
+      <p class="hint">1 porcja: ${portionText(item)}. Przy obecnym limicie mozesz zjesc do ok. ${maxPortion} g tego dania.</p>
     `;
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
     card.querySelector(".meal-type").addEventListener("change", event => updateMealType(slotIndex, event.target.value));
