@@ -241,7 +241,8 @@ button.primary {
   font-size: 13px;
 }
 
-.choice-label select {
+.choice-label select,
+.choice-label input {
   width: 100%;
   min-height: 42px;
   border: 1px solid var(--line);
@@ -249,6 +250,10 @@ button.primary {
   background: white;
   color: var(--ink);
   padding: 0 10px;
+}
+
+.choice-label input {
+  background: #fdfdfb;
 }
 
 .portion-row,

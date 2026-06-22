@@ -17,7 +17,12 @@ const mealOptions = [
     { name: "Jajka + awokado", text: "2 jajka + pol awokado + ogorek", kcal: 330, protein: 16, fat: 27, carbs: 8 },
     { name: "Kefir + jajka", text: "Kefir 300 ml + 2 jajka", kcal: 290, protein: 23, fat: 16, carbs: 15 },
     { name: "Serek + losos", text: "Serek wiejski 200 g + losos wedzony 80 g", kcal: 360, protein: 42, fat: 19, carbs: 7 },
-    { name: "Szynka + jajka", text: "Chuda szynka 100 g + 2 jajka + ogorek", kcal: 280, protein: 35, fat: 13, carbs: 3 }
+    { name: "Szynka + jajka", text: "Chuda szynka 100 g + 2 jajka + ogorek", kcal: 280, protein: 35, fat: 13, carbs: 3 },
+    { name: "Pasta jajeczna", text: "Pasta z 3 jajek + 1 lyzka jogurtu + ogorek, bez pieczywa", kcal: 300, protein: 23, fat: 20, carbs: 5 },
+    { name: "Tunczyk z jajkiem", text: "Tunczyk 100 g + 2 jajka + ogorek", kcal: 300, protein: 43, fat: 12, carbs: 3 },
+    { name: "Parowki dobrej jakosci", text: "2 parowki min. 90% miesa + ogorek, okazjonalnie", kcal: 330, protein: 22, fat: 26, carbs: 5 },
+    { name: "Sledz lagodny", text: "Sledz 120 g + jajko + ogorek, bez cebuli", kcal: 360, protein: 28, fat: 25, carbs: 4 },
+    { name: "Jajka na miekko", text: "3 jajka na miekko + cukinia na parze", kcal: 260, protein: 21, fat: 16, carbs: 8 }
   ],
   [
     { name: "Skyr 250 g", text: "Skyr naturalny 250 g", kcal: 160, protein: 28, fat: 0, carbs: 12 },
@@ -28,7 +33,12 @@ const mealOptions = [
     { name: "Orzechy + skyr", text: "Skyr 150 g + orzechy 20 g", kcal: 250, protein: 22, fat: 13, carbs: 10 },
     { name: "Tunczyk mini", text: "Pol puszki tunczyka + ogorek", kcal: 120, protein: 25, fat: 1, carbs: 2 },
     { name: "Mozzarella lekka", text: "Mozzarella light 125 g + ogorek/salata", kcal: 210, protein: 25, fat: 10, carbs: 3 },
-    { name: "U kogos: wedlina", text: "Wedlina/chude mieso 120 g + warzywa bez pieczywa", kcal: 220, protein: 35, fat: 8, carbs: 4 }
+    { name: "U kogos: wedlina", text: "Wedlina/chude mieso 120 g + warzywa bez pieczywa", kcal: 220, protein: 35, fat: 8, carbs: 4 },
+    { name: "Bialy ser na slono", text: "Twarog 200 g + jogurt + ogorek, bez cebuli", kcal: 300, protein: 40, fat: 12, carbs: 9 },
+    { name: "Jajko + mozzarella", text: "2 jajka + mozzarella light 80 g", kcal: 300, protein: 31, fat: 18, carbs: 3 },
+    { name: "Kabanosy awaryjne", text: "Kabanosy 60 g + ogorek, raczej awaryjnie", kcal: 290, protein: 18, fat: 23, carbs: 3 },
+    { name: "Serek proteinowy", text: "Serek/skyr proteinowy naturalny 200 g", kcal: 170, protein: 28, fat: 3, carbs: 8 },
+    { name: "Bulion + jajko", text: "Bulion 300 ml + 2 jajka, lekko dla zoladka", kcal: 210, protein: 18, fat: 13, carbs: 3 }
   ],
   [
     { name: "Kurczak + brokul", text: "Kurczak 220 g + brokul/cukinia 350 g + 1 lyzka oliwy", kcal: 550, protein: 70, fat: 23, carbs: 16 },
@@ -46,7 +56,33 @@ const mealOptions = [
     { name: "Karkowka + salata", text: "Karkowka pieczona 180 g + salata/ogorki", kcal: 560, protein: 38, fat: 44, carbs: 5 },
     { name: "Salatka z kurczakiem", text: "Salatka: kurczak 180 g + warzywa + sos jogurtowy", kcal: 420, protein: 55, fat: 16, carbs: 12 },
     { name: "Jajka sadzone obiad", text: "3 jajka + warzywa na parze 350 g", kcal: 360, protein: 25, fat: 21, carbs: 18 },
-    { name: "Zupa pomidorowa mala", text: "Pomidorowa 300 ml + mieso, bez ryzu lub z minimalnym makaronem", kcal: 260, protein: 20, fat: 12, carbs: 20 }
+    { name: "Zupa pomidorowa mala", text: "Pomidorowa 300 ml + mieso, bez ryzu lub z minimalnym makaronem", kcal: 260, protein: 20, fat: 12, carbs: 20 },
+    { name: "Pomidorowa egg-noodle", text: "Pomidorowa lagodna 350 ml + makaron z cienkiego omletu z 1 jajka", kcal: 310, protein: 24, fat: 18, carbs: 16 },
+    { name: "Pomidorowa konjac", text: "Pomidorowa lagodna 350 ml + makaron konjac/shirataki 100 g + kurczak", kcal: 280, protein: 30, fat: 13, carbs: 14 },
+    { name: "Pomidorowa bez makaronu", text: "Pomidorowa lagodna 400 ml + kurczak 150 g, bez makaronu", kcal: 300, protein: 38, fat: 12, carbs: 14 },
+    { name: "Ogorkowa keto", text: "Ogorkowa 400 ml bez ziemniakow + mieso 120 g; uwaga na kwas", kcal: 320, protein: 30, fat: 18, carbs: 12 },
+    { name: "Kalafiorowa", text: "Zupa kalafiorowa 450 ml + kurczak/indyk, bez maki", kcal: 330, protein: 35, fat: 16, carbs: 15 },
+    { name: "Jarzynowa bez ziemniakow", text: "Jarzynowa 450 ml + mieso, bez ziemniakow i zasmażki", kcal: 320, protein: 30, fat: 15, carbs: 18 },
+    { name: "Barszcz czysty + jajko", text: "Barszcz czysty 300 ml + 2 jajka, bez uszek", kcal: 260, protein: 18, fat: 12, carbs: 16 },
+    { name: "Zurek bez chleba", text: "Zurek 350 ml + jajko + kielbasa 60 g, bez ziemniakow", kcal: 430, protein: 25, fat: 30, carbs: 18 },
+    { name: "Flaki", text: "Flaki 400 ml bez maki i pieczywa", kcal: 330, protein: 32, fat: 18, carbs: 10 },
+    { name: "Rybna", text: "Zupa rybna 400 ml bez ziemniakow i maki", kcal: 340, protein: 38, fat: 16, carbs: 12 },
+    { name: "Krem dyniowy maly", text: "Krem z dyni 300 ml + kurczak; wiecej wegli, jedz mala porcje", kcal: 330, protein: 28, fat: 14, carbs: 25 },
+    { name: "Leczo bez cukru", text: "Leczo 350 g z kielbasa/kurczakiem, bez pieczywa", kcal: 480, protein: 32, fat: 32, carbs: 18 },
+    { name: "Bigos keto", text: "Bigos 350 g bez cukru i bez pieczywa", kcal: 450, protein: 30, fat: 32, carbs: 14 },
+    { name: "Golabki bez ryzu", text: "Golabki z miesem i kalafiorem zamiast ryzu, sos lagodny", kcal: 430, protein: 36, fat: 25, carbs: 16 },
+    { name: "Golabek zwykly", text: "1 golabek z ryzem, bez pieczywa; licz jako wyzsze wegle", kcal: 420, protein: 24, fat: 22, carbs: 32 },
+    { name: "Kurczak pieczony", text: "Udko/pieczen z kurczaka 220 g + surowka bez cukru", kcal: 520, protein: 48, fat: 34, carbs: 8 },
+    { name: "Roladki drobiowe", text: "Roladki z indyka/kurczaka 220 g + warzywa", kcal: 460, protein: 58, fat: 20, carbs: 10 },
+    { name: "Wolowina duszona", text: "Wolowina duszona 200 g + ogorek/salata, bez kaszy", kcal: 560, protein: 50, fat: 36, carbs: 8 },
+    { name: "Wieprzowina pieczona", text: "Schab/karkowka pieczona 200 g + warzywa, bez ziemniakow", kcal: 560, protein: 45, fat: 38, carbs: 8 },
+    { name: "Krewetki + warzywa", text: "Krewetki 220 g + cukinia/szpinak, 1 lyzka oliwy", kcal: 390, protein: 48, fat: 18, carbs: 12 },
+    { name: "Tofu + warzywa", text: "Tofu 200 g + warzywa na parze, delikatne przyprawy", kcal: 430, protein: 32, fat: 26, carbs: 16 },
+    { name: "Makaron jajeczny keto", text: "Makaron z omletu 2 jajka + kurczak + lagodny sos jogurtowy", kcal: 470, protein: 50, fat: 25, carbs: 9 },
+    { name: "Makaron konjac z kurczakiem", text: "Konjac 150 g + kurczak 180 g + cukinia; testuj tolerancje", kcal: 380, protein: 55, fat: 14, carbs: 10 },
+    { name: "Makaron jajeczny zwykly", text: "Makaron jajeczny gotowany 80 g + mieso; nie keto, licz wegle", kcal: 520, protein: 38, fat: 20, carbs: 42 },
+    { name: "Pizza keto patelnia", text: "Spod jajeczno-serowy + szynka + pieczarki, bez ostrego sosu", kcal: 620, protein: 48, fat: 42, carbs: 10 },
+    { name: "Burger bez bulki", text: "Kotlet wolowy/drobiowy + salata + ogorek, bez bulki i frytek", kcal: 520, protein: 42, fat: 36, carbs: 8 }
   ],
   [
     { name: "Twarog + jajko", text: "Twarog 200 g + 1 jajko", kcal: 350, protein: 45, fat: 17, carbs: 7 },
@@ -58,7 +94,15 @@ const mealOptions = [
     { name: "Ryba lekka", text: "Dorsz/mintaj 200 g + ogorek/salata", kcal: 230, protein: 45, fat: 3, carbs: 4 },
     { name: "Wedlina awaryjna", text: "Chuda wedlina 150 g + ogorki kiszone, bez pieczywa", kcal: 260, protein: 42, fat: 9, carbs: 4 },
     { name: "Sałatka grecka", text: "Salata, ogorek, feta 80 g, oliwki, 1 lyzka oliwy", kcal: 360, protein: 16, fat: 30, carbs: 10 },
-    { name: "Kielbasa awaryjna", text: "Kielbasa 120 g + ogorek/salata, raczej okazjonalnie", kcal: 420, protein: 22, fat: 34, carbs: 6 }
+    { name: "Kielbasa awaryjna", text: "Kielbasa 120 g + ogorek/salata, raczej okazjonalnie", kcal: 420, protein: 22, fat: 34, carbs: 6 },
+    { name: "Pomidorowa lekka", text: "Pomidorowa 250 ml bez makaronu + jajko; tylko jesli nie nasila zgagi", kcal: 210, protein: 16, fat: 11, carbs: 12 },
+    { name: "Zupa krem lekka", text: "Krem brokul/cukinia 300 ml + skyr lyzka, bez maki", kcal: 220, protein: 18, fat: 10, carbs: 14 },
+    { name: "Jajeczne kluski", text: "Kluski z cienkiego omletu 2 jajka + bulion", kcal: 250, protein: 18, fat: 16, carbs: 5 },
+    { name: "Galaretka drobiowa", text: "Galaretka z kurczaka 250 g + ogorek", kcal: 260, protein: 35, fat: 12, carbs: 4 },
+    { name: "Frittata", text: "Frittata 3 jajka + szpinak/cukinia", kcal: 330, protein: 26, fat: 22, carbs: 8 },
+    { name: "Pasta tunczykowa", text: "Tunczyk + jajko + jogurt, jedzone lyzka lub z ogorkiem", kcal: 310, protein: 45, fat: 11, carbs: 4 },
+    { name: "Caprese light", text: "Mozzarella light + ogorek/salata; pomidora unikaj przy zgadze", kcal: 280, protein: 30, fat: 15, carbs: 6 },
+    { name: "Resztki obiadu", text: "Mieso/ryba 150 g + warzywa, bez dodatkow skrobiowych", kcal: 330, protein: 42, fat: 15, carbs: 8 }
   ]
 ];
 
@@ -192,6 +236,22 @@ function macroLine(item, portion = 1) {
   return `${round(item.kcal * portion)} kcal | B ${round(item.protein * portion)} g | T ${round(item.fat * portion)} g | W ${round(item.carbs * portion)} g`;
 }
 
+function optionMatches(option, query) {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return true;
+  return `${option.name} ${option.text}`.toLowerCase().includes(normalized);
+}
+
+function optionMarkup(options, selected, query = "") {
+  const matched = options
+    .map((option, optionIndex) => ({ option, optionIndex }))
+    .filter(item => optionMatches(item.option, query));
+  const visible = matched.length ? matched : options.map((option, optionIndex) => ({ option, optionIndex }));
+  return visible.map(({ option, optionIndex }) => (
+    `<option value="${optionIndex}" ${optionIndex === selected ? "selected" : ""}>${option.name}</option>`
+  )).join("");
+}
+
 function calculateTotals(plan = getPlan()) {
   const totals = { kcal: 0, protein: 0, fat: 0, carbs: 0 };
   plan.selected.forEach((optionIndex, slotIndex) => {
@@ -263,8 +323,9 @@ function renderMeals() {
         <button class="check" type="button" aria-label="Odhacz posilek">${isDone ? "OK" : ""}</button>
       </div>
       <label class="choice-label">Co jesz?
+        <input class="meal-search" type="search" data-slot="${slotIndex}" placeholder="Szukaj, np. p, zupa, kurczak">
         <select class="meal-choice" data-slot="${slotIndex}">
-          ${options.map((option, optionIndex) => `<option value="${optionIndex}" ${optionIndex === selected ? "selected" : ""}>${option.name}</option>`).join("")}
+          ${optionMarkup(options, selected)}
         </select>
       </label>
       <div class="portion-row">
@@ -278,6 +339,7 @@ function renderMeals() {
     `;
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
     card.querySelector(".meal-choice").addEventListener("change", event => updateMealChoice(slotIndex, Number(event.target.value)));
+    card.querySelector(".meal-search").addEventListener("input", event => filterMealOptions(slotIndex, Number(plan.selected[slotIndex] || 0), event.target.value, card));
     card.querySelectorAll("button[data-step]").forEach(button => {
       button.addEventListener("click", () => changePortion(slotIndex, Number(button.dataset.step)));
     });
@@ -286,6 +348,14 @@ function renderMeals() {
 
   renderDrinks();
   renderSummary();
+}
+
+function filterMealOptions(slotIndex, selected, query, card) {
+  const select = card.querySelector(".meal-choice");
+  select.innerHTML = optionMarkup(mealOptions[slotIndex], selected, query);
+  if (!select.querySelector(`option[value="${selected}"]`)) {
+    select.selectedIndex = 0;
+  }
 }
 
 function suggestMaxPortion(slotIndex, plan) {
