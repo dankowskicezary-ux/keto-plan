@@ -493,7 +493,12 @@ function renderMeals() {
       <label class="choice-label">Co jesz? <em class="option-count">${options.length} dan</em>
         <input class="meal-search" type="search" data-slot="${slotIndex}" placeholder="Szukaj, np. p, zupa, kurczak">
       </label>
-      <div class="meal-choice-list" data-slot="${slotIndex}">
+      <button class="selected-meal" type="button" data-open-options="${slotIndex}">
+        <strong>${item.name}</strong>
+        <span>${item.text}</span>
+        <em>Zmien danie</em>
+      </button>
+      <div class="meal-choice-list collapsed" data-slot="${slotIndex}">
         ${mealChoiceListMarkup(options, selected)}
       </div>
       <div class="portion-row weight-row">
@@ -508,6 +513,7 @@ function renderMeals() {
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
     card.querySelector(".meal-type").addEventListener("change", event => updateMealType(slotIndex, event.target.value));
     card.querySelector(".meal-search").addEventListener("input", event => filterMealOptions(slotIndex, Number(plan.selected[slotIndex] || 0), event.target.value, card));
+    card.querySelector(".selected-meal").addEventListener("click", () => toggleMealChoiceList(card, true));
     bindMealChoiceButtons(card, slotIndex);
     card.querySelector(".weight-input").addEventListener("change", event => updateWeight(slotIndex, Number(event.target.value)));
     card.querySelectorAll("button[data-step]").forEach(button => {
@@ -564,6 +570,7 @@ function clearCustomForm() {
 function filterMealOptions(slotIndex, selected, query, card) {
   const options = getMealOptions(slotIndex, getPlan());
   const list = card.querySelector(".meal-choice-list");
+  toggleMealChoiceList(card, true);
   list.innerHTML = mealChoiceListMarkup(options, selected, query);
   const count = optionCount(options, query);
   card.querySelector(".option-count").textContent = query.trim() ? `${count} pasuje` : `${options.length} dan`;
@@ -574,6 +581,10 @@ function bindMealChoiceButtons(card, slotIndex) {
   card.querySelectorAll(".meal-option").forEach(button => {
     button.addEventListener("click", () => updateMealChoice(slotIndex, Number(button.dataset.option)));
   });
+}
+
+function toggleMealChoiceList(card, open) {
+  card.querySelector(".meal-choice-list").classList.toggle("collapsed", !open);
 }
 
 function suggestMaxPortion(slotIndex, plan) {

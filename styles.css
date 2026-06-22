@@ -281,6 +281,38 @@ button.primary {
   padding-right: 2px;
 }
 
+.meal-choice-list.collapsed {
+  display: none;
+}
+
+.selected-meal {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  text-align: left;
+  background: var(--soft);
+  border-color: var(--primary);
+}
+
+.selected-meal strong {
+  color: var(--ink);
+}
+
+.selected-meal span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.selected-meal em {
+  color: var(--primary-dark);
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .meal-option {
   display: grid;
   gap: 4px;
