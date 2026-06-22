@@ -155,8 +155,16 @@ function buildCatalog() {
 
 const foodCatalog = buildCatalog();
 
+function getCustomMeals() {
+  return JSON.parse(localStorage.getItem("customMeals") || "[]");
+}
+
+function setCustomMeals(meals) {
+  localStorage.setItem("customMeals", JSON.stringify(meals));
+}
+
 function getMealOptions() {
-  return foodCatalog;
+  return foodCatalog.concat(getCustomMeals());
 }
 
 const drinks = [
@@ -402,6 +410,43 @@ function renderMeals() {
 
   renderDrinks();
   renderSummary();
+}
+
+function addCustomMeal(meal) {
+  const customMeals = getCustomMeals();
+  const nextMeal = {
+    name: meal.name || "Wlasne danie",
+    text: meal.text || meal.name || "Wlasne danie",
+    kcal: Number(meal.kcal || 0),
+    protein: Number(meal.protein || 0),
+    fat: Number(meal.fat || 0),
+    carbs: Number(meal.carbs || 0)
+  };
+  if (!nextMeal.kcal) {
+    showToast("Wpisz przynajmniej kalorie.");
+    return;
+  }
+  setCustomMeals([nextMeal, ...customMeals].slice(0, 40));
+  clearCustomForm();
+  renderMeals();
+  renderWeek();
+  showToast("Dodano wlasne danie.");
+}
+
+function readCustomForm() {
+  return {
+    name: document.getElementById("customName").value.trim(),
+    kcal: document.getElementById("customKcal").value,
+    protein: document.getElementById("customProtein").value,
+    fat: document.getElementById("customFat").value,
+    carbs: document.getElementById("customCarbs").value
+  };
+}
+
+function clearCustomForm() {
+  ["customName", "customKcal", "customProtein", "customFat", "customCarbs"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
 }
 
 function filterMealOptions(slotIndex, selected, query, card) {
@@ -659,6 +704,20 @@ function bindEvents() {
     localStorage.removeItem(storageKey("plan"));
     renderMeals();
     showToast("Dzien zresetowany.");
+  });
+
+  document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
+
+  document.querySelectorAll("button[data-estimate]").forEach(button => {
+    button.addEventListener("click", () => {
+      const estimate = {
+        small: { name: "Wlasne male danie", kcal: 300, protein: 25, fat: 15, carbs: 15 },
+        medium: { name: "Wlasne srednie danie", kcal: 500, protein: 35, fat: 25, carbs: 25 },
+        large: { name: "Wlasne duze danie", kcal: 750, protein: 45, fat: 40, carbs: 45 },
+        carbs: { name: "Wlasne z weglami", kcal: 600, protein: 30, fat: 20, carbs: 65 }
+      }[button.dataset.estimate];
+      addCustomMeal(estimate);
+    });
   });
 
   document.querySelectorAll("button[data-preset]").forEach(button => {

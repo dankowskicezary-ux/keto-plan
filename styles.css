@@ -169,6 +169,7 @@ button.primary {
 .week-day,
 .shopping-category,
 .summary-card,
+.custom-card,
 .drink-card,
 .water-card,
 .tips {
@@ -432,6 +433,44 @@ button.primary {
 
 .inline-tip {
   margin: 0 0 12px;
+}
+
+.custom-card {
+  margin-bottom: 12px;
+}
+
+.custom-card h2 {
+  margin-bottom: 10px;
+}
+
+.custom-grid {
+  display: grid;
+  grid-template-columns: 1fr 82px;
+  gap: 8px;
+}
+
+.custom-grid input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+}
+
+.custom-grid input:first-child {
+  grid-column: 1 / -1;
+}
+
+.estimate-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.estimate-row button {
+  min-height: 38px;
+  font-size: 13px;
 }
 
 .tips ul {

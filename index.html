@@ -75,6 +75,23 @@
           <h2>Praca zmianowa</h2>
           <p>Kazdy posilek ma pelna baze dan. Jesli w kantynie jesz obiad jako drugi posilek, wybierz go po prostu w Posilku 2 i dopasuj reszte dnia.</p>
         </div>
+        <section class="custom-card" aria-label="Wlasne danie">
+          <h2>Wlasne danie</h2>
+          <div class="custom-grid">
+            <input id="customName" type="text" placeholder="Nazwa, np. obiad w kantynie">
+            <input id="customKcal" type="number" inputmode="numeric" placeholder="kcal">
+            <input id="customProtein" type="number" inputmode="numeric" placeholder="bialko g">
+            <input id="customFat" type="number" inputmode="numeric" placeholder="tluszcz g">
+            <input id="customCarbs" type="number" inputmode="numeric" placeholder="wegle g">
+          </div>
+          <div class="estimate-row">
+            <button type="button" data-estimate="small">Male</button>
+            <button type="button" data-estimate="medium">Srednie</button>
+            <button type="button" data-estimate="large">Duze</button>
+            <button type="button" data-estimate="carbs">Wegle</button>
+          </div>
+          <button id="addCustomMeal" type="button">Dodaj do listy</button>
+        </section>
         <div id="mealsList" class="meal-list"></div>
         <section class="drink-section" aria-label="Napoje">
           <div class="section-head">
