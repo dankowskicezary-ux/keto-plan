@@ -250,6 +250,12 @@ button.primary {
   font-size: 13px;
 }
 
+.choice-label em {
+  color: var(--primary-dark);
+  font-style: normal;
+  font-weight: 800;
+}
+
 .choice-label select,
 .choice-label input {
   width: 100%;

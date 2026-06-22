@@ -380,6 +380,12 @@ function optionMarkup(options, selected, query = "") {
   )).join("");
 }
 
+function optionCount(options, query = "") {
+  const normalized = query.trim();
+  if (!normalized) return options.length;
+  return options.filter(option => optionMatches(option, query)).length;
+}
+
 function calculateTotals(plan = getPlan()) {
   const totals = { kcal: 0, protein: 0, fat: 0, carbs: 0 };
   plan.selected.forEach((optionIndex, slotIndex) => {
@@ -459,7 +465,7 @@ function renderMeals() {
           <option value="any" ${plan.mealTypes?.[slotIndex] === "any" ? "selected" : ""}>dowolny</option>
         </select>
       </label>
-      <label class="choice-label">Co jesz?
+      <label class="choice-label">Co jesz? <em class="option-count">${options.length} dan</em>
         <input class="meal-search" type="search" data-slot="${slotIndex}" placeholder="Szukaj, np. p, zupa, kurczak">
         <select class="meal-choice" data-slot="${slotIndex}">
           ${optionMarkup(options, selected)}
@@ -532,7 +538,10 @@ function clearCustomForm() {
 
 function filterMealOptions(slotIndex, selected, query, card) {
   const select = card.querySelector(".meal-choice");
-  select.innerHTML = optionMarkup(getMealOptions(slotIndex, getPlan()), selected, query);
+  const options = getMealOptions(slotIndex, getPlan());
+  select.innerHTML = optionMarkup(options, selected, query);
+  const count = optionCount(options, query);
+  card.querySelector(".option-count").textContent = query.trim() ? `${count} pasuje` : `${options.length} dan`;
   if (!select.querySelector(`option[value="${selected}"]`)) {
     select.selectedIndex = 0;
   }

@@ -1,4 +1,4 @@
-const CACHE_NAME = "keto-plan-v10";
+const CACHE_NAME = "keto-plan-v11";
 const ASSETS = [
   "./",
   "./index.html",
