@@ -12,26 +12,53 @@ const mealOptions = [
     { name: "3 jajka + ogorek", text: "3 jajka na twardo + ogorek bez skorki", kcal: 230, protein: 19, fat: 15, carbs: 4 },
     { name: "2 jajka + serek", text: "2 jajka + serek wiejski 250 g", kcal: 330, protein: 38, fat: 15, carbs: 8 },
     { name: "Skyr + orzechy", text: "Skyr 250 g + 10 g orzechow", kcal: 220, protein: 30, fat: 6, carbs: 13 },
-    { name: "Twarog jogurtowy", text: "Twarog poltlusty 250 g + 2 lyzki jogurtu", kcal: 350, protein: 45, fat: 15, carbs: 10 }
+    { name: "Twarog jogurtowy", text: "Twarog poltlusty 250 g + 2 lyzki jogurtu", kcal: 350, protein: 45, fat: 15, carbs: 10 },
+    { name: "Omlet prosty", text: "Omlet z 3 jajek bez maki + szpinak/cukinia", kcal: 280, protein: 24, fat: 19, carbs: 5 },
+    { name: "Jajka + awokado", text: "2 jajka + pol awokado + ogorek", kcal: 330, protein: 16, fat: 27, carbs: 8 },
+    { name: "Kefir + jajka", text: "Kefir 300 ml + 2 jajka", kcal: 290, protein: 23, fat: 16, carbs: 15 },
+    { name: "Serek + losos", text: "Serek wiejski 200 g + losos wedzony 80 g", kcal: 360, protein: 42, fat: 19, carbs: 7 },
+    { name: "Szynka + jajka", text: "Chuda szynka 100 g + 2 jajka + ogorek", kcal: 280, protein: 35, fat: 13, carbs: 3 }
   ],
   [
     { name: "Skyr 250 g", text: "Skyr naturalny 250 g", kcal: 160, protein: 28, fat: 0, carbs: 12 },
     { name: "Kefir + skyr", text: "Kefir 300 ml + skyr 150 g", kcal: 250, protein: 27, fat: 6, carbs: 20 },
     { name: "2 jajka", text: "2 jajka na twardo", kcal: 150, protein: 13, fat: 10, carbs: 1 },
-    { name: "Twarog 200 g", text: "Twarog poltlusty 200 g", kcal: 280, protein: 38, fat: 12, carbs: 7 }
+    { name: "Twarog 200 g", text: "Twarog poltlusty 200 g", kcal: 280, protein: 38, fat: 12, carbs: 7 },
+    { name: "Jogurt grecki", text: "Jogurt grecki naturalny 200 g", kcal: 220, protein: 18, fat: 12, carbs: 9 },
+    { name: "Orzechy + skyr", text: "Skyr 150 g + orzechy 20 g", kcal: 250, protein: 22, fat: 13, carbs: 10 },
+    { name: "Tunczyk mini", text: "Pol puszki tunczyka + ogorek", kcal: 120, protein: 25, fat: 1, carbs: 2 },
+    { name: "Mozzarella lekka", text: "Mozzarella light 125 g + ogorek/salata", kcal: 210, protein: 25, fat: 10, carbs: 3 },
+    { name: "U kogos: wedlina", text: "Wedlina/chude mieso 120 g + warzywa bez pieczywa", kcal: 220, protein: 35, fat: 8, carbs: 4 }
   ],
   [
     { name: "Kurczak + brokul", text: "Kurczak 220 g + brokul/cukinia 350 g + 1 lyzka oliwy", kcal: 550, protein: 70, fat: 23, carbs: 16 },
     { name: "Indyk + fasolka", text: "Indyk 220 g + fasolka 350 g + 1 lyzka oliwy", kcal: 530, protein: 68, fat: 22, carbs: 18 },
     { name: "Dorsz + warzywa", text: "Dorsz/mintaj 250 g + warzywa 400 g + 1 lyzka oliwy", kcal: 430, protein: 58, fat: 16, carbs: 18 },
     { name: "Losos + brokul", text: "Losos 180 g + brokul/cukinia 350 g", kcal: 520, protein: 45, fat: 30, carbs: 14 },
-    { name: "Pulpeciki indyka", text: "Pulpeciki z indyka 250 g + cukinia/marchew 350 g", kcal: 560, protein: 62, fat: 26, carbs: 18 }
+    { name: "Pulpeciki indyka", text: "Pulpeciki z indyka 250 g + cukinia/marchew 350 g", kcal: 560, protein: 62, fat: 26, carbs: 18 },
+    { name: "Rosol bez makaronu", text: "Rosol 400 ml + mieso z kurczaka 150 g + warzywa", kcal: 300, protein: 35, fat: 14, carbs: 8 },
+    { name: "Rosol z makaronem", text: "Rosol 400 ml + kurczak 120 g + makaron jajeczny gotowany 50 g", kcal: 380, protein: 34, fat: 15, carbs: 28 },
+    { name: "Zupa krem", text: "Krem z brokula/cukinii 400 ml bez maki + kurczak 150 g", kcal: 380, protein: 42, fat: 18, carbs: 15 },
+    { name: "Gulasz bez kaszy", text: "Gulasz miesny 250 g + ogorek/salata, bez ziemniakow i kaszy", kcal: 520, protein: 48, fat: 32, carbs: 12 },
+    { name: "Kotlet bez panierki", text: "Mieso pieczone/grillowane 220 g + surowka bez cukru", kcal: 500, protein: 58, fat: 26, carbs: 10 },
+    { name: "Schabowy panierowany", text: "1 schabowy panierowany + surowka, bez ziemniakow", kcal: 620, protein: 45, fat: 38, carbs: 24 },
+    { name: "Mielony + surowka", text: "Kotlet mielony 180 g + surowka, bez ziemniakow", kcal: 520, protein: 35, fat: 36, carbs: 16 },
+    { name: "Karkowka + salata", text: "Karkowka pieczona 180 g + salata/ogorki", kcal: 560, protein: 38, fat: 44, carbs: 5 },
+    { name: "Salatka z kurczakiem", text: "Salatka: kurczak 180 g + warzywa + sos jogurtowy", kcal: 420, protein: 55, fat: 16, carbs: 12 },
+    { name: "Jajka sadzone obiad", text: "3 jajka + warzywa na parze 350 g", kcal: 360, protein: 25, fat: 21, carbs: 18 },
+    { name: "Zupa pomidorowa mala", text: "Pomidorowa 300 ml + mieso, bez ryzu lub z minimalnym makaronem", kcal: 260, protein: 20, fat: 12, carbs: 20 }
   ],
   [
     { name: "Twarog + jajko", text: "Twarog 200 g + 1 jajko", kcal: 350, protein: 45, fat: 17, carbs: 7 },
     { name: "Serek wiejski", text: "Serek wiejski 250 g + ogorek", kcal: 250, protein: 30, fat: 10, carbs: 10 },
     { name: "Tunczyk + jajko", text: "Tunczyk w sosie wlasnym + 1 jajko + ogorek", kcal: 260, protein: 42, fat: 7, carbs: 3 },
-    { name: "Kurczak lekki", text: "Kurczak 180 g + salata/ogorek", kcal: 300, protein: 55, fat: 6, carbs: 4 }
+    { name: "Kurczak lekki", text: "Kurczak 180 g + salata/ogorek", kcal: 300, protein: 55, fat: 6, carbs: 4 },
+    { name: "Rosol lekki", text: "Rosol 300 ml + mieso 100 g, bez makaronu", kcal: 220, protein: 25, fat: 11, carbs: 5 },
+    { name: "Jajka + skyr", text: "2 jajka + skyr 150 g", kcal: 250, protein: 30, fat: 10, carbs: 8 },
+    { name: "Ryba lekka", text: "Dorsz/mintaj 200 g + ogorek/salata", kcal: 230, protein: 45, fat: 3, carbs: 4 },
+    { name: "Wedlina awaryjna", text: "Chuda wedlina 150 g + ogorki kiszone, bez pieczywa", kcal: 260, protein: 42, fat: 9, carbs: 4 },
+    { name: "Sałatka grecka", text: "Salata, ogorek, feta 80 g, oliwki, 1 lyzka oliwy", kcal: 360, protein: 16, fat: 30, carbs: 10 },
+    { name: "Kielbasa awaryjna", text: "Kielbasa 120 g + ogorek/salata, raczej okazjonalnie", kcal: 420, protein: 22, fat: 34, carbs: 6 }
   ]
 ];
 
