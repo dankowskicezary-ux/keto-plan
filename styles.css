@@ -589,12 +589,14 @@ button.primary {
   font-size: 18px;
 }
 
-.custom-grid input {
+.custom-grid input,
+.custom-grid select {
   width: 100%;
   min-height: 40px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 0 10px;
+  background: white;
 }
 
 .custom-grid input:first-child {

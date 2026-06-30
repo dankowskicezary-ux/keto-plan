@@ -163,6 +163,16 @@ function setCustomMeals(meals) {
   localStorage.setItem("customMeals", JSON.stringify(meals));
 }
 
+const customTypeValues = {
+  mixed: { label: "danie mieszane", kcal: 160, protein: 10, fat: 8, carbs: 12 },
+  lean: { label: "chude mieso/ryba", kcal: 150, protein: 25, fat: 5, carbs: 0 },
+  sauce: { label: "mieso w sosie", kcal: 210, protein: 16, fat: 13, carbs: 8 },
+  soup: { label: "zupa", kcal: 70, protein: 4, fat: 3, carbs: 7 },
+  eggs: { label: "jajka/nabial", kcal: 150, protein: 13, fat: 10, carbs: 4 },
+  carbs: { label: "ziemniaki/ryz/makaron", kcal: 130, protein: 3, fat: 1, carbs: 27 },
+  fried: { label: "smazone/panierowane", kcal: 260, protein: 14, fat: 17, carbs: 14 }
+};
+
 function allMealOptions() {
   return foodCatalog.concat(getCustomMeals());
 }
@@ -556,41 +566,56 @@ function renderMeals() {
 
 function addCustomMeal(meal) {
   const customMeals = getCustomMeals();
+  const grams = Number(meal.grams || 0);
+  const type = customTypeValues[meal.type] || customTypeValues.mixed;
+  const factor = grams / 100;
   const nextMeal = {
     name: meal.name || "Wlasne danie",
-    text: meal.text || meal.name || "Wlasne danie",
-    kcal: Number(meal.kcal || 0),
-    protein: Number(meal.protein || 0),
-    fat: Number(meal.fat || 0),
-    carbs: Number(meal.carbs || 0),
-    grams: Number(meal.grams || 250)
+    text: `${meal.name || "Wlasne danie"} (${type.label}, ${grams} g)`,
+    kcal: Math.round(type.kcal * factor),
+    protein: Math.round(type.protein * factor),
+    fat: Math.round(type.fat * factor),
+    carbs: Math.round(type.carbs * factor),
+    grams,
+    portion: `${type.label} ${grams} g`
   };
-  if (!nextMeal.kcal) {
-    showToast("Wpisz przynajmniej kalorie.");
+  if (!grams) {
+    showToast("Wpisz wage dania.");
     return;
   }
-  setCustomMeals([nextMeal, ...customMeals].slice(0, 40));
+  const nextMeals = [nextMeal, ...customMeals].slice(0, 40);
+  setCustomMeals(nextMeals);
+  if (meal.slot !== "list") {
+    applyCustomMealToSlot(nextMeal, Number(meal.slot));
+  }
   clearCustomForm();
   renderMeals();
   renderWeek();
-  showToast("Dodano wlasne danie.");
+  showToast(`Dodano: ${nextMeal.kcal} kcal.`);
 }
 
 function readCustomForm() {
   return {
     name: document.getElementById("customName").value.trim(),
-    kcal: document.getElementById("customKcal").value,
-    protein: document.getElementById("customProtein").value,
-    fat: document.getElementById("customFat").value,
-    carbs: document.getElementById("customCarbs").value,
-    grams: document.getElementById("customGrams").value
+    grams: document.getElementById("customGrams").value,
+    type: document.getElementById("customType").value,
+    slot: document.getElementById("customSlot").value
   };
 }
 
 function clearCustomForm() {
-  ["customName", "customKcal", "customProtein", "customFat", "customCarbs", "customGrams"].forEach(id => {
+  ["customName", "customGrams"].forEach(id => {
     document.getElementById(id).value = "";
   });
+}
+
+function applyCustomMealToSlot(meal, slotIndex) {
+  const plan = getPlan();
+  const options = getMealOptions(slotIndex, plan);
+  const optionIndex = options.findIndex(item => item.name === meal.name && item.kcal === meal.kcal);
+  plan.selected[slotIndex] = optionIndex >= 0 ? optionIndex : options.length - 1;
+  plan.weights[slotIndex] = meal.grams;
+  fitPlanToLimit(plan, [slotIndex]);
 }
 
 function filterMealOptions(slotIndex, selected, query, card) {

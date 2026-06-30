@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1f6b5c">
   <title>Keto Plan</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=24">
+  <link rel="stylesheet" href="styles.css?v=25">
 </head>
 <body>
   <div class="app-shell">
@@ -85,19 +85,25 @@
           <h2>Wlasne danie</h2>
           <div class="custom-grid">
             <input id="customName" type="text" placeholder="Nazwa, np. obiad w kantynie">
-            <input id="customKcal" type="number" inputmode="numeric" placeholder="kcal">
             <input id="customGrams" type="number" inputmode="numeric" placeholder="waga g">
-            <input id="customProtein" type="number" inputmode="numeric" placeholder="bialko g">
-            <input id="customFat" type="number" inputmode="numeric" placeholder="tluszcz g">
-            <input id="customCarbs" type="number" inputmode="numeric" placeholder="wegle g">
+            <select id="customType">
+              <option value="mixed">danie mieszane</option>
+              <option value="lean">chude mieso/ryba</option>
+              <option value="sauce">mieso w sosie</option>
+              <option value="soup">zupa</option>
+              <option value="eggs">jajka/nabial</option>
+              <option value="carbs">ziemniaki/ryz/makaron</option>
+              <option value="fried">smazone/panierowane</option>
+            </select>
+            <select id="customSlot">
+              <option value="0">posilek 1</option>
+              <option value="1">posilek 2</option>
+              <option value="2">posilek 3</option>
+              <option value="3">posilek 4</option>
+              <option value="list">tylko do listy</option>
+            </select>
           </div>
-          <div class="estimate-row">
-            <button type="button" data-estimate="small">Male</button>
-            <button type="button" data-estimate="medium">Srednie</button>
-            <button type="button" data-estimate="large">Duze</button>
-            <button type="button" data-estimate="carbs">Wegle</button>
-          </div>
-          <button id="addCustomMeal" type="button">Dodaj do listy</button>
+          <button id="addCustomMeal" type="button">Przelicz i dodaj</button>
         </section>
         <div id="mealsList" class="meal-list"></div>
         <section class="drink-section" aria-label="Napoje">
@@ -201,13 +207,13 @@
         </div>
         <div class="tips">
           <h2>Na telefonie</h2>
-          <p>Wersja: v24. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=24 w przegladarce i odswiez strone.</p>
+          <p>Wersja: v25. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=25 w przegladarce i odswiez strone.</p>
         </div>
       </section>
     </main>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=24"></script>
+  <script src="app.js?v=25"></script>
 </body>
 </html>
