@@ -8,6 +8,7 @@ const defaultTargets = {
 const slotNames = ["Posilek 1", "Posilek 2", "Obiad", "Kolacja"];
 const dayNames = ["Poniedzialek", "Wtorek", "Sroda", "Czwartek", "Piatek", "Sobota", "Niedziela"];
 const dayShortNames = ["Pon", "Wt", "Sr", "Czw", "Pt", "Sob", "Niedz"];
+const CANTEEN_MEAL_NAME = "Kantyna: mieso + surowka";
 
 const mealOptions = [
   [
@@ -110,29 +111,29 @@ const mealOptions = [
 
 const extraMealOptions = [
   { name: "Kantyna: mieso + surowka", text: "Mieso 110 g + surowka 150 g, bez ziemniakow/ryzu/makaronu", portion: "mieso 110 g + surowka 150 g", grams: 260, components: [{ name: "mieso", grams: 110 }, { name: "surowka", grams: 150 }], kcal: 215, protein: 29, fat: 7, carbs: 9 },
-  { name: "Kantyna: kurczak bez dodatku", text: "Kurczak pieczony/grillowany 200 g + surowka, bez ziemniakow/ryzu", kcal: 460, protein: 55, fat: 22, carbs: 8 },
-  { name: "Kantyna: ryba bez panierki", text: "Ryba pieczona/gotowana 220 g + warzywa, bez ziemniakow", kcal: 390, protein: 48, fat: 18, carbs: 10 },
-  { name: "Kantyna: ryba panierowana", text: "Ryba panierowana 180 g + surowka, bez ziemniakow", kcal: 560, protein: 36, fat: 34, carbs: 26 },
-  { name: "Kantyna: mieso w sosie", text: "Mieso w sosie 220 g + surowka, bez kaszy/ryzu; sos moze miec make", kcal: 560, protein: 45, fat: 34, carbs: 18 },
-  { name: "Kantyna: pieczen", text: "Pieczen wieprzowa/wolowa 200 g + warzywa, bez dodatkow skrobiowych", kcal: 560, protein: 45, fat: 38, carbs: 8 },
-  { name: "Kantyna: zupa + mieso", text: "Zupa 350 ml + dodatkowe mieso/jajko, bez pieczywa", kcal: 360, protein: 30, fat: 18, carbs: 18 },
-  { name: "Kantyna: salatka z miesem", text: "Salatka z kurczakiem/tunczykiem/jajkiem, sos osobno", kcal: 420, protein: 42, fat: 22, carbs: 12 },
-  { name: "Kantyna: jajka", text: "3 jajka + warzywa/surowka, bez pieczywa", kcal: 330, protein: 24, fat: 22, carbs: 8 },
-  { name: "Kantyna: ser + wedlina", text: "Ser/wedlina 150 g + warzywa, bez pieczywa", kcal: 380, protein: 35, fat: 25, carbs: 5 },
-  { name: "Kantyna: leczo", text: "Leczo z miesem 350 g, bez pieczywa; uwaga na tluszcz", kcal: 520, protein: 32, fat: 36, carbs: 18 },
-  { name: "Kantyna: fasolka po bretonsku", text: "Fasolka 300 g, awaryjnie; duzo wegli, reszta dnia bardzo keto", kcal: 520, protein: 28, fat: 24, carbs: 45 },
-  { name: "Kantyna: pierogi 4 szt.", text: "Pierogi 4 szt. jako awaryjny wybor, nie keto", kcal: 430, protein: 16, fat: 16, carbs: 58 },
-  { name: "Kantyna: ziemniaki mala porcja", text: "Mieso + surowka + ziemniaki 100 g; licz jako wyzsze wegle", kcal: 620, protein: 45, fat: 30, carbs: 38 },
-  { name: "Kantyna: kasza mala porcja", text: "Mieso + surowka + kasza 80 g gotowana; licz wegle", kcal: 590, protein: 42, fat: 28, carbs: 36 },
-  { name: "Kantyna: ryz mala porcja", text: "Mieso + warzywa + ryz 80 g gotowany; licz wegle", kcal: 590, protein: 42, fat: 25, carbs: 42 },
-  { name: "Kantyna: omlet", text: "Omlet/jajecznica z 3 jaj, bez pieczywa", kcal: 320, protein: 24, fat: 22, carbs: 4 },
-  { name: "Kantyna: twarog mala porcja", text: "Twarog/serek 150 g + warzywa", kcal: 230, protein: 30, fat: 9, carbs: 7 },
-  { name: "Kantyna: rosol czysty", text: "Rosol 400 ml + mieso, bez makaronu", kcal: 280, protein: 30, fat: 14, carbs: 6 },
-  { name: "Kantyna: krupnik mala porcja", text: "Krupnik 300 ml; ma kasze/ziemniaki, licz wegle", kcal: 260, protein: 15, fat: 10, carbs: 28 },
-  { name: "Kantyna: pomidorowa mala", text: "Pomidorowa 300 ml, mala porcja; uwaga przy zgadze", kcal: 240, protein: 14, fat: 10, carbs: 22 },
-  { name: "Kantyna: barszcz + jajka", text: "Barszcz 300 ml + 2 jajka, bez uszek/krokieta", kcal: 260, protein: 18, fat: 12, carbs: 16 },
-  { name: "Kantyna: bigos", text: "Bigos 300 g, bez pieczywa; raczej okazjonalnie", kcal: 420, protein: 28, fat: 30, carbs: 12 },
-  { name: "Kantyna: golonka nie", text: "Golonka/tluste mieso - mala porcja, moze nasilac zgage", kcal: 700, protein: 45, fat: 55, carbs: 4 },
+  { name: "Awaryjnie: kurczak bez dodatku", text: "Kurczak pieczony/grillowany 200 g + surowka, bez ziemniakow/ryzu", kcal: 460, protein: 55, fat: 22, carbs: 8 },
+  { name: "Awaryjnie: ryba bez panierki", text: "Ryba pieczona/gotowana 220 g + warzywa, bez ziemniakow", kcal: 390, protein: 48, fat: 18, carbs: 10 },
+  { name: "Awaryjnie: ryba panierowana", text: "Ryba panierowana 180 g + surowka, bez ziemniakow", kcal: 560, protein: 36, fat: 34, carbs: 26 },
+  { name: "Awaryjnie: mieso w sosie", text: "Mieso w sosie 220 g + surowka, bez kaszy/ryzu; sos moze miec make", kcal: 560, protein: 45, fat: 34, carbs: 18 },
+  { name: "Awaryjnie: pieczen", text: "Pieczen wieprzowa/wolowa 200 g + warzywa, bez dodatkow skrobiowych", kcal: 560, protein: 45, fat: 38, carbs: 8 },
+  { name: "Awaryjnie: zupa + mieso", text: "Zupa 350 ml + dodatkowe mieso/jajko, bez pieczywa", kcal: 360, protein: 30, fat: 18, carbs: 18 },
+  { name: "Awaryjnie: salatka z miesem", text: "Salatka z kurczakiem/tunczykiem/jajkiem, sos osobno", kcal: 420, protein: 42, fat: 22, carbs: 12 },
+  { name: "Awaryjnie: jajka", text: "3 jajka + warzywa/surowka, bez pieczywa", kcal: 330, protein: 24, fat: 22, carbs: 8 },
+  { name: "Awaryjnie: ser + wedlina", text: "Ser/wedlina 150 g + warzywa, bez pieczywa", kcal: 380, protein: 35, fat: 25, carbs: 5 },
+  { name: "Awaryjnie: leczo", text: "Leczo z miesem 350 g, bez pieczywa; uwaga na tluszcz", kcal: 520, protein: 32, fat: 36, carbs: 18 },
+  { name: "Awaryjnie: fasolka po bretonsku", text: "Fasolka 300 g, awaryjnie; duzo wegli, reszta dnia bardzo keto", kcal: 520, protein: 28, fat: 24, carbs: 45 },
+  { name: "Awaryjnie: pierogi 4 szt.", text: "Pierogi 4 szt. jako awaryjny wybor, nie keto", kcal: 430, protein: 16, fat: 16, carbs: 58 },
+  { name: "Awaryjnie: ziemniaki mala porcja", text: "Mieso + surowka + ziemniaki 100 g; licz jako wyzsze wegle", kcal: 620, protein: 45, fat: 30, carbs: 38 },
+  { name: "Awaryjnie: kasza mala porcja", text: "Mieso + surowka + kasza 80 g gotowana; licz wegle", kcal: 590, protein: 42, fat: 28, carbs: 36 },
+  { name: "Awaryjnie: ryz mala porcja", text: "Mieso + warzywa + ryz 80 g gotowany; licz wegle", kcal: 590, protein: 42, fat: 25, carbs: 42 },
+  { name: "Awaryjnie: omlet", text: "Omlet/jajecznica z 3 jaj, bez pieczywa", kcal: 320, protein: 24, fat: 22, carbs: 4 },
+  { name: "Awaryjnie: twarog mala porcja", text: "Twarog/serek 150 g + warzywa", kcal: 230, protein: 30, fat: 9, carbs: 7 },
+  { name: "Awaryjnie: rosol czysty", text: "Rosol 400 ml + mieso, bez makaronu", kcal: 280, protein: 30, fat: 14, carbs: 6 },
+  { name: "Awaryjnie: krupnik mala porcja", text: "Krupnik 300 ml; ma kasze/ziemniaki, licz wegle", kcal: 260, protein: 15, fat: 10, carbs: 28 },
+  { name: "Awaryjnie: pomidorowa mala", text: "Pomidorowa 300 ml, mala porcja; uwaga przy zgadze", kcal: 240, protein: 14, fat: 10, carbs: 22 },
+  { name: "Awaryjnie: barszcz + jajka", text: "Barszcz 300 ml + 2 jajka, bez uszek/krokieta", kcal: 260, protein: 18, fat: 12, carbs: 16 },
+  { name: "Awaryjnie: bigos", text: "Bigos 300 g, bez pieczywa; raczej okazjonalnie", kcal: 420, protein: 28, fat: 30, carbs: 12 },
+  { name: "Awaryjnie: golonka nie", text: "Golonka/tluste mieso - mala porcja, moze nasilac zgage", kcal: 700, protein: 45, fat: 55, carbs: 4 },
   { name: "Awaryjnie: sklep jajka", text: "2 jajka gotowane + serek wiejski 150 g", kcal: 320, protein: 34, fat: 17, carbs: 7 },
   { name: "Awaryjnie: sklep tunczyk", text: "Tunczyk + ogorek + skyr 100 g", kcal: 250, protein: 45, fat: 2, carbs: 7 },
   { name: "Awaryjnie: sklep kabanosy", text: "Kabanosy 60 g + skyr 100 g; okazjonalnie", kcal: 360, protein: 32, fat: 23, carbs: 8 },
@@ -185,7 +186,7 @@ function allMealOptions() {
 
 function mealKind(item) {
   const text = `${item.name} ${item.text}`.toLowerCase();
-  if (text.includes("kantyna")) return "canteen";
+  if (item.name === CANTEEN_MEAL_NAME) return "canteen";
   const dinnerWords = ["kantyna", "zupa", "rosol", "barszcz", "zurek", "flaki", "kurczak", "indyk", "dorsz", "losos", "ryba", "schab", "mielony", "karkowka", "gulasz", "leczo", "bigos", "golab", "wolowina", "wieprzowina", "pizza", "burger", "makaron", "kasza", "ryz", "ziemniaki", "pierogi"];
   return dinnerWords.some(word => text.includes(word)) ? "dinner" : "light";
 }
@@ -197,12 +198,31 @@ function typeLabel(type) {
 function getMealOptions(slotIndex, plan = null) {
   const type = plan?.mealTypes?.[slotIndex] || settings.mealTypes?.[slotIndex] || "any";
   const options = allMealOptions();
+  if (type === "canteen") return options.filter(item => item.name === CANTEEN_MEAL_NAME);
   if (type === "any") return options;
   return options.slice().sort((a, b) => {
     const aMatch = mealKind(a) === type ? 0 : 1;
     const bMatch = mealKind(b) === type ? 0 : 1;
     return aMatch - bMatch || a.name.localeCompare(b.name, "pl");
   });
+}
+
+function fixedCanteenMeal() {
+  return allMealOptions().find(item => item.name === CANTEEN_MEAL_NAME);
+}
+
+function setFixedCanteenMeal(plan, slotIndex) {
+  const meal = fixedCanteenMeal();
+  plan.selected[slotIndex] = 0;
+  plan.weights[slotIndex] = meal ? baseGrams(meal) : 260;
+}
+
+function normalizeCanteenSlots(plan) {
+  if (!plan.weights || plan.weights.length !== slotNames.length) return plan;
+  slotNames.forEach((_, slotIndex) => {
+    if (plan.mealTypes?.[slotIndex] === "canteen") setFixedCanteenMeal(plan, slotIndex);
+  });
+  return plan;
 }
 
 const drinks = [
@@ -266,9 +286,9 @@ const defaultSettings = {
 };
 
 const shiftPresets = {
-  first: { label: "6:00", mealTimes: ["05:30", "10:30", "14:30", "18:30"], mealTypes: ["light", "dinner", "dinner", "light"], drinkTime: "06:00", waterStart: "05:30", waterEnd: "20:30" },
-  second: { label: "14:00", mealTimes: ["09:00", "12:30", "17:00", "21:00"], mealTypes: ["light", "dinner", "dinner", "light"], drinkTime: "09:30", waterStart: "09:00", waterEnd: "22:30" },
-  night: { label: "22:00", mealTimes: ["18:00", "22:00", "02:00", "06:30"], mealTypes: ["dinner", "dinner", "light", "light"], drinkTime: "21:30", waterStart: "18:00", waterEnd: "07:00" }
+  first: { label: "6:00", mealTimes: ["05:30", "10:30", "14:30", "18:30"], mealTypes: ["light", "canteen", "dinner", "light"], drinkTime: "06:00", waterStart: "05:30", waterEnd: "20:30" },
+  second: { label: "14:00", mealTimes: ["09:00", "12:30", "17:00", "21:00"], mealTypes: ["light", "canteen", "dinner", "light"], drinkTime: "09:30", waterStart: "09:00", waterEnd: "22:30" },
+  night: { label: "22:00", mealTimes: ["18:00", "22:00", "02:00", "06:30"], mealTypes: ["canteen", "dinner", "light", "light"], drinkTime: "21:30", waterStart: "18:00", waterEnd: "07:00" }
 };
 
 function currentPlanDayIndex() {
@@ -318,7 +338,7 @@ function getPlanForDay(day) {
     done: [],
     drinks: { nootri: 1, blackCoffee: 0 }
   };
-  return backfillWeights({ ...fallback, ...JSON.parse(localStorage.getItem(storageKeyForDay("plan", day)) || "{}") });
+  return normalizeCanteenSlots(backfillWeights({ ...fallback, ...JSON.parse(localStorage.getItem(storageKeyForDay("plan", day)) || "{}") }));
 }
 
 function setPlan(plan) {
@@ -520,6 +540,7 @@ function renderMeals() {
     const grams = Number(plan.weights?.[slotIndex] || baseGrams(item));
     const portion = portionFromGrams(item, grams);
     const isDone = plan.done.includes(slotIndex);
+    const isFixedCanteen = plan.mealTypes?.[slotIndex] === "canteen" && item.name === CANTEEN_MEAL_NAME;
 
     const card = document.createElement("article");
     card.className = `meal ${isDone ? "done" : ""}`;
@@ -551,9 +572,9 @@ function renderMeals() {
         </div>
       </div>
       <div class="portion-row weight-row">
-        <button type="button" data-step="-50" data-slot="${slotIndex}">-</button>
-        <label><span>Gramatura</span><input class="weight-input" type="number" inputmode="numeric" min="30" max="1000" step="10" value="${grams}" data-slot="${slotIndex}"></label>
-        <button type="button" data-step="50" data-slot="${slotIndex}">+</button>
+        <button type="button" data-step="-50" data-slot="${slotIndex}" ${isFixedCanteen ? "disabled" : ""}>-</button>
+        <label><span>Gramatura</span><input class="weight-input" type="number" inputmode="numeric" min="30" max="1000" step="10" value="${grams}" data-slot="${slotIndex}" ${isFixedCanteen ? "disabled" : ""}></label>
+        <button type="button" data-step="50" data-slot="${slotIndex}" ${isFixedCanteen ? "disabled" : ""}>+</button>
       </div>
       <p>${item.text}</p>
       <p class="macro">${macroLine(item, portion)}</p>
@@ -682,6 +703,7 @@ function updateMealChoice(slotIndex, optionIndex) {
   plan.selected[slotIndex] = optionIndex;
   const item = getMealOptions(slotIndex, plan)[optionIndex] || getMealOptions(slotIndex, plan)[0];
   plan.weights[slotIndex] = baseGrams(item);
+  if (plan.mealTypes?.[slotIndex] === "canteen") setFixedCanteenMeal(plan, slotIndex);
   fitPlanToLimit(plan, [slotIndex]);
   showToast("Wybrano danie i dopasowano reszte dnia.");
 }
@@ -693,23 +715,38 @@ function updateMealType(slotIndex, type) {
   plan.mealTypes = [...(plan.mealTypes || settings.mealTypes || defaultSettings.mealTypes)];
   plan.mealTypes[slotIndex] = type;
   const newOptions = getMealOptions(slotIndex, plan);
-  const canteenIndex = newOptions.findIndex(item => item.name === "Kantyna: mieso + surowka");
+  const canteenIndex = newOptions.findIndex(item => item.name === CANTEEN_MEAL_NAME);
   const sameIndex = type === "canteen" && canteenIndex >= 0 ? canteenIndex : newOptions.findIndex(item => oldItem && item.name === oldItem.name);
   plan.selected[slotIndex] = sameIndex >= 0 ? sameIndex : 0;
   const item = newOptions[plan.selected[slotIndex]] || newOptions[0];
   plan.weights[slotIndex] = baseGrams(item);
+  if (type === "canteen") setFixedCanteenMeal(plan, slotIndex);
   setPlan(plan);
   renderMeals();
 }
 
 function updateWeight(slotIndex, grams) {
   const plan = getPlan();
+  if (plan.mealTypes?.[slotIndex] === "canteen") {
+    setFixedCanteenMeal(plan, slotIndex);
+    setPlan(plan);
+    renderMeals();
+    showToast("Kantyna ma stala porcje: mieso 110 g + surowka 150 g.");
+    return;
+  }
   plan.weights[slotIndex] = Math.min(1000, Math.max(30, grams || 30));
   fitPlanToLimit(plan, [slotIndex]);
 }
 
 function changeWeight(slotIndex, step) {
   const plan = getPlan();
+  if (plan.mealTypes?.[slotIndex] === "canteen") {
+    setFixedCanteenMeal(plan, slotIndex);
+    setPlan(plan);
+    renderMeals();
+    showToast("Kantyna ma stala porcje: mieso 110 g + surowka 150 g.");
+    return;
+  }
   const selected = Number(plan.selected[slotIndex] || 0);
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
@@ -728,8 +765,8 @@ function suggestDayPlan() {
   ];
   const dinnerBySlot = [
     ["Pomidorowa + omlet", "Rosol bez makaronu", "Zupa krem", "Kalafiorowa"],
-    ["Kantyna: kurczak bez dodatku", "Kurczak + brokul", "Indyk + fasolka", "Kantyna: mieso w sosie"],
-    ["Dorsz + warzywa", "Kantyna: ryba bez panierki", "Losos + brokul", "Krewetki + warzywa"],
+    ["Kurczak + brokul", "Indyk + fasolka", "Awaryjnie: kurczak bez dodatku", "Awaryjnie: mieso w sosie"],
+    ["Dorsz + warzywa", "Losos + brokul", "Awaryjnie: ryba bez panierki", "Krewetki + warzywa"],
     ["Gulasz bez kaszy", "Leczo bez cukru", "Bigos keto", "Kotlet bez panierki"]
   ];
 
@@ -747,6 +784,7 @@ function suggestDayPlan() {
     const item = options[plan.selected[slotIndex]] || options[0];
     used.add(item.name);
     plan.weights[slotIndex] = baseGrams(item);
+    if (type === "canteen") setFixedCanteenMeal(plan, slotIndex);
   });
 
   fitPlanToLimit(plan, getWorkLockedSlots(plan));
@@ -1100,7 +1138,11 @@ function applyShiftPreset(presetId) {
   slotNames.forEach((_, slotIndex) => {
     const options = getMealOptions(slotIndex, plan);
     const item = options[plan.selected[slotIndex] || 0] || options[0];
-    plan.weights[slotIndex] = plan.weights[slotIndex] || baseGrams(item);
+    if (plan.mealTypes?.[slotIndex] === "canteen") {
+      setFixedCanteenMeal(plan, slotIndex);
+    } else {
+      plan.weights[slotIndex] = plan.weights[slotIndex] || baseGrams(item);
+    }
   });
   setPlan(plan);
   renderSettings();
