@@ -221,10 +221,10 @@ const shoppingPlan = [
   {
     category: "Nabial",
     items: [
-      ["Skyr naturalny", "5-7 szt."],
+      ["Skyr naturalny", "2-3 szt. opcjonalnie"],
       ["Kefir naturalny", "2-3 butelki"],
-      ["Twarog poltlusty", "4 kostki"],
-      ["Serek wiejski", "4-5 szt."],
+      ["Twarog poltlusty", "1-2 kostki opcjonalnie"],
+      ["Serek wiejski", "6-8 szt."],
       ["Jogurt naturalny", "1 op."]
     ]
   },
@@ -718,9 +718,9 @@ function suggestDayPlan() {
   const used = new Set();
   const lightBySlot = [
     ["3 jajka + ogorek", "Omlet prosty", "Pasta jajeczna", "Jajka na miekko"],
-    ["Skyr + orzechy", "Twarog 150 g", "Serek proteinowy", "Bialy ser na slono"],
+    ["Serek wiejski", "Serek + losos", "Jajko + mozzarella", "Tunczyk mini"],
     ["Tunczyk + jajko", "Ryba lekka", "Kurczak lekki", "Resztki obiadu"],
-    ["Twarog + jajko", "Serek wiejski", "Jajka + skyr", "Pasta tunczykowa"]
+    ["Pasta tunczykowa", "Serek wiejski", "Wedlina awaryjna", "Jajeczne kluski"]
   ];
   const dinnerBySlot = [
     ["Pomidorowa + omlet", "Rosol bez makaronu", "Zupa krem", "Kalafiorowa"],
