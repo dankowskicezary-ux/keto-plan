@@ -109,6 +109,7 @@ const mealOptions = [
 ];
 
 const extraMealOptions = [
+  { name: "Kantyna: mieso + surowka", text: "Mieso 110 g + surowka 150 g, bez ziemniakow/ryzu/makaronu", portion: "mieso 110 g + surowka 150 g", grams: 260, components: [{ name: "mieso", grams: 110 }, { name: "surowka", grams: 150 }], kcal: 215, protein: 29, fat: 7, carbs: 9 },
   { name: "Kantyna: kurczak bez dodatku", text: "Kurczak pieczony/grillowany 200 g + surowka, bez ziemniakow/ryzu", kcal: 460, protein: 55, fat: 22, carbs: 8 },
   { name: "Kantyna: ryba bez panierki", text: "Ryba pieczona/gotowana 220 g + warzywa, bez ziemniakow", kcal: 390, protein: 48, fat: 18, carbs: 10 },
   { name: "Kantyna: ryba panierowana", text: "Ryba panierowana 180 g + surowka, bez ziemniakow", kcal: 560, protein: 36, fat: 34, carbs: 26 },
@@ -692,7 +693,8 @@ function updateMealType(slotIndex, type) {
   plan.mealTypes = [...(plan.mealTypes || settings.mealTypes || defaultSettings.mealTypes)];
   plan.mealTypes[slotIndex] = type;
   const newOptions = getMealOptions(slotIndex, plan);
-  const sameIndex = newOptions.findIndex(item => oldItem && item.name === oldItem.name);
+  const canteenIndex = newOptions.findIndex(item => item.name === "Kantyna: mieso + surowka");
+  const sameIndex = type === "canteen" && canteenIndex >= 0 ? canteenIndex : newOptions.findIndex(item => oldItem && item.name === oldItem.name);
   plan.selected[slotIndex] = sameIndex >= 0 ? sameIndex : 0;
   const item = newOptions[plan.selected[slotIndex]] || newOptions[0];
   plan.weights[slotIndex] = baseGrams(item);
