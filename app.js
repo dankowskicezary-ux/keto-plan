@@ -401,16 +401,52 @@ function portionText(item) {
   return item.portion || `porcja bazowa ok. ${baseGrams(item)} g`;
 }
 
+function parsedPortionComponents(item) {
+  if (!item.portion) return [];
+  return item.portion.split("+").map(part => {
+    const match = part.trim().match(/^(.+?)\s+(?:ok\.\s*)?(\d+)\s*(g|ml)\b/i);
+    if (!match) return null;
+    return {
+      name: match[1].trim(),
+      grams: Number(match[2]),
+      unit: match[3].toLowerCase()
+    };
+  }).filter(Boolean);
+}
+
+function portionComponents(item) {
+  return item.components || parsedPortionComponents(item);
+}
+
 function scaledPortionText(item, grams) {
-  if (!item.components) return `${grams} g`;
+  const components = portionComponents(item);
+  if (!components.length) return `${grams} g`;
   const factor = grams / baseGrams(item);
-  return item.components.map(component => {
+  const hasPieceUnits = components.some(component => component.unit === "szt.");
+  let gramSum = 0;
+  const gramIndexes = components
+    .map((component, index) => component.unit === "szt." ? -1 : index)
+    .filter(index => index >= 0);
+  const lastGramIndex = gramIndexes[gramIndexes.length - 1];
+
+  return components.map((component, index) => {
     if (component.unit === "szt.") {
       const amount = Math.max(1, Math.round(component.amount * factor));
       return `${amount} ${component.name}`;
     }
-    return `${component.name} ${Math.round(component.grams * factor)} g`;
+    let amount = Math.round(component.grams * factor);
+    if (!hasPieceUnits && index === lastGramIndex) {
+      amount = Math.max(0, grams - gramSum);
+    }
+    gramSum += amount;
+    return `${component.name} ${amount} ${component.unit || "g"}`;
   }).join(" + ");
+}
+
+function mealDetailText(item, grams) {
+  const base = baseGrams(item);
+  if (Number(grams) === base) return item.text;
+  return `Danie przeliczone do ${grams} g. Baza: ${portionText(item)}.`;
 }
 
 function portionFromGrams(item, grams) {
@@ -560,7 +596,7 @@ function renderMeals() {
       </label>
       <button class="selected-meal" type="button" data-open-options="${slotIndex}">
         <strong>${item.name}</strong>
-        <span>${item.text}</span>
+        <span>${mealDetailText(item, grams)}</span>
         <em>Zmien danie</em>
       </button>
       <div class="meal-picker collapsed">
@@ -576,9 +612,9 @@ function renderMeals() {
         <label><span>Gramatura</span><input class="weight-input" type="number" inputmode="numeric" min="30" max="1000" step="10" value="${grams}" data-slot="${slotIndex}" ${isFixedCanteen ? "disabled" : ""}></label>
         <button type="button" data-step="50" data-slot="${slotIndex}" ${isFixedCanteen ? "disabled" : ""}>+</button>
       </div>
-      <p>${item.text}</p>
+      <p>${mealDetailText(item, grams)}</p>
       <p class="macro">${macroLine(item, portion)}</p>
-      <p class="hint">Zjedz: ${scaledPortionText(item, grams)}.</p>
+      <p class="hint">Zjedz: ${scaledPortionText(item, grams)}. Razem: ${grams} g.</p>
     `;
     card.querySelector(".check").addEventListener("click", () => toggleMeal(slotIndex));
     card.querySelector(".meal-type").addEventListener("change", event => updateMealType(slotIndex, event.target.value));
