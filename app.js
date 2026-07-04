@@ -329,9 +329,22 @@ function storageKey(type) {
   return storageKeyForDay(type, selectedDay);
 }
 
+function localDateKey() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function storageKeyForDay(type, day) {
-  const date = new Date().toISOString().slice(0, 10);
+  const date = localDateKey();
+  if (type === "plan") return `plan:week:day${day}`;
   return `${type}:${date}:day${day}`;
+}
+
+function oldDailyPlanKey(day) {
+  return `plan:${localDateKey()}:day${day}`;
 }
 
 function getPlan() {
@@ -339,6 +352,9 @@ function getPlan() {
 }
 
 function getPlanForDay(day) {
+  const oldDailyKey = oldDailyPlanKey(day);
+  const weeklyKey = storageKeyForDay("plan", day);
+  const savedPlan = localStorage.getItem(weeklyKey) || localStorage.getItem(oldDailyKey) || "{}";
   const fallback = {
     selected: [0, 0, 0, 0],
     portions: [1, 1, 1, 1],
@@ -349,11 +365,21 @@ function getPlanForDay(day) {
     done: [],
     drinks: { nootri: 1, blackCoffee: 0 }
   };
-  return normalizeMealWeights(backfillWeights({ ...fallback, ...JSON.parse(localStorage.getItem(storageKeyForDay("plan", day)) || "{}") }));
+  return normalizeMealWeights(backfillWeights({ ...fallback, ...JSON.parse(savedPlan) }));
 }
 
 function setPlan(plan) {
   localStorage.setItem(storageKey("plan"), JSON.stringify(plan));
+}
+
+function migratePlansToWeeklyKeys() {
+  for (let day = 0; day < 7; day += 1) {
+    const weeklyKey = storageKeyForDay("plan", day);
+    const oldKey = oldDailyPlanKey(day);
+    if (!localStorage.getItem(weeklyKey) && localStorage.getItem(oldKey)) {
+      localStorage.setItem(weeklyKey, localStorage.getItem(oldKey));
+    }
+  }
 }
 
 function getWater() {
@@ -711,7 +737,8 @@ function applyCustomMealToSlot(meal, slotIndex) {
   const optionIndex = options.findIndex(item => item.name === meal.name && item.kcal === meal.kcal);
   plan.selected[slotIndex] = optionIndex >= 0 ? optionIndex : options.length - 1;
   plan.weights[slotIndex] = meal.grams;
-  fitPlanToLimit(plan, [slotIndex]);
+  normalizeMealWeights(plan);
+  setPlan(plan);
 }
 
 function filterMealOptions(slotIndex, selected, query, card) {
@@ -751,8 +778,9 @@ function updateMealChoice(slotIndex, optionIndex) {
   const item = getMealOptions(slotIndex, plan)[optionIndex] || getMealOptions(slotIndex, plan)[0];
   plan.weights[slotIndex] = baseGrams(item);
   if (plan.mealTypes?.[slotIndex] === "canteen") setFixedCanteenMeal(plan, slotIndex);
-  fitPlanToLimit(plan, [slotIndex]);
-  showToast("Wybrano danie. Porcje zostaja normalne.");
+  setPlan(plan);
+  renderMeals();
+  showToast("Wybrano danie bez przeliczania dnia.");
 }
 
 function updateMealType(slotIndex, type) {
@@ -784,7 +812,8 @@ function updateWeight(slotIndex, grams) {
   const selected = Number(plan.selected[slotIndex] || 0);
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   plan.weights[slotIndex] = clampMealWeight(item, grams);
-  fitPlanToLimit(plan, [slotIndex]);
+  setPlan(plan);
+  renderMeals();
 }
 
 function changeWeight(slotIndex, step) {
@@ -800,7 +829,8 @@ function changeWeight(slotIndex, step) {
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
   plan.weights[slotIndex] = clampMealWeight(item, current + step);
-  fitPlanToLimit(plan, [slotIndex]);
+  setPlan(plan);
+  renderMeals();
 }
 
 function suggestDayPlan() {
@@ -836,8 +866,10 @@ function suggestDayPlan() {
     if (type === "canteen") setFixedCanteenMeal(plan, slotIndex);
   });
 
-  fitPlanToLimit(plan, getWorkLockedSlots(plan));
-  showToast("Zaproponowano i zoptymalizowano dzien.");
+  normalizeMealWeights(plan);
+  setPlan(plan);
+  renderMeals();
+  showToast("Zaproponowano dzien bez automatycznego przeliczania.");
 }
 
 function fitRemainingMealsToLimit() {
@@ -1336,6 +1368,7 @@ function bindEvents() {
 }
 
 function boot() {
+  migratePlansToWeeklyKeys();
   renderDayOptions();
   renderSettings();
   renderMeals();
