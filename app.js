@@ -184,12 +184,13 @@ function allMealOptions() {
 
 function mealKind(item) {
   const text = `${item.name} ${item.text}`.toLowerCase();
+  if (text.includes("kantyna")) return "canteen";
   const dinnerWords = ["kantyna", "zupa", "rosol", "barszcz", "zurek", "flaki", "kurczak", "indyk", "dorsz", "losos", "ryba", "schab", "mielony", "karkowka", "gulasz", "leczo", "bigos", "golab", "wolowina", "wieprzowina", "pizza", "burger", "makaron", "kasza", "ryz", "ziemniaki", "pierogi"];
   return dinnerWords.some(word => text.includes(word)) ? "dinner" : "light";
 }
 
 function typeLabel(type) {
-  return { light: "lekki", dinner: "obiadowy", any: "dowolny" }[type] || "dowolny";
+  return { light: "lekki", dinner: "obiadowy", canteen: "kantyna", any: "dowolny" }[type] || "dowolny";
 }
 
 function getMealOptions(slotIndex, plan = null) {
@@ -531,6 +532,7 @@ function renderMeals() {
         <select class="meal-type" data-slot="${slotIndex}">
           <option value="light" ${plan.mealTypes?.[slotIndex] === "light" ? "selected" : ""}>lekki</option>
           <option value="dinner" ${plan.mealTypes?.[slotIndex] === "dinner" ? "selected" : ""}>obiadowy</option>
+          <option value="canteen" ${plan.mealTypes?.[slotIndex] === "canteen" ? "selected" : ""}>kantyna</option>
           <option value="any" ${plan.mealTypes?.[slotIndex] === "any" ? "selected" : ""}>dowolny</option>
         </select>
       </label>
@@ -984,7 +986,10 @@ function buildDynamicShoppingPlan() {
 
 function isWorkMeal(day, shift, slotIndex) {
   const isWeekend = day >= 5;
-  if (isWeekend || !shift) return false;
+  if (isWeekend) return false;
+  const plan = getPlanForDay(day);
+  if (plan.mealTypes?.[slotIndex] === "canteen") return true;
+  if (!shift) return false;
   if (shift === "first" || shift === "second") return slotIndex === 1;
   if (shift === "night") return slotIndex === 0;
   return false;
