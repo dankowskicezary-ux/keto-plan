@@ -269,7 +269,12 @@ const shiftPresets = {
   night: { label: "22:00", mealTimes: ["18:00", "22:00", "02:00", "06:30"], mealTypes: ["dinner", "dinner", "light", "light"], drinkTime: "21:30", waterStart: "18:00", waterEnd: "07:00" }
 };
 
-let selectedDay = Number(localStorage.getItem("selectedDay") || "0");
+function currentPlanDayIndex() {
+  const day = new Date().getDay();
+  return day === 0 ? 6 : day - 1;
+}
+
+let selectedDay = Number(localStorage.getItem("selectedDay") ?? String(currentPlanDayIndex()));
 let settings = JSON.parse(localStorage.getItem("settings") || JSON.stringify(defaultSettings));
 settings = { ...defaultSettings, ...settings };
 settings.targets = { ...defaultTargets, ...(settings.targets || {}) };
@@ -972,7 +977,7 @@ function buildDynamicShoppingPlan() {
   return [
     { category: "Menu tygodnia", items: menuItems },
     { category: "Odliczone posilki w pracy", items: workMeals.length ? workMeals : [["Brak", "W dni robocze ustaw zmiane 6:00, 14:00 albo 22:00"]] },
-    { category: "Zakupy z wybranych dan", items: productItems.length ? productItems : [["Brak", "Uloz menu w zakladce Dzisiaj/Tydzien"]] },
+    { category: "Zakupy z wybranych dan", items: productItems.length ? productItems : [["Brak", "Uloz menu w zakladce Plan/Tydzien"]] },
     { category: "Stale zapasy", items: [["Nootri", "jesli pijesz codziennie"], ["Woda niegazowana", "min. 2,5 l dziennie"], ["Lagodne przyprawy", "bez ostrego"], ["Oliwa", "do odmierzania lyzka"]] }
   ];
 }
