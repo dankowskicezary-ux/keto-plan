@@ -6,6 +6,8 @@ const defaultTargets = {
 };
 
 const slotNames = ["Posilek 1", "Posilek 2", "Obiad", "Kolacja"];
+const dayNames = ["Poniedzialek", "Wtorek", "Sroda", "Czwartek", "Piatek", "Sobota", "Niedziela"];
+const dayShortNames = ["Pon", "Wt", "Sr", "Czw", "Pt", "Sob", "Niedz"];
 
 const mealOptions = [
   [
@@ -474,7 +476,7 @@ function renderDayOptions() {
   for (let index = 0; index < 7; index += 1) {
     const option = document.createElement("option");
     option.value = String(index);
-    option.textContent = `Dzien ${index + 1}`;
+    option.textContent = dayNames[index];
     select.append(option);
   }
   select.value = String(selectedDay);
@@ -488,7 +490,7 @@ function renderSummary() {
   const doneMeals = plan.done.length;
   const kcalText = `${round(totals.kcal)}/${targets.kcal}`;
 
-  document.getElementById("dayName").textContent = `Dzien ${selectedDay + 1}`;
+  document.getElementById("dayName").textContent = dayNames[selectedDay];
   document.getElementById("mealCount").textContent = String(doneMeals);
   document.getElementById("kcalCount").textContent = kcalText;
   document.getElementById("todayKcal").textContent = `${round(totals.kcal)} kcal`;
@@ -851,7 +853,7 @@ function renderWeek() {
       const portion = portionFromGrams(item, grams);
       return `<li>${plan.mealTimes?.[slotIndex] || ""} ${slotNames[slotIndex]} (${typeLabel(plan.mealTypes?.[slotIndex])}): ${item.name} <span>${grams} g | ${macroLine(item, portion)}</span></li>`;
     }).join("");
-    card.innerHTML = `<h3>Dzien ${day + 1} <span>${round(totals.kcal)} kcal</span></h3><ol>${items}</ol>`;
+    card.innerHTML = `<h3>${dayNames[day]} <span>${round(totals.kcal)} kcal</span></h3><ol>${items}</ol>`;
     list.append(card);
   }
 }
@@ -957,9 +959,9 @@ function buildDynamicShoppingPlan() {
       const options = getMealOptions(slotIndex, plan);
       const item = options[optionIndex] || options[0];
       const grams = Number(plan.weights?.[slotIndex] || baseGrams(item));
-      menuItems.push([`D${day + 1} ${slotNames[slotIndex]}`, `${item.name} (${grams} g)`]);
+      menuItems.push([`${dayShortNames[day]} ${slotNames[slotIndex]}`, `${item.name} (${grams} g)`]);
       if (isWorkMeal(day, plan.shift, slotIndex)) {
-        workMeals.push([`D${day + 1} ${slotNames[slotIndex]}`, `${item.name} (${grams} g)`]);
+        workMeals.push([`${dayShortNames[day]} ${slotNames[slotIndex]}`, `${item.name} (${grams} g)`]);
         return;
       }
       suggestProducts(item, grams, addProduct);
