@@ -217,10 +217,21 @@ function setFixedCanteenMeal(plan, slotIndex) {
   plan.weights[slotIndex] = meal ? baseGrams(meal) : 260;
 }
 
-function normalizeCanteenSlots(plan) {
+function clampMealWeight(item, grams) {
+  const base = baseGrams(item);
+  return Math.min(base, Math.max(30, Number(grams || base)));
+}
+
+function normalizeMealWeights(plan) {
   if (!plan.weights || plan.weights.length !== slotNames.length) return plan;
   slotNames.forEach((_, slotIndex) => {
-    if (plan.mealTypes?.[slotIndex] === "canteen") setFixedCanteenMeal(plan, slotIndex);
+    if (plan.mealTypes?.[slotIndex] === "canteen") {
+      setFixedCanteenMeal(plan, slotIndex);
+      return;
+    }
+    const options = getMealOptions(slotIndex, plan);
+    const item = options[plan.selected[slotIndex] || 0] || options[0];
+    plan.weights[slotIndex] = clampMealWeight(item, plan.weights[slotIndex]);
   });
   return plan;
 }
@@ -338,7 +349,7 @@ function getPlanForDay(day) {
     done: [],
     drinks: { nootri: 1, blackCoffee: 0 }
   };
-  return normalizeCanteenSlots(backfillWeights({ ...fallback, ...JSON.parse(localStorage.getItem(storageKeyForDay("plan", day)) || "{}") }));
+  return normalizeMealWeights(backfillWeights({ ...fallback, ...JSON.parse(localStorage.getItem(storageKeyForDay("plan", day)) || "{}") }));
 }
 
 function setPlan(plan) {
@@ -741,7 +752,7 @@ function updateMealChoice(slotIndex, optionIndex) {
   plan.weights[slotIndex] = baseGrams(item);
   if (plan.mealTypes?.[slotIndex] === "canteen") setFixedCanteenMeal(plan, slotIndex);
   fitPlanToLimit(plan, [slotIndex]);
-  showToast("Wybrano danie i dopasowano reszte dnia.");
+  showToast("Wybrano danie. Porcje zostaja normalne.");
 }
 
 function updateMealType(slotIndex, type) {
@@ -770,7 +781,9 @@ function updateWeight(slotIndex, grams) {
     showToast("Kantyna ma stala porcje: mieso 110 g + surowka 150 g.");
     return;
   }
-  plan.weights[slotIndex] = Math.min(1000, Math.max(30, grams || 30));
+  const selected = Number(plan.selected[slotIndex] || 0);
+  const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
+  plan.weights[slotIndex] = clampMealWeight(item, grams);
   fitPlanToLimit(plan, [slotIndex]);
 }
 
@@ -786,7 +799,7 @@ function changeWeight(slotIndex, step) {
   const selected = Number(plan.selected[slotIndex] || 0);
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
-  plan.weights[slotIndex] = Math.min(1000, Math.max(30, current + step));
+  plan.weights[slotIndex] = clampMealWeight(item, current + step);
   fitPlanToLimit(plan, [slotIndex]);
 }
 
@@ -833,6 +846,15 @@ function fitRemainingMealsToLimit() {
 
 function fitPlanToLimit(plan, lockedSlots = []) {
   const targets = getTargets();
+  normalizeMealWeights(plan);
+  const currentTotals = calculateTotals(plan);
+  if (currentTotals.kcal <= targets.kcal) {
+    setPlan(plan);
+    renderMeals();
+    showToast("Porcje zostaja normalne. Limit nie jest przekroczony.");
+    return;
+  }
+
   const locked = Array.from(new Set([...lockedSlots, ...getWorkLockedSlots(plan), ...(plan.done || [])]));
   const adjustable = slotNames
     .map((_, slotIndex) => slotIndex)
@@ -856,7 +878,7 @@ function fitPlanToLimit(plan, lockedSlots = []) {
   if (!adjustableKcal || !room) {
     setPlan(plan);
     renderMeals();
-    showToast("Brak kalorii do rozdzielenia na pozostale posilki.");
+    showToast("Nie da sie zejsc do limitu bez zmiany wybranych dan.");
     return;
   }
 
@@ -865,12 +887,12 @@ function fitPlanToLimit(plan, lockedSlots = []) {
     const options = getMealOptions(slotIndex, plan);
     const item = options[plan.selected[slotIndex] || 0] || options[0];
     const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
-    plan.weights[slotIndex] = Math.min(1000, Math.max(30, Math.round(current * factor / 10) * 10));
+    plan.weights[slotIndex] = clampMealWeight(item, Math.round(current * factor / 10) * 10);
   });
 
   setPlan(plan);
   renderMeals();
-  showToast("Dopasowano gramatury do limitu.");
+  showToast("Zmniejszono porcje, zeby nie przekroczyc limitu.");
 }
 
 function getWorkLockedSlots(plan) {
