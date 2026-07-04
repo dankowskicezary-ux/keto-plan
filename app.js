@@ -170,7 +170,10 @@ const customTypeValues = {
   soup: { label: "zupa", kcal: 70, protein: 4, fat: 3, carbs: 7 },
   eggs: { label: "jajka/nabial", kcal: 150, protein: 13, fat: 10, carbs: 4 },
   carbs: { label: "ziemniaki/ryz/makaron", kcal: 130, protein: 3, fat: 1, carbs: 27 },
-  fried: { label: "smazone/panierowane", kcal: 260, protein: 14, fat: 17, carbs: 14 }
+  fried: { label: "smazone/panierowane", kcal: 260, protein: 14, fat: 17, carbs: 14 },
+  salad: { label: "surowka lekka", kcal: 35, protein: 1, fat: 1, carbs: 6 },
+  mayoSalad: { label: "surowka z majonezem", kcal: 160, protein: 1, fat: 13, carbs: 8 },
+  none: { label: "brak", kcal: 0, protein: 0, fat: 0, carbs: 0 }
 };
 
 function allMealOptions() {
@@ -566,21 +569,34 @@ function renderMeals() {
 
 function addCustomMeal(meal) {
   const customMeals = getCustomMeals();
-  const grams = Number(meal.grams || 0);
-  const type = customTypeValues[meal.type] || customTypeValues.mixed;
-  const factor = grams / 100;
+  const meatGrams = Number(meal.meatGrams || 0);
+  const saladGrams = Number(meal.saladGrams || 0);
+  const meatType = customTypeValues[meal.meatType] || customTypeValues.lean;
+  const saladType = customTypeValues[meal.saladType] || customTypeValues.salad;
+  const grams = meatGrams + (meal.saladType === "none" ? 0 : saladGrams);
+  const meatFactor = meatGrams / 100;
+  const saladFactor = meal.saladType === "none" ? 0 : saladGrams / 100;
+  const kcal = Math.round(meatType.kcal * meatFactor + saladType.kcal * saladFactor);
+  const protein = Math.round(meatType.protein * meatFactor + saladType.protein * saladFactor);
+  const fat = Math.round(meatType.fat * meatFactor + saladType.fat * saladFactor);
+  const carbs = Math.round(meatType.carbs * meatFactor + saladType.carbs * saladFactor);
+  const components = [
+    { name: meatType.label, grams: meatGrams },
+    ...(meal.saladType === "none" ? [] : [{ name: saladType.label, grams: saladGrams }])
+  ];
   const nextMeal = {
     name: meal.name || "Wlasne danie",
-    text: `${meal.name || "Wlasne danie"} (${type.label}, ${grams} g)`,
-    kcal: Math.round(type.kcal * factor),
-    protein: Math.round(type.protein * factor),
-    fat: Math.round(type.fat * factor),
-    carbs: Math.round(type.carbs * factor),
+    text: `${meal.name || "Wlasne danie"} (${components.map(item => `${item.name} ${item.grams} g`).join(" + ")})`,
+    kcal,
+    protein,
+    fat,
+    carbs,
     grams,
-    portion: `${type.label} ${grams} g`
+    portion: components.map(item => `${item.name} ${item.grams} g`).join(" + "),
+    components
   };
-  if (!grams) {
-    showToast("Wpisz wage dania.");
+  if (!meatGrams && !saladGrams) {
+    showToast("Wpisz wage miesa albo surowki.");
     return;
   }
   const nextMeals = [nextMeal, ...customMeals].slice(0, 40);
@@ -597,14 +613,16 @@ function addCustomMeal(meal) {
 function readCustomForm() {
   return {
     name: document.getElementById("customName").value.trim(),
-    grams: document.getElementById("customGrams").value,
-    type: document.getElementById("customType").value,
+    meatGrams: document.getElementById("customMeatGrams").value,
+    meatType: document.getElementById("customMeatType").value,
+    saladGrams: document.getElementById("customSaladGrams").value,
+    saladType: document.getElementById("customSaladType").value,
     slot: document.getElementById("customSlot").value
   };
 }
 
 function clearCustomForm() {
-  ["customName", "customGrams"].forEach(id => {
+  ["customName", "customMeatGrams", "customSaladGrams"].forEach(id => {
     document.getElementById(id).value = "";
   });
 }

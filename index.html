@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1f6b5c">
   <title>Keto Plan</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=25">
+  <link rel="stylesheet" href="styles.css?v=26">
 </head>
 <body>
   <div class="app-shell">
@@ -85,15 +85,19 @@
           <h2>Wlasne danie</h2>
           <div class="custom-grid">
             <input id="customName" type="text" placeholder="Nazwa, np. obiad w kantynie">
-            <input id="customGrams" type="number" inputmode="numeric" placeholder="waga g">
-            <select id="customType">
-              <option value="mixed">danie mieszane</option>
+            <input id="customMeatGrams" type="number" inputmode="numeric" placeholder="mieso g, np. 110">
+            <select id="customMeatType">
               <option value="lean">chude mieso/ryba</option>
               <option value="sauce">mieso w sosie</option>
-              <option value="soup">zupa</option>
-              <option value="eggs">jajka/nabial</option>
-              <option value="carbs">ziemniaki/ryz/makaron</option>
               <option value="fried">smazone/panierowane</option>
+              <option value="eggs">jajka/nabial</option>
+            </select>
+            <input id="customSaladGrams" type="number" inputmode="numeric" placeholder="surowka g, np. 150">
+            <select id="customSaladType">
+              <option value="salad">surowka lekka</option>
+              <option value="mayoSalad">surowka z majonezem</option>
+              <option value="carbs">ziemniaki/ryz/makaron</option>
+              <option value="none">brak drugiego skladnika</option>
             </select>
             <select id="customSlot">
               <option value="0">posilek 1</option>
@@ -207,13 +211,13 @@
         </div>
         <div class="tips">
           <h2>Na telefonie</h2>
-          <p>Wersja: v25. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=25 w przegladarce i odswiez strone.</p>
+          <p>Wersja: v26. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=26 w przegladarce i odswiez strone.</p>
         </div>
       </section>
     </main>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=25"></script>
+  <script src="app.js?v=26"></script>
 </body>
 </html>
