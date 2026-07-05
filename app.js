@@ -570,6 +570,11 @@ function mealKcal(item, grams) {
   return item.kcal * portionFromGrams(item, grams);
 }
 
+function mealFitsType(item, type) {
+  if (!type || type === "any") return true;
+  return mealKind(item) === type;
+}
+
 function renderDayOptions() {
   const select = document.getElementById("daySelect");
   select.innerHTML = "";
@@ -597,7 +602,14 @@ function renderSummary() {
   document.getElementById("todayProtein").textContent = `${round(totals.protein)} g`;
   document.getElementById("todayFat").textContent = `${round(totals.fat)} g`;
   document.getElementById("todayCarbs").textContent = `${round(totals.carbs)} g`;
-  document.getElementById("remainingKcal").textContent = remaining >= 0 ? `${round(remaining)} kcal zostalo` : `${Math.abs(round(remaining))} kcal ponad plan`;
+  const remainingNode = document.getElementById("remainingKcal");
+  if (remaining > 250) {
+    remainingNode.textContent = `Brakuje ${round(remaining)} kcal do limitu`;
+  } else if (remaining >= 0) {
+    remainingNode.textContent = `${round(remaining)} kcal zapasu`;
+  } else {
+    remainingNode.textContent = `${Math.abs(round(remaining))} kcal ponad plan`;
+  }
 }
 
 function renderMeals() {
@@ -867,13 +879,126 @@ function suggestDayPlan() {
   });
 
   normalizeMealWeights(plan);
+  optimizeMealChoicesToLimit(plan, getWorkLockedSlots(plan));
   setPlan(plan);
   renderMeals();
-  showToast("Zaproponowano dzien bez automatycznego przeliczania.");
+  showToast("Zaproponowano dzien blizej limitu kcal.");
 }
 
 function fitRemainingMealsToLimit() {
-  fitPlanToLimit(getPlan(), []);
+  const plan = getPlan();
+  if (optimizeMealChoicesToLimit(plan, [])) {
+    setPlan(plan);
+    renderMeals();
+    showToast("Dobrano normalne dania blizej limitu kcal.");
+    return;
+  }
+  fitPlanToLimit(plan, []);
+}
+
+function optimizeMealChoicesToLimit(plan, lockedSlots = []) {
+  const targets = getTargets();
+  normalizeMealWeights(plan);
+  const locked = Array.from(new Set([...lockedSlots, ...getWorkLockedSlots(plan), ...(plan.done || [])]));
+  const adjustable = slotNames
+    .map((_, slotIndex) => slotIndex)
+    .filter(slotIndex => !locked.includes(slotIndex) && plan.mealTypes?.[slotIndex] !== "canteen");
+
+  if (!adjustable.length) return false;
+
+  const fixedTotals = { kcal: 0, protein: 0, fat: 0, carbs: 0 };
+  slotNames.forEach((_, slotIndex) => {
+    if (!locked.includes(slotIndex) && plan.mealTypes?.[slotIndex] !== "canteen") return;
+    const options = getMealOptions(slotIndex, plan);
+    const item = options[plan.selected[slotIndex] || 0] || options[0];
+    const portion = portionFromGrams(item, plan.weights?.[slotIndex]);
+    fixedTotals.kcal += item.kcal * portion;
+    fixedTotals.protein += item.protein * portion;
+    fixedTotals.fat += item.fat * portion;
+    fixedTotals.carbs += item.carbs * portion;
+  });
+  drinks.forEach(drink => {
+    const count = Number(plan.drinks?.[drink.id] || 0);
+    fixedTotals.kcal += drink.kcal * count;
+    fixedTotals.protein += drink.protein * count;
+    fixedTotals.fat += drink.fat * count;
+    fixedTotals.carbs += drink.carbs * count;
+  });
+
+  const currentNames = new Set();
+  slotNames.forEach((_, slotIndex) => {
+    const options = getMealOptions(slotIndex, plan);
+    const item = options[plan.selected[slotIndex] || 0] || options[0];
+    if (item) currentNames.add(item.name);
+  });
+
+  const candidateSets = adjustable.map(slotIndex => {
+    const type = plan.mealTypes?.[slotIndex] || "any";
+    const options = getMealOptions(slotIndex, plan)
+      .map((item, optionIndex) => ({ item, optionIndex }))
+      .filter(({ item }) => mealFitsType(item, type))
+      .filter(({ item }) => item.name !== CANTEEN_MEAL_NAME)
+      .sort((a, b) => b.item.kcal - a.item.kcal);
+    const selected = Number(plan.selected[slotIndex] || 0);
+    const selectedItem = getMealOptions(slotIndex, plan)[selected];
+    const keepCurrent = selectedItem ? [{ item: selectedItem, optionIndex: selected }] : [];
+    const merged = keepCurrent.concat(options).filter((candidate, index, array) =>
+      array.findIndex(other => other.item.name === candidate.item.name) === index
+    );
+    return merged.slice(0, 18);
+  });
+
+  let best = null;
+
+  function scoreChoice(total, names) {
+    const over = Math.max(0, total.kcal - targets.kcal);
+    const under = Math.max(0, targets.kcal - total.kcal);
+    const carbOver = Math.max(0, total.carbs - targets.carbs);
+    const proteinUnder = Math.max(0, targets.protein - total.protein);
+    const duplicatePenalty = names.length - new Set(names).size;
+    return under + over * 4 + carbOver * 20 + proteinUnder * 0.2 + duplicatePenalty * 250;
+  }
+
+  function walk(position, total, choices, names) {
+    if (position === adjustable.length) {
+      const score = scoreChoice(total, names);
+      if (!best || score < best.score) best = { score, choices: [...choices], total: { ...total } };
+      return;
+    }
+
+    candidateSets[position].forEach(candidate => {
+      const nextTotal = {
+        kcal: total.kcal + candidate.item.kcal,
+        protein: total.protein + candidate.item.protein,
+        fat: total.fat + candidate.item.fat,
+        carbs: total.carbs + candidate.item.carbs
+      };
+      if (nextTotal.kcal > targets.kcal + 120) return;
+      choices.push(candidate);
+      names.push(candidate.item.name);
+      walk(position + 1, nextTotal, choices, names);
+      names.pop();
+      choices.pop();
+    });
+  }
+
+  walk(0, fixedTotals, [], Array.from(currentNames).filter(name => {
+    return !adjustable.some(slotIndex => {
+      const options = getMealOptions(slotIndex, plan);
+      const item = options[plan.selected[slotIndex] || 0] || options[0];
+      return item?.name === name;
+    });
+  }));
+
+  if (!best) return false;
+
+  best.choices.forEach((choice, index) => {
+    const slotIndex = adjustable[index];
+    plan.selected[slotIndex] = choice.optionIndex;
+    plan.weights[slotIndex] = baseGrams(choice.item);
+  });
+  normalizeMealWeights(plan);
+  return true;
 }
 
 function fitPlanToLimit(plan, lockedSlots = []) {
