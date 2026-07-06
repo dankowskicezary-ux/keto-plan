@@ -305,9 +305,10 @@ function setFixedCanteenMeal(plan, slotIndex) {
   plan.weights[slotIndex] = meal ? baseGrams(meal) : 260;
 }
 
-function clampMealWeight(item, grams) {
+function clampMealWeight(item, grams, allowIncrease = false) {
   const base = baseGrams(item);
-  return Math.min(base, Math.max(30, Number(grams || base)));
+  const max = allowIncrease ? Math.round(base * 1.35 / 10) * 10 : base;
+  return Math.min(max, Math.max(30, Number(grams || base)));
 }
 
 function normalizeMealWeights(plan) {
@@ -1143,14 +1144,6 @@ function optimizeMealChoicesToLimit(plan, lockedSlots = []) {
 function fitPlanToLimit(plan, lockedSlots = []) {
   const targets = getTargets();
   normalizeMealWeights(plan);
-  const currentTotals = calculateTotals(plan);
-  if (currentTotals.kcal <= targets.kcal) {
-    setPlan(plan);
-    renderMeals();
-    showToast("Porcje zostaja normalne. Limit nie jest przekroczony.");
-    return;
-  }
-
   const locked = Array.from(new Set([...lockedSlots, ...getWorkLockedSlots(plan), ...(plan.done || [])]));
   const adjustable = slotNames
     .map((_, slotIndex) => slotIndex)
@@ -1183,12 +1176,20 @@ function fitPlanToLimit(plan, lockedSlots = []) {
     const options = getMealOptions(slotIndex, plan);
     const item = options[plan.selected[slotIndex] || 0] || options[0];
     const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
-    plan.weights[slotIndex] = clampMealWeight(item, Math.round(current * factor / 10) * 10);
+    plan.weights[slotIndex] = clampMealWeight(item, Math.round(current * factor / 10) * 10, factor > 1);
   });
 
   setPlan(plan);
   renderMeals();
-  showToast("Zmniejszono porcje, zeby nie przekroczyc limitu.");
+  const totals = calculateTotals(plan);
+  const diff = Math.round(targets.kcal - totals.kcal);
+  if (Math.abs(diff) <= 80) {
+    showToast("Dopasowano gramatury bez zmiany posilkow.");
+  } else if (diff > 0) {
+    showToast(`Dopasowano bez zmiany posilkow. Zostaje ${diff} kcal.`);
+  } else {
+    showToast(`Dopasowano bez zmiany posilkow. ${Math.abs(diff)} kcal ponad plan.`);
+  }
 }
 
 function getWorkLockedSlots(plan) {
