@@ -1032,12 +1032,6 @@ function suggestDayPlan() {
 
 function fitRemainingMealsToLimit() {
   const plan = getPlan();
-  if (optimizeMealChoicesToLimit(plan, [])) {
-    setPlan(plan);
-    renderMeals();
-    showToast("Dobrano normalne dania blizej limitu kcal.");
-    return;
-  }
   fitPlanToLimit(plan, []);
 }
 
