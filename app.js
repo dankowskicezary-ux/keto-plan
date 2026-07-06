@@ -180,6 +180,34 @@ const customTypeValues = {
   none: { label: "brak", kcal: 0, protein: 0, fat: 0, carbs: 0 }
 };
 
+const customProductCatalog = [
+  { id: "egg", name: "Jajko", unit: "szt.", gramsPerUnit: 50, kcal: 75, protein: 6.5, fat: 5, carbs: 0.5 },
+  { id: "egg_white", name: "Bialko jajka", unit: "szt.", gramsPerUnit: 35, kcal: 17, protein: 3.6, fat: 0, carbs: 0.2 },
+  { id: "chicken_breaded", name: "Kotlet z piersi panierowany", unit: "g", kcal100: 260, protein100: 23, fat100: 14, carbs100: 13 },
+  { id: "pork_cutlet", name: "Kotlet schabowy panierowany", unit: "g", kcal100: 300, protein100: 20, fat100: 19, carbs100: 14 },
+  { id: "minced_cutlet", name: "Kotlet mielony", unit: "g", kcal100: 260, protein100: 17, fat100: 19, carbs100: 7 },
+  { id: "chicken_grilled", name: "Piers z kurczaka bez panierki", unit: "g", kcal100: 165, protein100: 31, fat100: 4, carbs100: 0 },
+  { id: "pork_roast", name: "Schab/pieczen bez panierki", unit: "g", kcal100: 230, protein100: 27, fat100: 13, carbs100: 0 },
+  { id: "fish_breaded", name: "Ryba panierowana", unit: "g", kcal100: 240, protein100: 17, fat100: 13, carbs100: 14 },
+  { id: "fish_plain", name: "Ryba bez panierki", unit: "g", kcal100: 120, protein100: 24, fat100: 2, carbs100: 0 },
+  { id: "tuna", name: "Tunczyk w sosie wlasnym", unit: "g", kcal100: 110, protein100: 25, fat100: 1, carbs100: 0 },
+  { id: "cottage", name: "Serek wiejski", unit: "g", kcal100: 100, protein100: 12, fat100: 5, carbs100: 3 },
+  { id: "skyr", name: "Skyr naturalny", unit: "g", kcal100: 65, protein100: 11, fat100: 0, carbs100: 4 },
+  { id: "cheese", name: "Ser zolty", unit: "g", kcal100: 350, protein100: 25, fat100: 27, carbs100: 2 },
+  { id: "ham", name: "Szynka/chuda wedlina", unit: "g", kcal100: 120, protein100: 20, fat100: 4, carbs100: 2 },
+  { id: "salad_light", name: "Surowka lekka", unit: "g", kcal100: 35, protein100: 1, fat100: 1, carbs100: 6 },
+  { id: "salad_mayo", name: "Surowka z majonezem", unit: "g", kcal100: 160, protein100: 1, fat100: 13, carbs100: 8 },
+  { id: "cucumber", name: "Ogorek", unit: "g", kcal100: 15, protein100: 1, fat100: 0, carbs100: 3 },
+  { id: "vegetables", name: "Warzywa gotowane/parowane", unit: "g", kcal100: 35, protein100: 2, fat100: 0, carbs100: 7 },
+  { id: "potatoes", name: "Ziemniaki gotowane", unit: "g", kcal100: 77, protein100: 2, fat100: 0, carbs100: 17 },
+  { id: "rice", name: "Ryz gotowany", unit: "g", kcal100: 130, protein100: 3, fat100: 0, carbs100: 28 },
+  { id: "pasta", name: "Makaron gotowany", unit: "g", kcal100: 155, protein100: 5, fat100: 1, carbs100: 31 },
+  { id: "soup", name: "Zupa niezageszczana", unit: "g", kcal100: 45, protein100: 3, fat100: 2, carbs100: 5 },
+  { id: "sauce", name: "Sos miesny", unit: "g", kcal100: 110, protein100: 5, fat100: 8, carbs100: 5 },
+  { id: "olive", name: "Oliwa/olej", unit: "g", kcal100: 884, protein100: 0, fat100: 100, carbs100: 0 },
+  { id: "butter", name: "Maslo", unit: "g", kcal100: 720, protein100: 1, fat100: 82, carbs100: 1 }
+];
+
 function allMealOptions() {
   return foodCatalog.concat(getCustomMeals());
 }
@@ -587,6 +615,36 @@ function renderDayOptions() {
   select.value = String(selectedDay);
 }
 
+function productOptionMarkup(selected = "") {
+  return `<option value="">wybierz produkt</option>` + customProductCatalog.map(product =>
+    `<option value="${product.id}" ${product.id === selected ? "selected" : ""}>${product.name}</option>`
+  ).join("");
+}
+
+function renderCustomIngredients() {
+  const holder = document.getElementById("customIngredientRows");
+  holder.innerHTML = "";
+  for (let index = 0; index < 4; index += 1) {
+    const row = document.createElement("div");
+    row.className = "custom-ingredient-row";
+    row.innerHTML = `
+      <select class="custom-product" aria-label="Produkt ${index + 1}">
+        ${productOptionMarkup()}
+      </select>
+      <input class="custom-amount" type="number" inputmode="decimal" min="0" step="1" placeholder="${index === 0 ? "ilosc/waga" : "opcjonalnie"}">
+      <span class="custom-unit">${index === 0 ? "ilosc" : "-"}</span>
+    `;
+    row.querySelector(".custom-product").addEventListener("change", () => updateCustomUnit(row));
+    holder.append(row);
+  }
+}
+
+function updateCustomUnit(row) {
+  const product = customProductCatalog.find(item => item.id === row.querySelector(".custom-product").value);
+  const unit = product ? product.unit : "-";
+  row.querySelector(".custom-unit").textContent = unit === "szt." ? "szt." : "g";
+}
+
 function renderSummary() {
   const plan = getPlan();
   const targets = getTargets();
@@ -685,34 +743,58 @@ function renderMeals() {
 
 function addCustomMeal(meal) {
   const customMeals = getCustomMeals();
-  const meatGrams = Number(meal.meatGrams || 0);
-  const saladGrams = Number(meal.saladGrams || 0);
-  const meatType = customTypeValues[meal.meatType] || customTypeValues.lean;
-  const saladType = customTypeValues[meal.saladType] || customTypeValues.salad;
-  const grams = meatGrams + (meal.saladType === "none" ? 0 : saladGrams);
-  const meatFactor = meatGrams / 100;
-  const saladFactor = meal.saladType === "none" ? 0 : saladGrams / 100;
-  const kcal = Math.round(meatType.kcal * meatFactor + saladType.kcal * saladFactor);
-  const protein = Math.round(meatType.protein * meatFactor + saladType.protein * saladFactor);
-  const fat = Math.round(meatType.fat * meatFactor + saladType.fat * saladFactor);
-  const carbs = Math.round(meatType.carbs * meatFactor + saladType.carbs * saladFactor);
-  const components = [
-    { name: meatType.label, grams: meatGrams },
-    ...(meal.saladType === "none" ? [] : [{ name: saladType.label, grams: saladGrams }])
-  ];
+  const ingredients = meal.ingredients
+    .map(ingredient => {
+      const product = customProductCatalog.find(item => item.id === ingredient.productId);
+      const amount = Number(ingredient.amount || 0);
+      if (!product || !amount) return null;
+      if (product.unit === "szt.") {
+        return {
+          product,
+          amount,
+          grams: Math.round(product.gramsPerUnit * amount),
+          kcal: product.kcal * amount,
+          protein: product.protein * amount,
+          fat: product.fat * amount,
+          carbs: product.carbs * amount,
+          component: { name: product.name, amount, unit: "szt.", grams: Math.round(product.gramsPerUnit * amount) }
+        };
+      }
+      const factor = amount / 100;
+      return {
+        product,
+        amount,
+        grams: amount,
+        kcal: product.kcal100 * factor,
+        protein: product.protein100 * factor,
+        fat: product.fat100 * factor,
+        carbs: product.carbs100 * factor,
+        component: { name: product.name, grams: amount }
+      };
+    })
+    .filter(Boolean);
+  const grams = ingredients.reduce((sum, item) => sum + item.grams, 0);
+  const kcal = Math.round(ingredients.reduce((sum, item) => sum + item.kcal, 0));
+  const protein = Math.round(ingredients.reduce((sum, item) => sum + item.protein, 0));
+  const fat = Math.round(ingredients.reduce((sum, item) => sum + item.fat, 0));
+  const carbs = Math.round(ingredients.reduce((sum, item) => sum + item.carbs, 0));
+  const components = ingredients.map(item => item.component);
+  const componentText = ingredients.map(item =>
+    item.product.unit === "szt." ? `${item.amount} x ${item.product.name}` : `${item.product.name} ${item.amount} g`
+  ).join(" + ");
   const nextMeal = {
-    name: meal.name || "Wlasne danie",
-    text: `${meal.name || "Wlasne danie"} (${components.map(item => `${item.name} ${item.grams} g`).join(" + ")})`,
+    name: meal.name || "Wlasny posilek",
+    text: componentText,
     kcal,
     protein,
     fat,
     carbs,
     grams,
-    portion: components.map(item => `${item.name} ${item.grams} g`).join(" + "),
+    portion: components.map(item => item.unit === "szt." ? `${item.amount} ${item.name}` : `${item.name} ${item.grams} g`).join(" + "),
     components
   };
-  if (!meatGrams && !saladGrams) {
-    showToast("Wpisz wage miesa albo surowki.");
+  if (!ingredients.length) {
+    showToast("Wybierz produkt i wpisz ilosc.");
     return;
   }
   const nextMeals = [nextMeal, ...customMeals].slice(0, 40);
@@ -729,17 +811,20 @@ function addCustomMeal(meal) {
 function readCustomForm() {
   return {
     name: document.getElementById("customName").value.trim(),
-    meatGrams: document.getElementById("customMeatGrams").value,
-    meatType: document.getElementById("customMeatType").value,
-    saladGrams: document.getElementById("customSaladGrams").value,
-    saladType: document.getElementById("customSaladType").value,
+    ingredients: Array.from(document.querySelectorAll(".custom-ingredient-row")).map(row => ({
+      productId: row.querySelector(".custom-product").value,
+      amount: row.querySelector(".custom-amount").value
+    })),
     slot: document.getElementById("customSlot").value
   };
 }
 
 function clearCustomForm() {
-  ["customName", "customMeatGrams", "customSaladGrams"].forEach(id => {
-    document.getElementById(id).value = "";
+  document.getElementById("customName").value = "";
+  document.querySelectorAll(".custom-ingredient-row").forEach((row, index) => {
+    row.querySelector(".custom-product").value = "";
+    row.querySelector(".custom-amount").value = "";
+    row.querySelector(".custom-unit").textContent = index === 0 ? "ilosc" : "-";
   });
 }
 
@@ -1458,18 +1543,6 @@ function bindEvents() {
   document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
   document.getElementById("addResult").addEventListener("click", addResult);
 
-  document.querySelectorAll("button[data-estimate]").forEach(button => {
-    button.addEventListener("click", () => {
-      const estimate = {
-        small: { name: "Wlasne male danie", kcal: 300, protein: 25, fat: 15, carbs: 15, grams: 250 },
-        medium: { name: "Wlasne srednie danie", kcal: 500, protein: 35, fat: 25, carbs: 25, grams: 350 },
-        large: { name: "Wlasne duze danie", kcal: 750, protein: 45, fat: 40, carbs: 45, grams: 500 },
-        carbs: { name: "Wlasne z weglami", kcal: 600, protein: 30, fat: 20, carbs: 65, grams: 400 }
-      }[button.dataset.estimate];
-      addCustomMeal(estimate);
-    });
-  });
-
   document.querySelectorAll("button[data-preset]").forEach(button => {
     button.addEventListener("click", () => applyShiftPreset(button.dataset.preset));
   });
@@ -1494,6 +1567,7 @@ function bindEvents() {
 
 function boot() {
   migratePlansToWeeklyKeys();
+  renderCustomIngredients();
   renderDayOptions();
   renderSettings();
   renderMeals();

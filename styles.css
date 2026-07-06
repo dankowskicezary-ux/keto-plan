@@ -564,6 +564,34 @@ button.primary {
   gap: 8px;
 }
 
+.custom-builder {
+  grid-template-columns: 1fr;
+}
+
+.ingredient-rows {
+  display: grid;
+  gap: 8px;
+}
+
+.custom-ingredient-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px 42px;
+  gap: 6px;
+  align-items: center;
+}
+
+.custom-unit {
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--primary-dark);
+  font-weight: 800;
+  font-size: 13px;
+}
+
 .results-summary {
   display: grid;
   gap: 8px;
