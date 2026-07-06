@@ -313,6 +313,7 @@ function clampMealWeight(item, grams, allowIncrease = false) {
 
 function normalizeMealWeights(plan) {
   if (!plan.weights || plan.weights.length !== slotNames.length) return plan;
+  const allowIncrease = Boolean(plan.fitExpanded);
   slotNames.forEach((_, slotIndex) => {
     if (plan.mealTypes?.[slotIndex] === "canteen") {
       setFixedCanteenMeal(plan, slotIndex);
@@ -320,7 +321,7 @@ function normalizeMealWeights(plan) {
     }
     const options = getMealOptions(slotIndex, plan);
     const item = options[plan.selected[slotIndex] || 0] || options[0];
-    plan.weights[slotIndex] = clampMealWeight(item, plan.weights[slotIndex]);
+    plan.weights[slotIndex] = clampMealWeight(item, plan.weights[slotIndex], allowIncrease);
   });
   return plan;
 }
@@ -895,6 +896,7 @@ function applyCustomMealToSlot(meal, slotIndex) {
   const optionIndex = options.findIndex(item => item.name === meal.name && item.kcal === meal.kcal);
   plan.selected[slotIndex] = optionIndex >= 0 ? optionIndex : options.length - 1;
   plan.weights[slotIndex] = meal.grams;
+  plan.fitExpanded = false;
   normalizeMealWeights(plan);
   setPlan(plan);
 }
@@ -935,6 +937,7 @@ function updateMealChoice(slotIndex, optionIndex) {
   plan.selected[slotIndex] = optionIndex;
   const item = getMealOptions(slotIndex, plan)[optionIndex] || getMealOptions(slotIndex, plan)[0];
   plan.weights[slotIndex] = baseGrams(item);
+  plan.fitExpanded = false;
   if (plan.mealTypes?.[slotIndex] === "canteen") setFixedCanteenMeal(plan, slotIndex);
   setPlan(plan);
   renderMeals();
@@ -953,6 +956,7 @@ function updateMealType(slotIndex, type) {
   plan.selected[slotIndex] = sameIndex >= 0 ? sameIndex : 0;
   const item = newOptions[plan.selected[slotIndex]] || newOptions[0];
   plan.weights[slotIndex] = baseGrams(item);
+  plan.fitExpanded = false;
   if (type === "canteen") setFixedCanteenMeal(plan, slotIndex);
   setPlan(plan);
   renderMeals();
@@ -970,6 +974,7 @@ function updateWeight(slotIndex, grams) {
   const selected = Number(plan.selected[slotIndex] || 0);
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   plan.weights[slotIndex] = clampMealWeight(item, grams);
+  plan.fitExpanded = false;
   setPlan(plan);
   renderMeals();
 }
@@ -987,6 +992,7 @@ function changeWeight(slotIndex, step) {
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
   plan.weights[slotIndex] = clampMealWeight(item, current + step);
+  plan.fitExpanded = false;
   setPlan(plan);
   renderMeals();
 }
@@ -1026,6 +1032,7 @@ function suggestDayPlan() {
 
   normalizeMealWeights(plan);
   optimizeMealChoicesToLimit(plan, getWorkLockedSlots(plan));
+  plan.fitExpanded = false;
   setPlan(plan);
   renderMeals();
   showToast("Zaproponowano dzien blizej limitu kcal.");
@@ -1178,6 +1185,7 @@ function fitPlanToLimit(plan, lockedSlots = []) {
     const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
     plan.weights[slotIndex] = clampMealWeight(item, Math.round(current * factor / 10) * 10, factor > 1);
   });
+  plan.fitExpanded = factor > 1;
 
   setPlan(plan);
   renderMeals();
