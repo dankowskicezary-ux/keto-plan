@@ -307,7 +307,7 @@ function setFixedCanteenMeal(plan, slotIndex) {
 
 function clampMealWeight(item, grams, allowIncrease = false) {
   const base = baseGrams(item);
-  const max = allowIncrease ? Math.round(base * 1.35 / 10) * 10 : base;
+  const max = allowIncrease ? 1000 : base;
   return Math.min(max, Math.max(30, Number(grams || base)));
 }
 
@@ -1157,6 +1157,13 @@ function fitPlanToLimit(plan, lockedSlots = []) {
     .filter(slotIndex => !locked.includes(slotIndex));
 
   const slots = adjustable.length ? adjustable : slotNames.map((_, slotIndex) => slotIndex).filter(slotIndex => !locked.includes(slotIndex));
+  if (!slots.length) {
+    setPlan(plan);
+    renderMeals();
+    showToast("Brak wolnych posilkow do dopasowania.");
+    return;
+  }
+
   const fixedKcal = slotNames.reduce((sum, _, slotIndex) => {
     if (slots.includes(slotIndex)) return sum;
     const options = getMealOptions(slotIndex, plan);
