@@ -140,7 +140,52 @@ const extraMealOptions = [
   { name: "Awaryjnie: hot bar mieso", text: "Mieso/kurczak z baru 200 g + salatka, bez frytek", kcal: 520, protein: 45, fat: 32, carbs: 12 },
   { name: "Dom: jajecznica lekka", text: "Jajecznica z 2 jaj + bialko/jogurt + cukinia", kcal: 260, protein: 24, fat: 15, carbs: 7 },
   { name: "Dom: miska bialka", text: "Kurczak/indyk 150 g + jajko + ogorek", kcal: 330, protein: 50, fat: 12, carbs: 4 },
-  { name: "Dom: wolnowar", text: "Duszony indyk/wolowina 220 g + warzywa", kcal: 500, protein: 55, fat: 26, carbs: 12 }
+  { name: "Dom: wolnowar", text: "Duszony indyk/wolowina 220 g + warzywa", kcal: 500, protein: 55, fat: 26, carbs: 12 },
+  { name: "Keto chleb z jajkiem", text: "Keto chleb 70 g + 2 jajka + ogorek", portion: "keto chleb 70 g + jajka 100 g + ogorek 100 g", grams: 270, components: [{ name: "keto chleb", grams: 70 }, { name: "jajka", grams: 100 }, { name: "ogorek", grams: 100 }], kcal: 350, protein: 28, fat: 22, carbs: 10 },
+  { name: "Keto chleb z wedlina", text: "Keto chleb 80 g + wedlina 100 g + maslo 10 g + ogorek", kcal: 420, protein: 35, fat: 27, carbs: 11 },
+  { name: "Keto tost", text: "Keto chleb 70 g + ser 40 g + szynka 80 g", kcal: 430, protein: 38, fat: 28, carbs: 8 },
+  { name: "Pizza keto jajeczna", text: "Spod z jajek i sera + szynka/pieczarki; bez ostrego sosu", kcal: 650, protein: 52, fat: 44, carbs: 11 },
+  { name: "Pizza keto z tortilli low carb", text: "Tortilla low carb + mozzarella + kurczak/szynka + pieczarki", kcal: 560, protein: 45, fat: 34, carbs: 18 },
+  { name: "Pizza keto kalafiorowa", text: "Spod kalafiorowo-serowy + chude mieso + lagodny sos", kcal: 520, protein: 38, fat: 34, carbs: 14 },
+  { name: "Zapiekanka keto", text: "Kurczak 180 g + brokul/kalafior + ser 40 g", kcal: 520, protein: 58, fat: 28, carbs: 12 },
+  { name: "Lasagne keto z cukinii", text: "Plastry cukinii + mieso mielone + mozzarella, bez makaronu", kcal: 560, protein: 45, fat: 38, carbs: 13 },
+  { name: "Makaron z jajka + kurczak", text: "Paski z omletu 2 jajka + kurczak 170 g + cukinia", kcal: 500, protein: 58, fat: 25, carbs: 8 },
+  { name: "Pomidorowa keto + makaron jajeczny", text: "Pomidorowa 300 ml + paski z omletu; uwaga przy zgadze", kcal: 300, protein: 22, fat: 17, carbs: 15 },
+  { name: "Pomidorowa + konjac", text: "Pomidorowa 300 ml + makaron konjac 150 g + kurczak 100 g", kcal: 260, protein: 28, fat: 10, carbs: 12 },
+  { name: "Rosol + makaron jajeczny keto", text: "Rosol 400 ml + paski z omletu 2 jajka + mieso", kcal: 390, protein: 36, fat: 23, carbs: 7 },
+  { name: "Rosol + konjac", text: "Rosol 400 ml + konjac 150 g + mieso kurczaka", kcal: 270, protein: 30, fat: 14, carbs: 4 },
+  { name: "Krem brokulowy z kurczakiem", text: "Krem brokulowy 350 g + kurczak 150 g + jogurt", kcal: 390, protein: 45, fat: 17, carbs: 15 },
+  { name: "Krem kalafiorowy z jajkiem", text: "Krem kalafiorowy 350 g + 2 jajka", kcal: 330, protein: 22, fat: 20, carbs: 13 },
+  { name: "Zurek keto", text: "Zurek bez ziemniakow + jajko + kielbasa, mala porcja", kcal: 460, protein: 27, fat: 34, carbs: 14 },
+  { name: "Salatka cezar keto", text: "Kurczak + salata + parmezan + sos jogurtowy, bez grzanek", kcal: 480, protein: 48, fat: 28, carbs: 9 },
+  { name: "Salatka jajeczna", text: "3 jajka + ogorek + jogurt/majonez 15 g", kcal: 380, protein: 25, fat: 27, carbs: 6 },
+  { name: "Salatka z tunczykiem", text: "Tunczyk 120 g + jajko + ogorek + salata + oliwa 10 g", kcal: 390, protein: 45, fat: 20, carbs: 5 },
+  { name: "Bowl keto kurczak", text: "Kurczak 180 g + awokado 70 g + salata + ogorek", kcal: 500, protein: 58, fat: 26, carbs: 10 },
+  { name: "Bowl keto wolowina", text: "Wolowina 170 g + warzywa + oliwa 10 g", kcal: 560, protein: 45, fat: 38, carbs: 11 },
+  { name: "Burger keto talerz", text: "Kotlet wolowy + ser + salata + ogorek, bez bulki", kcal: 620, protein: 44, fat: 47, carbs: 8 },
+  { name: "Hot dog keto talerz", text: "Parowki 120 g + salata + ogorek + musztarda, bez bulki", kcal: 390, protein: 20, fat: 31, carbs: 6 },
+  { name: "Kebab box keto", text: "Mieso kebab 180 g + salata + sos jogurtowy, bez frytek", kcal: 560, protein: 40, fat: 39, carbs: 12 },
+  { name: "Schabowy bez dodatkow", text: "Schabowy panierowany 170 g + surowka 150 g, bez ziemniakow", kcal: 600, protein: 40, fat: 36, carbs: 25 },
+  { name: "Kotlet z piersi panierowany", text: "Kotlet z piersi 180 g + surowka 150 g, bez ziemniakow", kcal: 560, protein: 47, fat: 31, carbs: 28 },
+  { name: "Mielony + ogorki", text: "Kotlet mielony 180 g + ogorki/salata, bez ziemniakow", kcal: 500, protein: 34, fat: 36, carbs: 10 },
+  { name: "Pulpet w sosie + surowka", text: "Pulpety 220 g + surowka; sos licz jako wyzsze kcal", kcal: 560, protein: 40, fat: 34, carbs: 18 },
+  { name: "Gulasz + ogorek", text: "Gulasz 280 g + ogorek/salata, bez kaszy", kcal: 540, protein: 42, fat: 34, carbs: 14 },
+  { name: "Leczo keto", text: "Leczo z miesem i cukinia, bez pieczywa", kcal: 430, protein: 30, fat: 30, carbs: 14 },
+  { name: "Ryba po grecku keto", text: "Ryba + warzywa bez cukru, mala porcja marchwi", kcal: 420, protein: 38, fat: 22, carbs: 17 },
+  { name: "Dorsz w sosie jogurtowym", text: "Dorsz 220 g + warzywa + sos jogurtowy", kcal: 360, protein: 50, fat: 12, carbs: 12 },
+  { name: "Losos + szpinak", text: "Losos 180 g + szpinak/cukinia", kcal: 520, protein: 40, fat: 36, carbs: 6 },
+  { name: "Tunczyk z keto chlebem", text: "Tunczyk 120 g + keto chleb 60 g + ogorek", kcal: 330, protein: 44, fat: 11, carbs: 10 },
+  { name: "Serek wiejski + jajka", text: "Serek wiejski 200 g + 2 jajka + ogorek", kcal: 360, protein: 37, fat: 18, carbs: 8 },
+  { name: "Omlet z szynka", text: "3 jajka + szynka 80 g + pieczarki", kcal: 430, protein: 39, fat: 28, carbs: 5 },
+  { name: "Omlet z serem", text: "3 jajka + ser 40 g + cukinia", kcal: 470, protein: 34, fat: 34, carbs: 6 },
+  { name: "Jajka faszerowane", text: "3 jajka + jogurt/majonez 15 g + ogorek", kcal: 360, protein: 24, fat: 27, carbs: 5 },
+  { name: "Tortilla low carb", text: "Tortilla low carb + kurczak 130 g + salata + jogurt", kcal: 440, protein: 43, fat: 20, carbs: 20 },
+  { name: "Nalesnik keto", text: "Nalesnik z jajka/twarogu + serek, bez cukru", kcal: 360, protein: 32, fat: 22, carbs: 9 },
+  { name: "Gofr keto", text: "Gofr z jajka i maki migdalowej + skyr", kcal: 420, protein: 30, fat: 28, carbs: 10 },
+  { name: "Chaffle", text: "Jajko + mozzarella jako keto tost/gofr", kcal: 330, protein: 25, fat: 24, carbs: 3 },
+  { name: "Keto kanapki", text: "Keto chleb 90 g + szynka/ser + ogorek", kcal: 480, protein: 38, fat: 30, carbs: 12 },
+  { name: "Keto zapiekanka z tunczykiem", text: "Tunczyk + jajko + mozzarella + cukinia", kcal: 500, protein: 55, fat: 28, carbs: 8 },
+  { name: "Keto chleb solo", text: "Keto chleb/proteinowy jako wazony dodatek", portion: "keto chleb 100 g", grams: 100, components: [{ name: "keto chleb", grams: 100 }], kcal: 240, protein: 18, fat: 12, carbs: 8 }
 ];
 
 function buildCatalog() {
@@ -267,6 +312,91 @@ const customProductCatalog = [
   { id: "banana", name: "Banan", unit: "g", kcal100: 89, protein100: 1, fat100: 0, carbs100: 23 },
   { id: "berries", name: "Owoce jagodowe", unit: "g", kcal100: 50, protein100: 1, fat100: 0, carbs100: 12 }
 ];
+
+const expandedProductCatalog = [
+  { id: "egg_boiled", name: "Jajko gotowane", unit: "szt.", gramsPerUnit: 50, kcal: 75, protein: 6.5, fat: 5, carbs: 0.5 },
+  { id: "egg_scrambled_fat", name: "Jajecznica na masle", unit: "g", kcal100: 190, protein100: 11, fat100: 15, carbs100: 2 },
+  { id: "keto_bread_home", name: "Chleb keto domowy", unit: "g", kcal100: 260, protein100: 17, fat100: 18, carbs100: 7 },
+  { id: "keto_bread_seed", name: "Chleb keto ziarnisty", unit: "g", kcal100: 310, protein100: 16, fat100: 24, carbs100: 8 },
+  { id: "protein_bread", name: "Chleb proteinowy low carb", unit: "g", kcal100: 250, protein100: 22, fat100: 10, carbs100: 9 },
+  { id: "low_carb_tortilla", name: "Tortilla low carb", unit: "g", kcal100: 240, protein100: 16, fat100: 9, carbs100: 18 },
+  { id: "almond_flour", name: "Maka migdalowa", unit: "g", kcal100: 580, protein100: 21, fat100: 50, carbs100: 20 },
+  { id: "coconut_flour", name: "Maka kokosowa", unit: "g", kcal100: 400, protein100: 18, fat100: 14, carbs100: 60 },
+  { id: "psyllium", name: "Babka jajowata/luska", unit: "g", kcal100: 180, protein100: 2, fat100: 1, carbs100: 85 },
+  { id: "flaxseed", name: "Siemie lniane", unit: "g", kcal100: 530, protein100: 18, fat100: 42, carbs100: 29 },
+  { id: "chia", name: "Nasiona chia", unit: "g", kcal100: 490, protein100: 17, fat100: 31, carbs100: 42 },
+  { id: "sunflower", name: "Slonecznik", unit: "g", kcal100: 585, protein100: 21, fat100: 51, carbs100: 20 },
+  { id: "pumpkin_seeds", name: "Pestki dyni", unit: "g", kcal100: 560, protein100: 30, fat100: 49, carbs100: 11 },
+  { id: "sesame", name: "Sezam", unit: "g", kcal100: 570, protein100: 18, fat100: 50, carbs100: 23 },
+  { id: "peanut_butter", name: "Maslo orzechowe", unit: "g", kcal100: 590, protein100: 25, fat100: 50, carbs100: 20 },
+  { id: "cream_cheese", name: "Serek kremowy", unit: "g", kcal100: 250, protein100: 7, fat100: 24, carbs100: 4 },
+  { id: "ricotta", name: "Ricotta", unit: "g", kcal100: 170, protein100: 11, fat100: 13, carbs100: 3 },
+  { id: "parmesan", name: "Parmezan", unit: "g", kcal100: 430, protein100: 38, fat100: 29, carbs100: 4 },
+  { id: "blue_cheese", name: "Ser plesniowy", unit: "g", kcal100: 350, protein100: 21, fat100: 29, carbs100: 2 },
+  { id: "halloumi", name: "Halloumi", unit: "g", kcal100: 320, protein100: 22, fat100: 26, carbs100: 2 },
+  { id: "cream_30", name: "Smietanka 30%", unit: "g", kcal100: 290, protein100: 2, fat100: 30, carbs100: 3 },
+  { id: "sour_cream", name: "Smietana 18%", unit: "g", kcal100: 185, protein100: 3, fat100: 18, carbs100: 4 },
+  { id: "whey", name: "Odzywka bialkowa", unit: "g", kcal100: 390, protein100: 78, fat100: 6, carbs100: 8 },
+  { id: "tofu", name: "Tofu naturalne", unit: "g", kcal100: 120, protein100: 13, fat100: 7, carbs100: 2 },
+  { id: "tempeh", name: "Tempeh", unit: "g", kcal100: 190, protein100: 20, fat100: 11, carbs100: 8 },
+  { id: "bacon", name: "Boczek", unit: "g", kcal100: 500, protein100: 15, fat100: 48, carbs100: 1 },
+  { id: "pork_loin", name: "Schab pieczony", unit: "g", kcal100: 230, protein100: 27, fat100: 13, carbs100: 0 },
+  { id: "pork_shoulder", name: "Lopatka wieprzowa", unit: "g", kcal100: 260, protein100: 24, fat100: 18, carbs100: 0 },
+  { id: "meatballs", name: "Pulpety", unit: "g", kcal100: 230, protein100: 16, fat100: 16, carbs100: 7 },
+  { id: "kebab_meat", name: "Mieso kebab", unit: "g", kcal100: 260, protein100: 18, fat100: 19, carbs100: 5 },
+  { id: "beef_patty", name: "Kotlet wolowy burger", unit: "g", kcal100: 260, protein100: 25, fat100: 17, carbs100: 0 },
+  { id: "duck", name: "Kaczka pieczona", unit: "g", kcal100: 300, protein100: 19, fat100: 25, carbs100: 0 },
+  { id: "mackerel", name: "Makrela", unit: "g", kcal100: 260, protein100: 19, fat100: 20, carbs100: 0 },
+  { id: "sardines", name: "Sardynki", unit: "g", kcal100: 210, protein100: 25, fat100: 11, carbs100: 0 },
+  { id: "trout", name: "Pstrag", unit: "g", kcal100: 170, protein100: 24, fat100: 8, carbs100: 0 },
+  { id: "pollock", name: "Mintaj", unit: "g", kcal100: 90, protein100: 20, fat100: 1, carbs100: 0 },
+  { id: "squid", name: "Kalmary", unit: "g", kcal100: 92, protein100: 16, fat100: 1, carbs100: 3 },
+  { id: "crab_sticks", name: "Paluszki krabowe", unit: "g", kcal100: 100, protein100: 8, fat100: 1, carbs100: 15 },
+  { id: "cauliflower_rice", name: "Ryż z kalafiora", unit: "g", kcal100: 25, protein100: 2, fat100: 0, carbs100: 5 },
+  { id: "celeriac", name: "Seler korzeniowy", unit: "g", kcal100: 42, protein100: 1.5, fat100: 0, carbs100: 9 },
+  { id: "asparagus", name: "Szparagi", unit: "g", kcal100: 20, protein100: 2, fat100: 0, carbs100: 4 },
+  { id: "brussels", name: "Brukselka", unit: "g", kcal100: 43, protein100: 3, fat100: 0, carbs100: 9 },
+  { id: "eggplant", name: "Baklazan", unit: "g", kcal100: 25, protein100: 1, fat100: 0, carbs100: 6 },
+  { id: "pepper", name: "Papryka", unit: "g", kcal100: 31, protein100: 1, fat100: 0, carbs100: 6 },
+  { id: "onion", name: "Cebula", unit: "g", kcal100: 40, protein100: 1, fat100: 0, carbs100: 9 },
+  { id: "garlic", name: "Czosnek", unit: "g", kcal100: 150, protein100: 6, fat100: 0, carbs100: 33 },
+  { id: "olives", name: "Oliwki", unit: "g", kcal100: 145, protein100: 1, fat100: 15, carbs100: 4 },
+  { id: "pickles_mix", name: "Warzywa konserwowe", unit: "g", kcal100: 25, protein100: 1, fat100: 0, carbs100: 5 },
+  { id: "salsa_mild", name: "Sos pomidorowy lagodny", unit: "g", kcal100: 55, protein100: 2, fat100: 1, carbs100: 10 },
+  { id: "tomato_passata", name: "Passata pomidorowa", unit: "g", kcal100: 35, protein100: 2, fat100: 0, carbs100: 6 },
+  { id: "pesto", name: "Pesto", unit: "g", kcal100: 430, protein100: 5, fat100: 42, carbs100: 6 },
+  { id: "guacamole", name: "Guacamole", unit: "g", kcal100: 160, protein100: 2, fat100: 14, carbs100: 8 },
+  { id: "yogurt_sauce", name: "Sos jogurtowy", unit: "g", kcal100: 80, protein100: 4, fat100: 5, carbs100: 5 },
+  { id: "breaded_chicken_ready", name: "Kotlet drobiowy panierowany gotowy", unit: "g", kcal100: 260, protein100: 20, fat100: 14, carbs100: 18 },
+  { id: "keto_pizza_ready", name: "Pizza keto gotowa/domowa", unit: "g", kcal100: 260, protein100: 20, fat100: 17, carbs100: 6 },
+  { id: "keto_pizza_tortilla", name: "Pizza keto na tortilli", unit: "g", kcal100: 240, protein100: 18, fat100: 14, carbs100: 10 },
+  { id: "keto_waffle", name: "Gofr keto", unit: "g", kcal100: 260, protein100: 18, fat100: 18, carbs100: 8 },
+  { id: "keto_pancake", name: "Nalesnik keto", unit: "g", kcal100: 210, protein100: 17, fat100: 13, carbs100: 8 },
+  { id: "chaffle_ready", name: "Chaffle jajko + ser", unit: "g", kcal100: 300, protein100: 22, fat100: 23, carbs100: 3 },
+  { id: "zucchini_noodles", name: "Makaron z cukinii", unit: "g", kcal100: 20, protein100: 1, fat100: 0, carbs100: 4 },
+  { id: "egg_noodles_keto", name: "Makaron z jajka/paski omletu", unit: "g", kcal100: 155, protein100: 11, fat100: 11, carbs100: 2 },
+  { id: "shirataki_rice", name: "Ryz konjac/shirataki", unit: "g", kcal100: 10, protein100: 0, fat100: 0, carbs100: 1 },
+  { id: "tomato_soup_keto", name: "Pomidorowa keto", unit: "g", kcal100: 55, protein100: 3, fat100: 3, carbs100: 5 },
+  { id: "broccoli_soup", name: "Zupa brokulowa", unit: "g", kcal100: 60, protein100: 3, fat100: 4, carbs100: 5 },
+  { id: "cauliflower_soup", name: "Zupa kalafiorowa", unit: "g", kcal100: 55, protein100: 3, fat100: 3, carbs100: 6 },
+  { id: "zucchini_soup", name: "Zupa krem z cukinii", unit: "g", kcal100: 45, protein100: 2, fat100: 3, carbs100: 4 },
+  { id: "ceasar_salad", name: "Salatka cezar bez grzanek", unit: "g", kcal100: 165, protein100: 15, fat100: 10, carbs100: 4 },
+  { id: "coleslaw", name: "Coleslaw", unit: "g", kcal100: 150, protein100: 1, fat100: 12, carbs100: 9 },
+  { id: "greek_salad_ready", name: "Salatka grecka", unit: "g", kcal100: 120, protein100: 5, fat100: 9, carbs100: 5 },
+  { id: "strawberries", name: "Truskawki", unit: "g", kcal100: 32, protein100: 1, fat100: 0, carbs100: 8 },
+  { id: "raspberries", name: "Maliny", unit: "g", kcal100: 52, protein100: 1, fat100: 1, carbs100: 12 },
+  { id: "blueberries", name: "Borowki", unit: "g", kcal100: 57, protein100: 1, fat100: 0, carbs100: 14 },
+  { id: "dark_chocolate", name: "Czekolada gorzka 85%", unit: "g", kcal100: 600, protein100: 10, fat100: 50, carbs100: 20 }
+];
+
+function allCustomProducts() {
+  const seen = new Set();
+  return customProductCatalog.concat(expandedProductCatalog).filter(product => {
+    if (seen.has(product.id)) return false;
+    seen.add(product.id);
+    return true;
+  });
+}
 
 function allMealOptions() {
   return foodCatalog.concat(getCustomMeals());
@@ -620,7 +750,7 @@ function mealChoiceListMarkup(options, selected, query = "") {
   const matched = options
     .map((option, optionIndex) => ({ option, optionIndex }))
     .filter(item => optionMatches(item.option, query));
-  const visible = (matched.length ? matched : options.map((option, optionIndex) => ({ option, optionIndex }))).slice(0, 24);
+  const visible = (matched.length ? matched : options.map((option, optionIndex) => ({ option, optionIndex }))).slice(0, 60);
   return visible.map(({ option, optionIndex }) => `
     <button class="meal-option ${optionIndex === selected ? "selected" : ""}" type="button" data-option="${optionIndex}">
       <strong>${option.name}</strong>
@@ -677,10 +807,33 @@ function renderDayOptions() {
   select.value = String(selectedDay);
 }
 
-function productOptionMarkup(selected = "") {
-  return `<option value="">wybierz produkt</option>` + customProductCatalog.slice().sort((a, b) => a.name.localeCompare(b.name, "pl")).map(product =>
-    `<option value="${product.id}" ${product.id === selected ? "selected" : ""}>${product.name}</option>`
-  ).join("");
+function fillCustomDatalists() {
+  const productList = document.getElementById("customProductList");
+  const readyList = document.getElementById("readyMealList");
+  if (productList) {
+    productList.innerHTML = allCustomProducts().slice().sort((a, b) => a.name.localeCompare(b.name, "pl")).map(product =>
+      `<option value="${product.name}"></option>`
+    ).join("");
+  }
+  if (readyList) {
+    readyList.innerHTML = foodCatalog.slice().sort((a, b) => a.name.localeCompare(b.name, "pl")).map(item =>
+      `<option value="${item.name}"></option>`
+    ).join("");
+  }
+}
+
+function findProductByInput(value) {
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return null;
+  return allCustomProducts().find(product => product.id === value || product.name.toLowerCase() === normalized)
+    || allCustomProducts().find(product => product.name.toLowerCase().includes(normalized));
+}
+
+function findReadyMealByInput(value) {
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return null;
+  return foodCatalog.find(item => item.name.toLowerCase() === normalized)
+    || foodCatalog.find(item => `${item.name} ${item.text}`.toLowerCase().includes(normalized));
 }
 
 function renderCustomIngredients() {
@@ -690,21 +843,41 @@ function renderCustomIngredients() {
     const row = document.createElement("div");
     row.className = "custom-ingredient-row";
     row.innerHTML = `
-      <select class="custom-product" aria-label="Produkt ${index + 1}">
-        ${productOptionMarkup()}
-      </select>
+      <input class="custom-product-search" type="search" list="customProductList" aria-label="Produkt ${index + 1}" placeholder="${index === 0 ? "wpisz produkt" : "produkt"}">
       <input class="custom-amount" type="number" inputmode="decimal" min="0" step="1" placeholder="${index === 0 ? "ilosc/waga" : "opcjonalnie"}">
       <span class="custom-unit">${index === 0 ? "ilosc" : "-"}</span>
     `;
-    row.querySelector(".custom-product").addEventListener("change", () => updateCustomUnit(row));
+    row.querySelector(".custom-product-search").addEventListener("input", () => updateCustomUnit(row));
     holder.append(row);
   }
+  fillCustomDatalists();
+  updateCustomMode();
 }
 
 function updateCustomUnit(row) {
-  const product = customProductCatalog.find(item => item.id === row.querySelector(".custom-product").value);
+  const product = findProductByInput(row.querySelector(".custom-product-search").value);
   const unit = product ? product.unit : "-";
   row.querySelector(".custom-unit").textContent = unit === "szt." ? "szt." : "g";
+}
+
+function updateCustomMode() {
+  const mode = document.querySelector("input[name='customMode']:checked")?.value || "products";
+  document.getElementById("customProductMode").classList.toggle("hidden", mode !== "products");
+  document.getElementById("customReadyMode").classList.toggle("hidden", mode !== "ready");
+  updateReadyPreview();
+}
+
+function updateReadyPreview() {
+  const preview = document.getElementById("customReadyPreview");
+  if (!preview) return;
+  const item = findReadyMealByInput(document.getElementById("customReadySearch").value);
+  const grams = Number(document.getElementById("customReadyGrams").value || 0);
+  if (!item) {
+    preview.textContent = "Wpisz i wybierz gotowe danie z listy.";
+    return;
+  }
+  const portion = portionFromGrams(item, grams || baseGrams(item));
+  preview.textContent = `${item.name}: ${mealDetailText(item, grams || baseGrams(item))} | ${macroLine(item, portion)}`;
 }
 
 function renderSummary() {
@@ -804,10 +977,41 @@ function renderMeals() {
 }
 
 function addCustomMeal(meal) {
+  if (meal.mode === "ready") {
+    const item = findReadyMealByInput(meal.readyName);
+    const grams = Math.max(30, Number(meal.readyGrams || baseGrams(item || {})));
+    if (!item) {
+      showToast("Wybierz gotowe danie z listy.");
+      return;
+    }
+    const portion = portionFromGrams(item, grams);
+    const nextMeal = {
+      name: meal.name || item.name,
+      text: item.text,
+      kcal: Math.round(item.kcal * portion),
+      protein: Math.round(item.protein * portion),
+      fat: Math.round(item.fat * portion),
+      carbs: Math.round(item.carbs * portion),
+      grams,
+      portion: `${item.name} ${grams} g`,
+      components: [{ name: item.name, grams }]
+    };
+    const customMeals = getCustomMeals();
+    setCustomMeals([nextMeal, ...customMeals].slice(0, 80));
+    if (meal.slot !== "list") {
+      applyCustomMealToSlot(nextMeal, Number(meal.slot));
+    }
+    clearCustomForm();
+    renderMeals();
+    renderWeek();
+    showToast(`Dodano gotowe danie: ${nextMeal.kcal} kcal.`);
+    return;
+  }
+
   const customMeals = getCustomMeals();
   const ingredients = meal.ingredients
     .map(ingredient => {
-      const product = customProductCatalog.find(item => item.id === ingredient.productId);
+      const product = findProductByInput(ingredient.productId);
       const amount = Number(ingredient.amount || 0);
       if (!product || !amount) return null;
       if (product.unit === "szt.") {
@@ -859,7 +1063,7 @@ function addCustomMeal(meal) {
     showToast("Wybierz produkt i wpisz ilosc.");
     return;
   }
-  const nextMeals = [nextMeal, ...customMeals].slice(0, 40);
+  const nextMeals = [nextMeal, ...customMeals].slice(0, 80);
   setCustomMeals(nextMeals);
   if (meal.slot !== "list") {
     applyCustomMealToSlot(nextMeal, Number(meal.slot));
@@ -872,22 +1076,28 @@ function addCustomMeal(meal) {
 
 function readCustomForm() {
   return {
+    mode: document.querySelector("input[name='customMode']:checked")?.value || "products",
     name: document.getElementById("customName").value.trim(),
     ingredients: Array.from(document.querySelectorAll(".custom-ingredient-row")).map(row => ({
-      productId: row.querySelector(".custom-product").value,
+      productId: row.querySelector(".custom-product-search").value,
       amount: row.querySelector(".custom-amount").value
     })),
+    readyName: document.getElementById("customReadySearch").value,
+    readyGrams: document.getElementById("customReadyGrams").value,
     slot: document.getElementById("customSlot").value
   };
 }
 
 function clearCustomForm() {
   document.getElementById("customName").value = "";
+  document.getElementById("customReadySearch").value = "";
+  document.getElementById("customReadyGrams").value = "250";
   document.querySelectorAll(".custom-ingredient-row").forEach((row, index) => {
-    row.querySelector(".custom-product").value = "";
+    row.querySelector(".custom-product-search").value = "";
     row.querySelector(".custom-amount").value = "";
     row.querySelector(".custom-unit").textContent = index === 0 ? "ilosc" : "-";
   });
+  updateReadyPreview();
 }
 
 function applyCustomMealToSlot(meal, slotIndex) {
@@ -1610,6 +1820,11 @@ function bindEvents() {
   document.getElementById("fitLimit").addEventListener("click", fitRemainingMealsToLimit);
   document.getElementById("suggestDay").addEventListener("click", suggestDayPlan);
 
+  document.querySelectorAll("input[name='customMode']").forEach(input => {
+    input.addEventListener("change", updateCustomMode);
+  });
+  document.getElementById("customReadySearch").addEventListener("input", updateReadyPreview);
+  document.getElementById("customReadyGrams").addEventListener("input", updateReadyPreview);
   document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
   document.getElementById("addResult").addEventListener("click", addResult);
 

@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1f6b5c">
   <title>Keto Plan</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=44">
+  <link rel="stylesheet" href="styles.css?v=45">
 </head>
 <body>
   <div class="app-shell">
@@ -84,8 +84,21 @@
         <section class="custom-card" aria-label="Wlasne danie">
           <h2>Wlasne danie</h2>
           <div class="custom-grid custom-builder">
+            <div class="custom-mode" role="radiogroup" aria-label="Tryb dodawania posilku">
+              <label><input type="radio" name="customMode" value="products" checked> produkty</label>
+              <label><input type="radio" name="customMode" value="ready"> gotowe danie</label>
+            </div>
             <input id="customName" type="text" placeholder="Nazwa, np. sniadanie jajka albo obiad w pracy">
-            <div id="customIngredientRows" class="ingredient-rows"></div>
+            <div id="customProductMode">
+              <div id="customIngredientRows" class="ingredient-rows"></div>
+            </div>
+            <div id="customReadyMode" class="ready-mode hidden">
+              <input id="customReadySearch" type="search" list="readyMealList" placeholder="Szukaj gotowego dania, np. pizza keto albo chleb keto">
+              <datalist id="readyMealList"></datalist>
+              <input id="customReadyGrams" type="number" inputmode="numeric" min="30" max="1000" step="10" value="250" placeholder="gramatura">
+              <div id="customReadyPreview" class="ready-preview"></div>
+            </div>
+            <datalist id="customProductList"></datalist>
             <select id="customSlot">
               <option value="0">posilek 1</option>
               <option value="1">posilek 2</option>
@@ -202,13 +215,13 @@
         </div>
         <div class="tips">
           <h2>Na telefonie</h2>
-          <p>Wersja: v44. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=44 w przegladarce i odswiez strone.</p>
+          <p>Wersja: v45. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=45 w przegladarce i odswiez strone.</p>
         </div>
       </section>
     </main>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=44"></script>
+  <script src="app.js?v=45"></script>
 </body>
 </html>

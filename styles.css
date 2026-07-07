@@ -568,6 +568,28 @@ button.primary {
   grid-template-columns: 1fr;
 }
 
+.custom-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.custom-mode label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: white;
+  font-weight: 800;
+}
+
+.hidden {
+  display: none !important;
+}
+
 .ingredient-rows {
   display: grid;
   gap: 8px;
@@ -590,6 +612,23 @@ button.primary {
   color: var(--primary-dark);
   font-weight: 800;
   font-size: 13px;
+}
+
+.ready-mode {
+  display: grid;
+  gap: 8px;
+}
+
+.ready-preview {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--soft);
+  color: var(--primary-dark);
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 .results-summary {
