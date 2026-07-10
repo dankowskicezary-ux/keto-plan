@@ -526,7 +526,7 @@ function mealKind(item) {
 }
 
 function typeLabel(type) {
-  return { light: "lekki", dinner: "obiadowy", canteen: "kantyna", any: "dowolny" }[type] || "dowolny";
+  return { light: "lekki", dinner: "obiadowy", canteen: "kantyna", any: "dowolny", random: "random" }[type] || "dowolny";
 }
 
 function getMealOptions(slotIndex, plan = null) {
@@ -943,7 +943,7 @@ function mealKcal(item, grams) {
 }
 
 function mealFitsType(item, type) {
-  if (!type || type === "any") return true;
+  if (!type || type === "any" || type === "random") return true;
   return mealKind(item) === type;
 }
 
@@ -1086,6 +1086,7 @@ function renderMeals() {
           <option value="dinner" ${plan.mealTypes?.[slotIndex] === "dinner" ? "selected" : ""}>obiadowy</option>
           <option value="canteen" ${plan.mealTypes?.[slotIndex] === "canteen" ? "selected" : ""}>kantyna</option>
           <option value="any" ${plan.mealTypes?.[slotIndex] === "any" ? "selected" : ""}>dowolny</option>
+          <option value="random">random</option>
         </select>
       </label>
       <button class="selected-meal" type="button" data-open-options="${slotIndex}">
@@ -1309,6 +1310,10 @@ function updateMealChoice(slotIndex, optionIndex) {
 }
 
 function updateMealType(slotIndex, type) {
+  if (type === "random") {
+    randomizeMeal(slotIndex);
+    return;
+  }
   const plan = getPlan();
   const oldOptions = getMealOptions(slotIndex, plan);
   const oldItem = oldOptions[plan.selected[slotIndex] || 0];
@@ -1325,6 +1330,53 @@ function updateMealType(slotIndex, type) {
   if (type === "canteen") setFixedCanteenMeal(plan, slotIndex);
   setPlan(plan);
   renderMeals();
+}
+
+function randomizeMeal(slotIndex) {
+  const plan = getPlan();
+  if (plan.mealTypes?.[slotIndex] === "canteen") {
+    showToast("Kantyna ma stala porcje.");
+    renderMeals();
+    return;
+  }
+
+  plan.mealTypes = [...(plan.mealTypes || settings.mealTypes || defaultSettings.mealTypes)];
+  plan.mealTypes[slotIndex] = "any";
+  const options = getMealOptions(slotIndex, plan);
+  const current = options[plan.selected[slotIndex] || 0];
+  const usedNames = new Set(slotNames.map((_, index) => {
+    if (index === slotIndex) return null;
+    const slotOptions = getMealOptions(index, plan);
+    return (slotOptions[plan.selected[index] || 0] || slotOptions[0])?.name;
+  }).filter(Boolean));
+  const candidates = options
+    .map((item, optionIndex) => ({ item, optionIndex }))
+    .filter(({ item }) => item.name !== CANTEEN_MEAL_NAME)
+    .filter(({ item }) => item.name !== current?.name)
+    .filter(({ item }) => !usedNames.has(item.name));
+  const pool = candidates.length ? candidates : options
+    .map((item, optionIndex) => ({ item, optionIndex }))
+    .filter(({ item }) => item.name !== CANTEEN_MEAL_NAME && item.name !== current?.name);
+  if (!pool.length) {
+    showToast("Brak innego dania do wylosowania.");
+    renderMeals();
+    return;
+  }
+
+  const choice = pool[Math.floor(Math.random() * pool.length)];
+  plan.selected[slotIndex] = choice.optionIndex;
+  const targets = getTargets();
+  const totals = calculateTotals(plan);
+  const currentPortion = portionFromGrams(choice.item, plan.weights?.[slotIndex]);
+  const kcalWithoutThis = totals.kcal - choice.item.kcal * currentPortion;
+  const room = Math.max(0, targets.kcal - kcalWithoutThis);
+  const grams = room ? Math.round(Math.min(practicalMaxGrams(choice.item), Math.max(80, (room / choice.item.kcal) * baseGrams(choice.item))) / 10) * 10 : baseGrams(choice.item);
+  plan.weights[slotIndex] = clampMealWeight(choice.item, grams, true);
+  markManualSlot(plan, slotIndex, false);
+  plan.fitExpanded = true;
+  setPlan(plan);
+  renderMeals();
+  showToast(`Wylosowano: ${choice.item.name}.`);
 }
 
 function updateWeight(slotIndex, grams) {
@@ -2120,7 +2172,7 @@ function boot() {
       refreshing = true;
       window.location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=52").then(registration => {
+    navigator.serviceWorker.register("sw.js?v=53").then(registration => {
       registration.update();
       if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
       registration.addEventListener("updatefound", () => {
