@@ -1418,7 +1418,79 @@ function fitRemainingMealsToLimit() {
   const lockForFit = slotNames
     .map((_, slotIndex) => slotIndex)
     .filter(slotIndex => !slotsToFit.includes(slotIndex));
-  fitPlanToLimit(plan, lockForFit);
+  if (!fitOpenMealsToLimit(plan, slotsToFit)) {
+    fitPlanToLimit(plan, lockForFit);
+  }
+}
+
+function practicalMaxGrams(item) {
+  const text = `${item.name} ${item.text}`.toLowerCase();
+  if (text.includes("zupa") || text.includes("rosol") || text.includes("barszcz") || text.includes("zurek")) return 650;
+  return mealKind(item) === "dinner" ? 650 : 450;
+}
+
+function fitOpenMealsToLimit(plan, slotsToFit) {
+  if (!slotsToFit.length) return false;
+  const targets = getTargets();
+  const fixedKcal = slotNames.reduce((sum, _, slotIndex) => {
+    if (slotsToFit.includes(slotIndex)) return sum;
+    const options = getMealOptions(slotIndex, plan);
+    const item = options[plan.selected[slotIndex] || 0] || options[0];
+    return sum + mealKcal(item, plan.weights?.[slotIndex]);
+  }, 0) + drinks.reduce((sum, drink) => sum + drink.kcal * Number(plan.drinks?.[drink.id] || 0), 0);
+
+  let room = Math.max(0, targets.kcal - fixedKcal);
+  if (!room) return false;
+  const usedNames = new Set(slotNames.map((_, slotIndex) => {
+    if (slotsToFit.includes(slotIndex)) return null;
+    const options = getMealOptions(slotIndex, plan);
+    return (options[plan.selected[slotIndex] || 0] || options[0])?.name;
+  }).filter(Boolean));
+
+  slotsToFit.forEach((slotIndex, index) => {
+    const targetForSlot = room / Math.max(1, slotsToFit.length - index);
+    const type = plan.mealTypes?.[slotIndex] || "any";
+    const options = getMealOptions(slotIndex, plan);
+    const candidates = options
+      .map((item, optionIndex) => ({ item, optionIndex }))
+      .filter(({ item }) => item.name !== CANTEEN_MEAL_NAME && mealFitsType(item, type));
+
+    let best = null;
+    candidates.forEach(candidate => {
+      const base = baseGrams(candidate.item);
+      const kcalPerGram = candidate.item.kcal / base;
+      const max = practicalMaxGrams(candidate.item);
+      const grams = Math.round(Math.min(max, Math.max(80, targetForSlot / kcalPerGram)) / 10) * 10;
+      const kcal = mealKcal(candidate.item, grams);
+      const over = Math.max(0, kcal - targetForSlot);
+      const under = Math.max(0, targetForSlot - kcal);
+      const duplicatePenalty = usedNames.has(candidate.item.name) ? 250 : 0;
+      const hugePortionPenalty = grams > 500 ? (grams - 500) * 1.5 : 0;
+      const portionPenalty = Math.abs(grams - base) * 0.12;
+      const score = under + over * 3 + duplicatePenalty + hugePortionPenalty + portionPenalty;
+      if (!best || score < best.score) best = { ...candidate, grams, score };
+    });
+
+    if (!best) return;
+    plan.selected[slotIndex] = best.optionIndex;
+    plan.weights[slotIndex] = best.grams;
+    usedNames.add(best.item.name);
+    room = Math.max(0, room - mealKcal(best.item, best.grams));
+  });
+
+  plan.fitExpanded = true;
+  setPlan(plan);
+  renderMeals();
+  const totals = calculateTotals(plan);
+  const diff = Math.round(targets.kcal - totals.kcal);
+  if (Math.abs(diff) <= 80) {
+    showToast("Dopasowano wolny posilek do limitu.");
+  } else if (diff > 0) {
+    showToast(`Dopasowano wolny posilek. Zostaje ${diff} kcal.`);
+  } else {
+    showToast(`Dopasowano wolny posilek. ${Math.abs(diff)} kcal ponad plan.`);
+  }
+  return true;
 }
 
 function optimizeMealChoicesToLimit(plan, lockedSlots = []) {
