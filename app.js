@@ -697,6 +697,7 @@ function getPlanForDay(day) {
     weights: null,
     mealTimes: settings.mealTimes || defaultSettings.mealTimes,
     mealTypes: settings.mealTypes || defaultSettings.mealTypes,
+    manualSlots: [false, false, false, false],
     shift: null,
     done: [],
     drinks: { nootri: 1, blackCoffee: 0 }
@@ -736,6 +737,11 @@ function rememberSelectedMeals(plan) {
     return mealRef(options[plan.selected[slotIndex] || 0] || options[0]);
   });
   return plan;
+}
+
+function markManualSlot(plan, slotIndex, manual = true) {
+  plan.manualSlots = [...(plan.manualSlots || [false, false, false, false])];
+  plan.manualSlots[slotIndex] = manual;
 }
 
 function migratePlansToWeeklyKeys() {
@@ -1253,6 +1259,7 @@ function applyCustomMealToSlot(meal, slotIndex) {
   plan.selected[slotIndex] = optionIndex >= 0 ? optionIndex : options.length - 1;
   plan.weights[slotIndex] = meal.grams;
   plan.fitExpanded = false;
+  markManualSlot(plan, slotIndex);
   normalizeMealWeights(plan);
   setPlan(plan);
 }
@@ -1294,6 +1301,7 @@ function updateMealChoice(slotIndex, optionIndex) {
   const item = getMealOptions(slotIndex, plan)[optionIndex] || getMealOptions(slotIndex, plan)[0];
   plan.weights[slotIndex] = baseGrams(item);
   plan.fitExpanded = false;
+  markManualSlot(plan, slotIndex);
   if (plan.mealTypes?.[slotIndex] === "canteen") setFixedCanteenMeal(plan, slotIndex);
   setPlan(plan);
   renderMeals();
@@ -1313,6 +1321,7 @@ function updateMealType(slotIndex, type) {
   const item = newOptions[plan.selected[slotIndex]] || newOptions[0];
   plan.weights[slotIndex] = baseGrams(item);
   plan.fitExpanded = false;
+  markManualSlot(plan, slotIndex);
   if (type === "canteen") setFixedCanteenMeal(plan, slotIndex);
   setPlan(plan);
   renderMeals();
@@ -1331,6 +1340,7 @@ function updateWeight(slotIndex, grams) {
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   plan.weights[slotIndex] = clampMealWeight(item, grams);
   plan.fitExpanded = false;
+  markManualSlot(plan, slotIndex);
   setPlan(plan);
   renderMeals();
 }
@@ -1349,6 +1359,7 @@ function changeWeight(slotIndex, step) {
   const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
   plan.weights[slotIndex] = clampMealWeight(item, current + step);
   plan.fitExpanded = false;
+  markManualSlot(plan, slotIndex);
   setPlan(plan);
   renderMeals();
 }
@@ -1386,6 +1397,7 @@ function suggestDayPlan() {
     if (type === "canteen") setFixedCanteenMeal(plan, slotIndex);
   });
 
+  plan.manualSlots = [false, false, false, false];
   normalizeMealWeights(plan);
   optimizeMealChoicesToLimit(plan, getWorkLockedSlots(plan));
   plan.fitExpanded = false;
@@ -1396,7 +1408,17 @@ function suggestDayPlan() {
 
 function fitRemainingMealsToLimit() {
   const plan = getPlan();
-  fitPlanToLimit(plan, []);
+  const alreadyLocked = Array.from(new Set([...getWorkLockedSlots(plan), ...(plan.done || [])]));
+  const manualSlots = (plan.manualSlots || []).map((isManual, slotIndex) => isManual ? slotIndex : -1).filter(slotIndex => slotIndex >= 0);
+  const unlocked = slotNames
+    .map((_, slotIndex) => slotIndex)
+    .filter(slotIndex => !alreadyLocked.includes(slotIndex));
+  const autoSlots = unlocked.filter(slotIndex => !manualSlots.includes(slotIndex));
+  const slotsToFit = manualSlots.length && autoSlots.length ? autoSlots : unlocked.slice(-1);
+  const lockForFit = slotNames
+    .map((_, slotIndex) => slotIndex)
+    .filter(slotIndex => !slotsToFit.includes(slotIndex));
+  fitPlanToLimit(plan, lockForFit);
 }
 
 function optimizeMealChoicesToLimit(plan, lockedSlots = []) {
