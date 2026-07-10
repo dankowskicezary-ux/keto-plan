@@ -701,11 +701,41 @@ function getPlanForDay(day) {
     done: [],
     drinks: { nootri: 1, blackCoffee: 0 }
   };
-  return normalizeMealWeights(backfillWeights({ ...fallback, ...JSON.parse(savedPlan) }));
+  const plan = { ...fallback, ...JSON.parse(savedPlan) };
+  restoreSelectedMeals(plan);
+  return rememberSelectedMeals(normalizeMealWeights(backfillWeights(plan)));
 }
 
 function setPlan(plan) {
-  localStorage.setItem(storageKey("plan"), JSON.stringify(plan));
+  localStorage.setItem(storageKey("plan"), JSON.stringify(rememberSelectedMeals(plan)));
+}
+
+function mealRef(item) {
+  return item ? { name: item.name, kcal: Math.round(item.kcal) } : null;
+}
+
+function restoreSelectedMeals(plan) {
+  if (!Array.isArray(plan.selectedMeals)) return plan;
+  slotNames.forEach((_, slotIndex) => {
+    const wanted = plan.selectedMeals[slotIndex];
+    if (!wanted?.name) return;
+    const options = getMealOptions(slotIndex, plan);
+    const sameMeal = options.findIndex(item => item.name === wanted.name && Math.round(item.kcal) === Number(wanted.kcal));
+    const sameName = options.findIndex(item => item.name === wanted.name);
+    if (sameMeal >= 0 || sameName >= 0) {
+      plan.selected[slotIndex] = sameMeal >= 0 ? sameMeal : sameName;
+    }
+  });
+  return plan;
+}
+
+function rememberSelectedMeals(plan) {
+  if (!Array.isArray(plan.selected)) return plan;
+  plan.selectedMeals = slotNames.map((_, slotIndex) => {
+    const options = getMealOptions(slotIndex, plan);
+    return mealRef(options[plan.selected[slotIndex] || 0] || options[0]);
+  });
+  return plan;
 }
 
 function migratePlansToWeeklyKeys() {
@@ -1476,7 +1506,13 @@ function optimizeMealChoicesToLimit(plan, lockedSlots = []) {
 
 function fitPlanToLimit(plan, lockedSlots = []) {
   const targets = getTargets();
+  const selectedBeforeFit = slotNames.map((_, slotIndex) => {
+    const options = getMealOptions(slotIndex, plan);
+    return mealRef(options[plan.selected[slotIndex] || 0] || options[0]);
+  });
   normalizeMealWeights(plan);
+  plan.selectedMeals = selectedBeforeFit;
+  restoreSelectedMeals(plan);
   const locked = Array.from(new Set([...lockedSlots, ...getWorkLockedSlots(plan), ...(plan.done || [])]));
   const adjustable = slotNames
     .map((_, slotIndex) => slotIndex)
@@ -1519,6 +1555,8 @@ function fitPlanToLimit(plan, lockedSlots = []) {
     plan.weights[slotIndex] = clampMealWeight(item, Math.round(current * factor / 10) * 10, factor > 1);
   });
   plan.fitExpanded = factor > 1;
+  plan.selectedMeals = selectedBeforeFit;
+  restoreSelectedMeals(plan);
 
   setPlan(plan);
   renderMeals();
