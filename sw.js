@@ -1,9 +1,9 @@
-const CACHE_NAME = "keto-plan-v51";
+const CACHE_NAME = "keto-plan-v52";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=51",
-  "./app.js?v=51",
+  "./styles.css?v=52",
+  "./app.js?v=52",
   "./manifest.webmanifest",
   "./icon.svg"
 ];
@@ -21,8 +21,19 @@ self.addEventListener("activate", event => {
   );
 });
 
+self.addEventListener("message", event => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+});
+
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(new Request(event.request, { cache: "no-store" }))
+        .catch(() => caches.match("./index.html") || caches.match("./"))
+    );
+    return;
+  }
   event.respondWith(
     fetch(event.request)
       .then(response => {
