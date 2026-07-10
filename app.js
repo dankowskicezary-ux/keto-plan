@@ -567,7 +567,7 @@ function normalizeMealWeights(plan) {
     }
     const options = getMealOptions(slotIndex, plan);
     const item = options[plan.selected[slotIndex] || 0] || options[0];
-    plan.weights[slotIndex] = clampMealWeight(item, plan.weights[slotIndex], allowIncrease);
+    plan.weights[slotIndex] = clampMealWeight(item, plan.weights[slotIndex], allowIncrease || Boolean(plan.manualSlots?.[slotIndex]));
   });
   return plan;
 }
@@ -1338,7 +1338,7 @@ function updateWeight(slotIndex, grams) {
   }
   const selected = Number(plan.selected[slotIndex] || 0);
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
-  plan.weights[slotIndex] = clampMealWeight(item, grams);
+  plan.weights[slotIndex] = clampMealWeight(item, grams, true);
   plan.fitExpanded = false;
   markManualSlot(plan, slotIndex);
   setPlan(plan);
@@ -1357,7 +1357,7 @@ function changeWeight(slotIndex, step) {
   const selected = Number(plan.selected[slotIndex] || 0);
   const item = getMealOptions(slotIndex, plan)[selected] || getMealOptions(slotIndex, plan)[0];
   const current = Number(plan.weights?.[slotIndex] || baseGrams(item));
-  plan.weights[slotIndex] = clampMealWeight(item, current + step);
+  plan.weights[slotIndex] = clampMealWeight(item, current + step, true);
   plan.fitExpanded = false;
   markManualSlot(plan, slotIndex);
   setPlan(plan);
