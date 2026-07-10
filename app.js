@@ -1414,7 +1414,11 @@ function fitRemainingMealsToLimit() {
     .map((_, slotIndex) => slotIndex)
     .filter(slotIndex => !alreadyLocked.includes(slotIndex));
   const autoSlots = unlocked.filter(slotIndex => !manualSlots.includes(slotIndex));
-  const slotsToFit = manualSlots.length && autoSlots.length ? autoSlots : unlocked.slice(-1);
+  const slotsToFit = autoSlots.length ? autoSlots : (manualSlots.length ? [] : unlocked);
+  if (!slotsToFit.length) {
+    showToast("Brak niezmienionych posilkow do dopasowania.");
+    return;
+  }
   const lockForFit = slotNames
     .map((_, slotIndex) => slotIndex)
     .filter(slotIndex => !slotsToFit.includes(slotIndex));
@@ -1484,11 +1488,11 @@ function fitOpenMealsToLimit(plan, slotsToFit) {
   const totals = calculateTotals(plan);
   const diff = Math.round(targets.kcal - totals.kcal);
   if (Math.abs(diff) <= 80) {
-    showToast("Dopasowano wolny posilek do limitu.");
+    showToast("Dopasowano wolne posilki do limitu.");
   } else if (diff > 0) {
-    showToast(`Dopasowano wolny posilek. Zostaje ${diff} kcal.`);
+    showToast(`Dopasowano wolne posilki. Zostaje ${diff} kcal.`);
   } else {
-    showToast(`Dopasowano wolny posilek. ${Math.abs(diff)} kcal ponad plan.`);
+    showToast(`Dopasowano wolne posilki. ${Math.abs(diff)} kcal ponad plan.`);
   }
   return true;
 }
