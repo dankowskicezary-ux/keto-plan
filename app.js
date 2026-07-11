@@ -2422,7 +2422,7 @@ function boot() {
       refreshing = true;
       window.location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=56").then(registration => {
+    navigator.serviceWorker.register("sw.js?v=57").then(registration => {
       registration.update();
       if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
       registration.addEventListener("updatefound", () => {
