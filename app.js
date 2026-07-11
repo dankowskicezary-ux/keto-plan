@@ -655,6 +655,7 @@ let settings = JSON.parse(localStorage.getItem("settings") || JSON.stringify(def
 settings = { ...defaultSettings, ...settings };
 settings.targets = { ...defaultTargets, ...(settings.targets || {}) };
 let deferredInstallPrompt = null;
+let mealCameraStream = null;
 
 const tabs = document.querySelectorAll(".tab");
 const panels = {
@@ -1282,11 +1283,66 @@ function handlePhotoMealInput(event) {
   const file = event.target.files?.[0];
   if (!file) return;
   resizePhoto(file, dataUrl => {
-    const preview = document.getElementById("photoMealPreview");
-    preview.src = dataUrl;
-    preview.classList.remove("hidden");
-    preview.dataset.image = dataUrl;
+    setPhotoMealImage(dataUrl);
   });
+}
+
+function setPhotoMealImage(dataUrl) {
+  const preview = document.getElementById("photoMealPreview");
+  preview.src = dataUrl;
+  preview.classList.remove("hidden");
+  preview.dataset.image = dataUrl;
+}
+
+async function startMealCamera() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    showToast("Ta przegladarka nie obsluguje aparatu w aplikacji.");
+    return;
+  }
+  try {
+    mealCameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" } },
+      audio: false
+    });
+    const video = document.getElementById("photoMealCamera");
+    video.srcObject = mealCameraStream;
+    video.classList.remove("hidden");
+    document.getElementById("captureMealPhoto").disabled = false;
+    document.getElementById("stopMealCamera").disabled = false;
+    document.getElementById("startMealCamera").disabled = true;
+  } catch (error) {
+    showToast("Nie udalo sie wlaczyc aparatu. Sprawdz zgode w przegladarce.");
+  }
+}
+
+function stopMealCamera() {
+  if (mealCameraStream) {
+    mealCameraStream.getTracks().forEach(track => track.stop());
+    mealCameraStream = null;
+  }
+  const video = document.getElementById("photoMealCamera");
+  video.srcObject = null;
+  video.classList.add("hidden");
+  document.getElementById("captureMealPhoto").disabled = true;
+  document.getElementById("stopMealCamera").disabled = true;
+  document.getElementById("startMealCamera").disabled = false;
+}
+
+function captureMealPhoto() {
+  const video = document.getElementById("photoMealCamera");
+  if (!video.videoWidth || !video.videoHeight) {
+    showToast("Aparat jeszcze sie uruchamia.");
+    return;
+  }
+  const maxSize = 720;
+  const scale = Math.min(1, maxSize / Math.max(video.videoWidth, video.videoHeight));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(video.videoWidth * scale);
+  canvas.height = Math.round(video.videoHeight * scale);
+  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+  setPhotoMealImage(canvas.toDataURL("image/jpeg", 0.72));
+  stopMealCamera();
+  showToast("Zdjecie dodane do posilku.");
 }
 
 function addPhotoMeal() {
@@ -2227,6 +2283,9 @@ function bindEvents() {
   document.getElementById("customReadySearch").addEventListener("input", updateReadyPreview);
   document.getElementById("customReadyGrams").addEventListener("input", updateReadyPreview);
   document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
+  document.getElementById("startMealCamera").addEventListener("click", startMealCamera);
+  document.getElementById("captureMealPhoto").addEventListener("click", captureMealPhoto);
+  document.getElementById("stopMealCamera").addEventListener("click", stopMealCamera);
   document.getElementById("photoMealInput").addEventListener("change", handlePhotoMealInput);
   document.getElementById("addPhotoMeal").addEventListener("click", addPhotoMeal);
   document.getElementById("addResult").addEventListener("click", addResult);
@@ -2271,7 +2330,7 @@ function boot() {
       refreshing = true;
       window.location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=54").then(registration => {
+    navigator.serviceWorker.register("sw.js?v=55").then(registration => {
       registration.update();
       if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
       registration.addEventListener("updatefound", () => {

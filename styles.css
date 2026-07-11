@@ -649,6 +649,18 @@ button.primary {
   background: var(--soft);
 }
 
+.camera-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.camera-actions button {
+  min-height: 40px;
+  padding: 0 8px;
+  font-size: 13px;
+}
+
 .photo-note {
   margin: 0;
   color: var(--muted);

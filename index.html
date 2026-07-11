@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1f6b5c">
   <title>Keto Plan</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=54">
+  <link rel="stylesheet" href="styles.css?v=55">
 </head>
 <body>
   <div class="app-shell">
@@ -113,6 +113,12 @@
         <section class="custom-card photo-card" aria-label="Posilek ze zdjecia">
           <h2>Posilek ze zdjecia</h2>
           <div class="custom-grid custom-builder">
+            <div class="camera-actions">
+              <button id="startMealCamera" type="button">Wlacz aparat</button>
+              <button id="captureMealPhoto" type="button" disabled>Zrob zdjecie</button>
+              <button id="stopMealCamera" type="button" disabled>Zamknij aparat</button>
+            </div>
+            <video id="photoMealCamera" class="photo-preview hidden" autoplay playsinline muted></video>
             <input id="photoMealInput" type="file" accept="image/*" capture="environment">
             <img id="photoMealPreview" class="photo-preview hidden" alt="Podglad posilku">
             <input id="photoMealName" type="text" placeholder="Nazwa, np. obiad ze zdjecia">
@@ -237,13 +243,13 @@
         </div>
         <div class="tips">
           <h2>Na telefonie</h2>
-          <p>Wersja: v54. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=54 w przegladarce i odswiez strone.</p>
+          <p>Wersja: v55. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=55 w przegladarce i odswiez strone.</p>
         </div>
       </section>
     </main>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=54"></script>
+  <script src="app.js?v=55"></script>
 </body>
 </html>
