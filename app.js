@@ -264,6 +264,13 @@ function setCustomMeals(meals) {
   localStorage.setItem("customMeals", JSON.stringify(meals));
 }
 
+function saveCustomMeal(meal, limit = 120) {
+  const customMeals = getCustomMeals();
+  const key = `${meal.name}|${meal.kcal}|${meal.grams}`;
+  const withoutDuplicate = customMeals.filter(item => `${item.name}|${item.kcal}|${item.grams}` !== key);
+  setCustomMeals([meal, ...withoutDuplicate].slice(0, limit));
+}
+
 const customTypeValues = {
   mixed: { label: "danie mieszane", kcal: 160, protein: 10, fat: 8, carbs: 12 },
   lean: { label: "chude mieso/ryba", kcal: 150, protein: 25, fat: 5, carbs: 0 },
@@ -1094,6 +1101,7 @@ function renderMeals() {
         <span>${mealDetailText(item, grams)}</span>
         <em>Zmien danie</em>
       </button>
+      <button class="memory-button" type="button" data-save-meal="${slotIndex}">Zapisz do pamieci</button>
       <div class="meal-picker collapsed">
         <label class="choice-label">Co jesz? <em class="option-count">${options.length} dan</em>
           <input class="meal-search" type="search" data-slot="${slotIndex}" placeholder="Szukaj, np. p, zupa, kurczak">
@@ -1115,6 +1123,7 @@ function renderMeals() {
     card.querySelector(".meal-type").addEventListener("change", event => updateMealType(slotIndex, event.target.value));
     card.querySelector(".meal-search").addEventListener("input", event => filterMealOptions(slotIndex, Number(plan.selected[slotIndex] || 0), event.target.value, card));
     card.querySelector(".selected-meal").addEventListener("click", () => toggleMealChoiceList(card, true));
+    card.querySelector(".memory-button").addEventListener("click", () => saveMealFromSlot(slotIndex));
     bindMealChoiceButtons(card, slotIndex);
     card.querySelector(".weight-input").addEventListener("change", event => updateWeight(slotIndex, Number(event.target.value)));
     card.querySelectorAll("button[data-step]").forEach(button => {
@@ -1127,6 +1136,33 @@ function renderMeals() {
   renderSummary();
   renderShopping();
   renderWeek();
+}
+
+function mealSnapshot(item, grams, name = item.name) {
+  const portion = portionFromGrams(item, grams);
+  const components = portionComponents(item);
+  return {
+    name,
+    text: `${item.name} zapisane z planu (${grams} g)`,
+    kcal: Math.round(item.kcal * portion),
+    protein: Math.round(item.protein * portion),
+    fat: Math.round(item.fat * portion),
+    carbs: Math.round(item.carbs * portion),
+    grams,
+    portion: `${item.name} ${grams} g`,
+    components: components.length ? components : [{ name: item.name, grams }]
+  };
+}
+
+function saveMealFromSlot(slotIndex) {
+  const plan = getPlan();
+  const options = getMealOptions(slotIndex, plan);
+  const item = options[plan.selected[slotIndex] || 0] || options[0];
+  const grams = Number(plan.weights?.[slotIndex] || baseGrams(item));
+  saveCustomMeal(mealSnapshot(item, grams));
+  renderMeals();
+  renderWeek();
+  showToast("Zapisano posilek do pamieci.");
 }
 
 function addCustomMeal(meal) {
@@ -1149,8 +1185,7 @@ function addCustomMeal(meal) {
       portion: `${item.name} ${grams} g`,
       components: [{ name: item.name, grams }]
     };
-    const customMeals = getCustomMeals();
-    setCustomMeals([nextMeal, ...customMeals].slice(0, 80));
+    saveCustomMeal(nextMeal);
     if (meal.slot !== "list") {
       applyCustomMealToSlot(nextMeal, Number(meal.slot));
     }
@@ -1161,7 +1196,6 @@ function addCustomMeal(meal) {
     return;
   }
 
-  const customMeals = getCustomMeals();
   const ingredients = meal.ingredients
     .map(ingredient => {
       const product = findProductByInput(ingredient.productId);
@@ -1216,8 +1250,7 @@ function addCustomMeal(meal) {
     showToast("Wybierz produkt i wpisz ilosc.");
     return;
   }
-  const nextMeals = [nextMeal, ...customMeals].slice(0, 80);
-  setCustomMeals(nextMeals);
+  saveCustomMeal(nextMeal);
   if (meal.slot !== "list") {
     applyCustomMealToSlot(nextMeal, Number(meal.slot));
   }
@@ -1225,6 +1258,70 @@ function addCustomMeal(meal) {
   renderMeals();
   renderWeek();
   showToast(`Dodano: ${nextMeal.kcal} kcal.`);
+}
+
+function resizePhoto(file, callback) {
+  const reader = new FileReader();
+  reader.onload = event => {
+    const img = new Image();
+    img.onload = () => {
+      const maxSize = 720;
+      const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      callback(canvas.toDataURL("image/jpeg", 0.72));
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handlePhotoMealInput(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  resizePhoto(file, dataUrl => {
+    const preview = document.getElementById("photoMealPreview");
+    preview.src = dataUrl;
+    preview.classList.remove("hidden");
+    preview.dataset.image = dataUrl;
+  });
+}
+
+function addPhotoMeal() {
+  const grams = Number(document.getElementById("photoMealGrams").value || 0);
+  const kcal = Number(document.getElementById("photoMealKcal").value || 0);
+  if (!grams || !kcal) {
+    showToast("Wpisz gramature i kcal dla posilku ze zdjecia.");
+    return;
+  }
+  const meal = {
+    name: document.getElementById("photoMealName").value.trim() || "Posilek ze zdjecia",
+    text: "Zapisane ze zdjecia w aplikacji",
+    kcal: Math.round(kcal),
+    protein: Math.round(Number(document.getElementById("photoMealProtein").value || 0)),
+    fat: Math.round(Number(document.getElementById("photoMealFat").value || 0)),
+    carbs: Math.round(Number(document.getElementById("photoMealCarbs").value || 0)),
+    grams,
+    portion: `porcja ze zdjecia ${grams} g`,
+    components: [{ name: "posilek ze zdjecia", grams }],
+    photo: document.getElementById("photoMealPreview").dataset.image || ""
+  };
+  saveCustomMeal(meal);
+  const slot = document.getElementById("photoMealSlot").value;
+  if (slot !== "list") applyCustomMealToSlot(meal, Number(slot));
+  ["photoMealName", "photoMealGrams", "photoMealKcal", "photoMealProtein", "photoMealFat", "photoMealCarbs"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("photoMealInput").value = "";
+  const preview = document.getElementById("photoMealPreview");
+  preview.removeAttribute("src");
+  preview.dataset.image = "";
+  preview.classList.add("hidden");
+  renderMeals();
+  renderWeek();
+  showToast("Zapisano posilek ze zdjecia.");
 }
 
 function readCustomForm() {
@@ -2130,6 +2227,8 @@ function bindEvents() {
   document.getElementById("customReadySearch").addEventListener("input", updateReadyPreview);
   document.getElementById("customReadyGrams").addEventListener("input", updateReadyPreview);
   document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
+  document.getElementById("photoMealInput").addEventListener("change", handlePhotoMealInput);
+  document.getElementById("addPhotoMeal").addEventListener("click", addPhotoMeal);
   document.getElementById("addResult").addEventListener("click", addResult);
 
   document.querySelectorAll("button[data-preset]").forEach(button => {
@@ -2172,7 +2271,7 @@ function boot() {
       refreshing = true;
       window.location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=53").then(registration => {
+    navigator.serviceWorker.register("sw.js?v=54").then(registration => {
       registration.update();
       if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
       registration.addEventListener("updatefound", () => {
