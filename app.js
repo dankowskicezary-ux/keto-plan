@@ -1398,6 +1398,30 @@ function responseText(data) {
     .join("\n");
 }
 
+function explainOpenAiError(error) {
+  const message = String(error.message || "");
+  const lower = message.toLowerCase();
+  if (error.status === 401 || lower.includes("invalid_api_key") || lower.includes("incorrect api key")) {
+    return "OpenAI odrzucilo klucz API. Utworz nowy klucz, wklej caly zaczynajacy sie od sk- i usun spacje.";
+  }
+  if (error.status === 403 || lower.includes("permission") || lower.includes("not have access")) {
+    return "Klucz nie ma uprawnien do tego projektu albo modelu. W kluczu ustaw Permissions: All.";
+  }
+  if (error.status === 404 || lower.includes("model") && lower.includes("not")) {
+    return "Model jest niedostepny dla tego klucza. W Ustawieniach wpisz model gpt-5.6 albo sprawdz dostep w panelu OpenAI.";
+  }
+  if (error.status === 429 || lower.includes("quota") || lower.includes("billing") || lower.includes("rate limit")) {
+    return "OpenAI zwrocilo limit albo brak rozliczen. Sprawdz billing/credits w koncie OpenAI.";
+  }
+  if (error.status === 400) {
+    return `OpenAI nie przyjelo zapytania: ${message.slice(0, 220)}`;
+  }
+  if (error.name === "TypeError" || lower.includes("failed to fetch")) {
+    return "Blad polaczenia z OpenAI. Sprawdz internet; jesli internet dziala, przegladarka moze blokowac zapytanie z aplikacji.";
+  }
+  return `OpenAI zwrocilo blad: ${message.slice(0, 220) || "brak szczegolow"}`;
+}
+
 async function estimatePhotoMealWithAI() {
   const image = document.getElementById("photoMealPreview").dataset.image;
   if (!image) {
@@ -1448,7 +1472,16 @@ async function estimatePhotoMealWithAI() {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(errorText.slice(0, 180));
+      let message = errorText;
+      try {
+        const parsed = JSON.parse(errorText);
+        message = parsed.error?.message || parsed.error?.code || errorText;
+      } catch (parseError) {
+        message = errorText;
+      }
+      const apiError = new Error(message);
+      apiError.status = response.status;
+      throw apiError;
     }
 
     const data = await response.json();
@@ -1462,7 +1495,7 @@ async function estimatePhotoMealWithAI() {
     result.textContent = `AI: ${estimate.confidence || "szacunek"} pewnosc. ${estimate.note || "Sprawdz wage, jesli mozesz."}`;
     showToast("AI wpisalo szacunek kcal.");
   } catch (error) {
-    result.textContent = "Nie udalo sie wyliczyc ze zdjecia. Sprawdz klucz API, internet albo wpisz wartosci recznie.";
+    result.textContent = `Nie udalo sie wyliczyc ze zdjecia. ${explainOpenAiError(error)}`;
     showToast("AI nie policzylo zdjecia.");
   } finally {
     button.disabled = false;
@@ -2437,7 +2470,7 @@ function boot() {
       refreshing = true;
       window.location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=58").then(registration => {
+    navigator.serviceWorker.register("sw.js?v=59").then(registration => {
       registration.update();
       if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
       registration.addEventListener("updatefound", () => {
