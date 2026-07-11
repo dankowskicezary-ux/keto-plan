@@ -636,6 +636,8 @@ const defaultSettings = {
   drinkTime: "08:00",
   waterStart: "07:30",
   waterEnd: "20:30",
+  openaiKey: "",
+  openaiModel: "gpt-5.6",
   notifications: false
 };
 
@@ -1378,6 +1380,91 @@ function addPhotoMeal() {
   renderMeals();
   renderWeek();
   showToast("Zapisano posilek ze zdjecia.");
+}
+
+function extractJson(text) {
+  const trimmed = text.trim();
+  if (trimmed.startsWith("{")) return JSON.parse(trimmed);
+  const match = trimmed.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error("Brak JSON w odpowiedzi AI");
+  return JSON.parse(match[0]);
+}
+
+function responseText(data) {
+  if (data.output_text) return data.output_text;
+  return (data.output || [])
+    .flatMap(item => item.content || [])
+    .map(part => part.text || "")
+    .join("\n");
+}
+
+async function estimatePhotoMealWithAI() {
+  const image = document.getElementById("photoMealPreview").dataset.image;
+  if (!image) {
+    showToast("Najpierw zrob zdjecie posilku.");
+    return;
+  }
+  const apiKey = (settings.openaiKey || "").trim();
+  if (!apiKey) {
+    showToast("Wpisz OpenAI API key w Ustawieniach.");
+    return;
+  }
+
+  const result = document.getElementById("photoMealAiResult");
+  const button = document.getElementById("estimatePhotoMeal");
+  result.classList.remove("hidden");
+  result.textContent = "AI liczy posilek ze zdjecia...";
+  button.disabled = true;
+
+  try {
+    const prompt = [
+      "Oszacuj kalorie i makroskladniki posilku ze zdjecia dla aplikacji dietetycznej.",
+      "Uwzglednij widoczne porcje, typowe polskie dania, panierke, sosy i tluszcz.",
+      "Jesli nie widzisz dokladnie, podaj ostrozny szacunek i nizsza pewnosc.",
+      "Zwroc TYLKO JSON bez komentarza:",
+      "{\"name\":\"nazwa posilku\",\"grams\":300,\"kcal\":500,\"protein\":35,\"fat\":25,\"carbs\":20,\"confidence\":\"niska/srednia/wysoka\",\"note\":\"krotka uwaga\"}"
+    ].join(" ");
+
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: settings.openaiModel || defaultSettings.openaiModel,
+        input: [{
+          role: "user",
+          content: [
+            { type: "input_text", text: prompt },
+            { type: "input_image", image_url: image }
+          ]
+        }],
+        max_output_tokens: 350
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText.slice(0, 180));
+    }
+
+    const data = await response.json();
+    const estimate = extractJson(responseText(data));
+    document.getElementById("photoMealName").value = estimate.name || "Posilek ze zdjecia AI";
+    document.getElementById("photoMealGrams").value = Math.round(Number(estimate.grams || 0));
+    document.getElementById("photoMealKcal").value = Math.round(Number(estimate.kcal || 0));
+    document.getElementById("photoMealProtein").value = Math.round(Number(estimate.protein || 0));
+    document.getElementById("photoMealFat").value = Math.round(Number(estimate.fat || 0));
+    document.getElementById("photoMealCarbs").value = Math.round(Number(estimate.carbs || 0));
+    result.textContent = `AI: ${estimate.confidence || "szacunek"} pewnosc. ${estimate.note || "Sprawdz wage, jesli mozesz."}`;
+    showToast("AI wpisalo szacunek kcal.");
+  } catch (error) {
+    result.textContent = "Nie udalo sie wyliczyc ze zdjecia. Sprawdz klucz API, internet albo wpisz wartosci recznie.";
+    showToast("AI nie policzylo zdjecia.");
+  } finally {
+    button.disabled = false;
+  }
 }
 
 function readCustomForm() {
@@ -2138,6 +2225,8 @@ function renderSettings() {
   document.getElementById("drinkTime").value = settings.drinkTime;
   document.getElementById("waterStart").value = settings.waterStart;
   document.getElementById("waterEnd").value = settings.waterEnd;
+  document.getElementById("openaiKey").value = settings.openaiKey || "";
+  document.getElementById("openaiModel").value = settings.openaiModel || defaultSettings.openaiModel;
 }
 
 function saveSettings() {
@@ -2152,7 +2241,9 @@ function saveSettings() {
     mealTimes: [0, 1, 2, 3].map(index => document.getElementById(`mealTime${index}`).value || defaultSettings.mealTimes[index]),
     drinkTime: document.getElementById("drinkTime").value || defaultSettings.drinkTime,
     waterStart: document.getElementById("waterStart").value || defaultSettings.waterStart,
-    waterEnd: document.getElementById("waterEnd").value || defaultSettings.waterEnd
+    waterEnd: document.getElementById("waterEnd").value || defaultSettings.waterEnd,
+    openaiKey: document.getElementById("openaiKey").value.trim(),
+    openaiModel: document.getElementById("openaiModel").value.trim() || defaultSettings.openaiModel
   };
   localStorage.setItem("settings", JSON.stringify(settings));
   const plan = getPlan();
@@ -2287,6 +2378,7 @@ function bindEvents() {
   document.getElementById("captureMealPhoto").addEventListener("click", captureMealPhoto);
   document.getElementById("stopMealCamera").addEventListener("click", stopMealCamera);
   document.getElementById("photoMealInput").addEventListener("change", handlePhotoMealInput);
+  document.getElementById("estimatePhotoMeal").addEventListener("click", estimatePhotoMealWithAI);
   document.getElementById("addPhotoMeal").addEventListener("click", addPhotoMeal);
   document.getElementById("addResult").addEventListener("click", addResult);
 
@@ -2330,7 +2422,7 @@ function boot() {
       refreshing = true;
       window.location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=55").then(registration => {
+    navigator.serviceWorker.register("sw.js?v=56").then(registration => {
       registration.update();
       if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
       registration.addEventListener("updatefound", () => {
