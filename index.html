@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1f6b5c">
   <title>Keto Plan</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=59">
+  <link rel="stylesheet" href="styles.css?v=60">
 </head>
 <body>
   <div class="app-shell">
@@ -91,6 +91,7 @@
             <input id="customName" type="text" placeholder="Nazwa, np. sniadanie jajka albo obiad w pracy">
             <div id="customProductMode">
               <div id="customIngredientRows" class="ingredient-rows"></div>
+              <button id="addIngredientRow" type="button" class="secondary-action">Dodaj produkt</button>
             </div>
             <div id="customReadyMode" class="ready-mode hidden">
               <input id="customReadySearch" type="search" list="readyMealList" placeholder="Szukaj gotowego dania, np. pizza keto albo chleb keto">
@@ -110,36 +111,6 @@
           <button id="addCustomMeal" type="button">Przelicz i dodaj posilek</button>
         </section>
         <div id="mealsList" class="meal-list"></div>
-        <section class="custom-card photo-card" aria-label="Posilek ze zdjecia">
-          <h2>Posilek ze zdjecia</h2>
-          <div class="custom-grid custom-builder">
-            <div class="camera-actions">
-              <button id="startMealCamera" type="button">Wlacz aparat</button>
-              <button id="captureMealPhoto" type="button" disabled>Zrob zdjecie</button>
-              <button id="stopMealCamera" type="button" disabled>Zamknij aparat</button>
-            </div>
-            <video id="photoMealCamera" class="photo-preview hidden" autoplay playsinline muted></video>
-            <input id="photoMealInput" type="file" accept="image/*">
-            <img id="photoMealPreview" class="photo-preview hidden" alt="Podglad posilku">
-            <input id="photoMealName" type="text" placeholder="Nazwa, np. obiad ze zdjecia">
-            <input id="photoMealGrams" type="number" inputmode="numeric" min="30" max="1500" step="10" placeholder="gramatura">
-            <input id="photoMealKcal" type="number" inputmode="numeric" min="0" step="10" placeholder="kcal">
-            <input id="photoMealProtein" type="number" inputmode="decimal" min="0" step="1" placeholder="bialko g">
-            <input id="photoMealFat" type="number" inputmode="decimal" min="0" step="1" placeholder="tluszcz g">
-            <input id="photoMealCarbs" type="number" inputmode="decimal" min="0" step="1" placeholder="wegle g">
-            <button id="estimatePhotoMeal" type="button">Wylicz AI ze zdjecia</button>
-            <div id="photoMealAiResult" class="ready-preview hidden"></div>
-            <select id="photoMealSlot">
-              <option value="0">posilek 1</option>
-              <option value="1">posilek 2</option>
-              <option value="2">posilek 3</option>
-              <option value="3">posilek 4</option>
-              <option value="list">tylko do listy</option>
-            </select>
-            <p class="photo-note">Zdjecie zapisuje kontekst posilku. Automatyczne liczenie kalorii ze zdjecia wymaga modulu AI/backendu; tutaj wpisz wartosci po oszacowaniu albo z etykiety.</p>
-          </div>
-          <button id="addPhotoMeal" type="button">Zapisz posilek ze zdjecia</button>
-        </section>
         <section class="drink-section" aria-label="Napoje">
           <div class="section-head">
             <h2>Napoje</h2>
@@ -209,8 +180,6 @@
           <label>Kolacja <input id="mealTime3" type="time"></label>
           <label>Start wody <input id="waterStart" type="time"></label>
           <label>Koniec wody <input id="waterEnd" type="time"></label>
-          <label>OpenAI API key <input id="openaiKey" type="password" autocomplete="off" placeholder="sk-..."></label>
-          <label>Model AI <input id="openaiModel" type="text" placeholder="gpt-5.6"></label>
         </div>
         <div class="button-row">
           <button id="saveSettings" type="button">Zapisz ustawienia</button>
@@ -220,10 +189,6 @@
           <button type="button" data-preset="first">6:00</button>
           <button type="button" data-preset="second">14:00</button>
           <button type="button" data-preset="night">22:00</button>
-        </div>
-        <div class="tips">
-          <h2>AI ze zdjecia</h2>
-          <p>Wpisz OpenAI API key, zeby przycisk "Wylicz AI ze zdjecia" mogl oszacowac kcal i makro. Klucz jest zapisany lokalnie w tej przegladarce. Wynik ze zdjecia traktuj jako szacunek, szczegolnie przy sosach, panierce i ukrytym tluszczu.</p>
         </div>
         <div class="tips">
           <h2>Nootri</h2>
@@ -251,13 +216,13 @@
         </div>
         <div class="tips">
           <h2>Na telefonie</h2>
-          <p>Wersja: v59. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=59 w przegladarce i odswiez strone.</p>
+          <p>Wersja: v60. Jesli aplikacja wyglada staro, otworz adres z koncowka ?v=60 w przegladarce i odswiez strone.</p>
         </div>
       </section>
     </main>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=59"></script>
+  <script src="app.js?v=60"></script>
 </body>
 </html>

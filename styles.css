@@ -602,25 +602,29 @@ button.primary {
 .ingredient-rows {
   display: grid;
   gap: 8px;
+  margin-bottom: 8px;
 }
 
 .custom-ingredient-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 92px 42px;
+  grid-template-columns: minmax(0, 1fr) 82px 72px 40px;
   gap: 6px;
   align-items: center;
 }
 
-.custom-unit {
+.remove-ingredient {
   min-height: 40px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--soft);
-  color: var(--primary-dark);
+  padding: 0;
+}
+
+.remove-ingredient:disabled {
+  opacity: 0.35;
+}
+
+.secondary-action {
+  width: 100%;
+  min-height: 40px;
   font-weight: 800;
-  font-size: 13px;
 }
 
 .ready-mode {
@@ -636,34 +640,6 @@ button.primary {
   background: var(--soft);
   color: var(--primary-dark);
   font-weight: 800;
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.photo-preview {
-  width: 100%;
-  max-height: 260px;
-  object-fit: cover;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--soft);
-}
-
-.camera-actions {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.camera-actions button {
-  min-height: 40px;
-  padding: 0 8px;
-  font-size: 13px;
-}
-
-.photo-note {
-  margin: 0;
-  color: var(--muted);
   font-size: 13px;
   line-height: 1.35;
 }

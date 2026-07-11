@@ -636,8 +636,6 @@ const defaultSettings = {
   drinkTime: "08:00",
   waterStart: "07:30",
   waterEnd: "20:30",
-  openaiKey: "",
-  openaiModel: "gpt-5.6",
   notifications: false
 };
 
@@ -656,8 +654,12 @@ let selectedDay = Number(localStorage.getItem("selectedDay") ?? String(currentPl
 let settings = JSON.parse(localStorage.getItem("settings") || JSON.stringify(defaultSettings));
 settings = { ...defaultSettings, ...settings };
 settings.targets = { ...defaultTargets, ...(settings.targets || {}) };
+if ("openaiKey" in settings || "openaiModel" in settings) {
+  delete settings.openaiKey;
+  delete settings.openaiModel;
+  localStorage.setItem("settings", JSON.stringify(settings));
+}
 let deferredInstallPrompt = null;
-let mealCameraStream = null;
 
 const tabs = document.querySelectorAll(".tab");
 const panels = {
@@ -998,28 +1000,88 @@ function findReadyMealByInput(value) {
     || foodCatalog.find(item => `${item.name} ${item.text}`.toLowerCase().includes(normalized));
 }
 
+function productMacrosForAmount(product, amount, unitChoice) {
+  if (unitChoice === "szt") {
+    if (!product.gramsPerUnit) return null;
+    const grams = Math.round(product.gramsPerUnit * amount);
+    if (product.unit === "szt.") {
+      return {
+        grams,
+        kcal: product.kcal * amount,
+        protein: product.protein * amount,
+        fat: product.fat * amount,
+        carbs: product.carbs * amount,
+        component: { name: product.name, amount, unit: "szt.", grams }
+      };
+    }
+    const factor = grams / 100;
+    return {
+      grams,
+      kcal: product.kcal100 * factor,
+      protein: product.protein100 * factor,
+      fat: product.fat100 * factor,
+      carbs: product.carbs100 * factor,
+      component: { name: product.name, amount, unit: "szt.", grams }
+    };
+  }
+
+  const grams = Math.round(amount);
+  if (product.unit === "szt.") {
+    const factor = grams / product.gramsPerUnit;
+    return {
+      grams,
+      kcal: product.kcal * factor,
+      protein: product.protein * factor,
+      fat: product.fat * factor,
+      carbs: product.carbs * factor,
+      component: { name: product.name, grams }
+    };
+  }
+  const factor = grams / 100;
+  return {
+    grams,
+    kcal: product.kcal100 * factor,
+    protein: product.protein100 * factor,
+    fat: product.fat100 * factor,
+    carbs: product.carbs100 * factor,
+    component: { name: product.name, grams }
+  };
+}
+
 function renderCustomIngredients() {
   const holder = document.getElementById("customIngredientRows");
   holder.innerHTML = "";
-  for (let index = 0; index < 4; index += 1) {
-    const row = document.createElement("div");
-    row.className = "custom-ingredient-row";
-    row.innerHTML = `
-      <input class="custom-product-search" type="search" list="customProductList" aria-label="Produkt ${index + 1}" placeholder="${index === 0 ? "wpisz produkt" : "produkt"}">
-      <input class="custom-amount" type="number" inputmode="decimal" min="0" step="1" placeholder="${index === 0 ? "ilosc/waga" : "opcjonalnie"}">
-      <span class="custom-unit">${index === 0 ? "ilosc" : "-"}</span>
-    `;
-    row.querySelector(".custom-product-search").addEventListener("input", () => updateCustomUnit(row));
-    holder.append(row);
-  }
+  addCustomIngredientRow();
+  addCustomIngredientRow();
   fillCustomDatalists();
   updateCustomMode();
 }
 
+function addCustomIngredientRow() {
+  const holder = document.getElementById("customIngredientRows");
+  const index = holder.children.length;
+  const row = document.createElement("div");
+  row.className = "custom-ingredient-row";
+  row.innerHTML = `
+    <input class="custom-product-search" type="search" list="customProductList" aria-label="Produkt ${index + 1}" placeholder="${index === 0 ? "wpisz produkt" : "produkt"}">
+    <input class="custom-amount" type="number" inputmode="decimal" min="0" step="1" placeholder="${index === 0 ? "ilosc" : "ile"}">
+    <select class="custom-unit-choice" aria-label="Jednostka ${index + 1}">
+      <option value="g">g</option>
+      <option value="szt">szt.</option>
+    </select>
+    <button class="remove-ingredient" type="button" aria-label="Usun produkt" ${index < 2 ? "disabled" : ""}>x</button>
+  `;
+  row.querySelector(".custom-product-search").addEventListener("input", () => updateCustomUnit(row));
+  row.querySelector(".remove-ingredient").addEventListener("click", () => row.remove());
+  holder.append(row);
+  updateCustomUnit(row);
+}
+
 function updateCustomUnit(row) {
   const product = findProductByInput(row.querySelector(".custom-product-search").value);
-  const unit = product ? product.unit : "-";
-  row.querySelector(".custom-unit").textContent = unit === "szt." ? "szt." : "g";
+  const unitChoice = row.querySelector(".custom-unit-choice");
+  if (!product) return;
+  unitChoice.value = product.unit === "szt." ? "szt" : "g";
 }
 
 function updateCustomMode() {
@@ -1199,36 +1261,23 @@ function addCustomMeal(meal) {
     return;
   }
 
-  const ingredients = meal.ingredients
-    .map(ingredient => {
-      const product = findProductByInput(ingredient.productId);
-      const amount = Number(ingredient.amount || 0);
-      if (!product || !amount) return null;
-      if (product.unit === "szt.") {
-        return {
-          product,
-          amount,
-          grams: Math.round(product.gramsPerUnit * amount),
-          kcal: product.kcal * amount,
-          protein: product.protein * amount,
-          fat: product.fat * amount,
-          carbs: product.carbs * amount,
-          component: { name: product.name, amount, unit: "szt.", grams: Math.round(product.gramsPerUnit * amount) }
-        };
-      }
-      const factor = amount / 100;
-      return {
-        product,
-        amount,
-        grams: amount,
-        kcal: product.kcal100 * factor,
-        protein: product.protein100 * factor,
-        fat: product.fat100 * factor,
-        carbs: product.carbs100 * factor,
-        component: { name: product.name, grams: amount }
-      };
-    })
-    .filter(Boolean);
+  const ingredients = [];
+  for (const ingredient of meal.ingredients) {
+    const product = findProductByInput(ingredient.productId);
+    const amount = Number(ingredient.amount || 0);
+    if (!product || !amount) continue;
+    const calculated = productMacrosForAmount(product, amount, ingredient.unit);
+    if (!calculated) {
+      showToast(`Dla "${product.name}" wybierz gramy, bo nie znam wagi 1 sztuki.`);
+      return;
+    }
+    ingredients.push({
+      product,
+      amount,
+      unit: ingredient.unit,
+      ...calculated
+    });
+  }
   const grams = ingredients.reduce((sum, item) => sum + item.grams, 0);
   const kcal = Math.round(ingredients.reduce((sum, item) => sum + item.kcal, 0));
   const protein = Math.round(ingredients.reduce((sum, item) => sum + item.protein, 0));
@@ -1236,7 +1285,7 @@ function addCustomMeal(meal) {
   const carbs = Math.round(ingredients.reduce((sum, item) => sum + item.carbs, 0));
   const components = ingredients.map(item => item.component);
   const componentText = ingredients.map(item =>
-    item.product.unit === "szt." ? `${item.amount} x ${item.product.name}` : `${item.product.name} ${item.amount} g`
+    item.unit === "szt" ? `${item.amount} x ${item.product.name}` : `${item.product.name} ${item.amount} g`
   ).join(" + ");
   const nextMeal = {
     name: meal.name || "Wlasny posilek",
@@ -1263,252 +1312,14 @@ function addCustomMeal(meal) {
   showToast(`Dodano: ${nextMeal.kcal} kcal.`);
 }
 
-function resizePhoto(file, callback) {
-  const reader = new FileReader();
-  reader.onload = event => {
-    const img = new Image();
-    img.onload = () => {
-      const maxSize = 720;
-      const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
-      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      callback(canvas.toDataURL("image/jpeg", 0.72));
-    };
-    img.src = event.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function handlePhotoMealInput(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  resizePhoto(file, dataUrl => {
-    setPhotoMealImage(dataUrl);
-  });
-}
-
-function setPhotoMealImage(dataUrl) {
-  const preview = document.getElementById("photoMealPreview");
-  preview.src = dataUrl;
-  preview.classList.remove("hidden");
-  preview.dataset.image = dataUrl;
-}
-
-async function startMealCamera() {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    showToast("Ta przegladarka nie obsluguje aparatu w aplikacji.");
-    return;
-  }
-  try {
-    mealCameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" } },
-      audio: false
-    });
-    const video = document.getElementById("photoMealCamera");
-    video.srcObject = mealCameraStream;
-    video.classList.remove("hidden");
-    document.getElementById("captureMealPhoto").disabled = false;
-    document.getElementById("stopMealCamera").disabled = false;
-    document.getElementById("startMealCamera").disabled = true;
-  } catch (error) {
-    showToast("Nie udalo sie wlaczyc aparatu. Sprawdz zgode w przegladarce.");
-  }
-}
-
-function stopMealCamera() {
-  if (mealCameraStream) {
-    mealCameraStream.getTracks().forEach(track => track.stop());
-    mealCameraStream = null;
-  }
-  const video = document.getElementById("photoMealCamera");
-  video.srcObject = null;
-  video.classList.add("hidden");
-  document.getElementById("captureMealPhoto").disabled = true;
-  document.getElementById("stopMealCamera").disabled = true;
-  document.getElementById("startMealCamera").disabled = false;
-}
-
-function captureMealPhoto() {
-  const video = document.getElementById("photoMealCamera");
-  if (!video.videoWidth || !video.videoHeight) {
-    showToast("Aparat jeszcze sie uruchamia.");
-    return;
-  }
-  const maxSize = 720;
-  const scale = Math.min(1, maxSize / Math.max(video.videoWidth, video.videoHeight));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(video.videoWidth * scale);
-  canvas.height = Math.round(video.videoHeight * scale);
-  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-  setPhotoMealImage(canvas.toDataURL("image/jpeg", 0.72));
-  stopMealCamera();
-  showToast("Zdjecie dodane do posilku.");
-}
-
-function addPhotoMeal() {
-  const grams = Number(document.getElementById("photoMealGrams").value || 0);
-  const kcal = Number(document.getElementById("photoMealKcal").value || 0);
-  if (!grams || !kcal) {
-    showToast("Wpisz gramature i kcal dla posilku ze zdjecia.");
-    return;
-  }
-  const meal = {
-    name: document.getElementById("photoMealName").value.trim() || "Posilek ze zdjecia",
-    text: "Zapisane ze zdjecia w aplikacji",
-    kcal: Math.round(kcal),
-    protein: Math.round(Number(document.getElementById("photoMealProtein").value || 0)),
-    fat: Math.round(Number(document.getElementById("photoMealFat").value || 0)),
-    carbs: Math.round(Number(document.getElementById("photoMealCarbs").value || 0)),
-    grams,
-    portion: `porcja ze zdjecia ${grams} g`,
-    components: [{ name: "posilek ze zdjecia", grams }],
-    photo: document.getElementById("photoMealPreview").dataset.image || ""
-  };
-  saveCustomMeal(meal);
-  const slot = document.getElementById("photoMealSlot").value;
-  if (slot !== "list") applyCustomMealToSlot(meal, Number(slot));
-  ["photoMealName", "photoMealGrams", "photoMealKcal", "photoMealProtein", "photoMealFat", "photoMealCarbs"].forEach(id => {
-    document.getElementById(id).value = "";
-  });
-  document.getElementById("photoMealInput").value = "";
-  const preview = document.getElementById("photoMealPreview");
-  preview.removeAttribute("src");
-  preview.dataset.image = "";
-  preview.classList.add("hidden");
-  renderMeals();
-  renderWeek();
-  showToast("Zapisano posilek ze zdjecia.");
-}
-
-function extractJson(text) {
-  const trimmed = text.trim();
-  if (trimmed.startsWith("{")) return JSON.parse(trimmed);
-  const match = trimmed.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error("Brak JSON w odpowiedzi AI");
-  return JSON.parse(match[0]);
-}
-
-function responseText(data) {
-  if (data.output_text) return data.output_text;
-  return (data.output || [])
-    .flatMap(item => item.content || [])
-    .map(part => part.text || "")
-    .join("\n");
-}
-
-function explainOpenAiError(error) {
-  const message = String(error.message || "");
-  const lower = message.toLowerCase();
-  if (error.status === 401 || lower.includes("invalid_api_key") || lower.includes("incorrect api key")) {
-    return "OpenAI odrzucilo klucz API. Utworz nowy klucz, wklej caly zaczynajacy sie od sk- i usun spacje.";
-  }
-  if (error.status === 403 || lower.includes("permission") || lower.includes("not have access")) {
-    return "Klucz nie ma uprawnien do tego projektu albo modelu. W kluczu ustaw Permissions: All.";
-  }
-  if (error.status === 404 || lower.includes("model") && lower.includes("not")) {
-    return "Model jest niedostepny dla tego klucza. W Ustawieniach wpisz model gpt-5.6 albo sprawdz dostep w panelu OpenAI.";
-  }
-  if (error.status === 429 || lower.includes("quota") || lower.includes("billing") || lower.includes("rate limit")) {
-    return "OpenAI zwrocilo limit albo brak rozliczen. Sprawdz billing/credits w koncie OpenAI.";
-  }
-  if (error.status === 400) {
-    return `OpenAI nie przyjelo zapytania: ${message.slice(0, 220)}`;
-  }
-  if (error.name === "TypeError" || lower.includes("failed to fetch")) {
-    return "Blad polaczenia z OpenAI. Sprawdz internet; jesli internet dziala, przegladarka moze blokowac zapytanie z aplikacji.";
-  }
-  return `OpenAI zwrocilo blad: ${message.slice(0, 220) || "brak szczegolow"}`;
-}
-
-async function estimatePhotoMealWithAI() {
-  const image = document.getElementById("photoMealPreview").dataset.image;
-  if (!image) {
-    showToast("Najpierw zrob zdjecie posilku.");
-    return;
-  }
-  persistOpenAiSettings();
-  const apiKey = (document.getElementById("openaiKey").value || settings.openaiKey || "").trim();
-  const model = (document.getElementById("openaiModel").value || settings.openaiModel || defaultSettings.openaiModel).trim();
-  if (!apiKey) {
-    showToast("Wpisz OpenAI API key w Ustawieniach.");
-    return;
-  }
-
-  const result = document.getElementById("photoMealAiResult");
-  const button = document.getElementById("estimatePhotoMeal");
-  result.classList.remove("hidden");
-  result.textContent = "AI liczy posilek ze zdjecia...";
-  button.disabled = true;
-
-  try {
-    const prompt = [
-      "Oszacuj kalorie i makroskladniki posilku ze zdjecia dla aplikacji dietetycznej.",
-      "Uwzglednij widoczne porcje, typowe polskie dania, panierke, sosy i tluszcz.",
-      "Jesli nie widzisz dokladnie, podaj ostrozny szacunek i nizsza pewnosc.",
-      "Zwroc TYLKO JSON bez komentarza:",
-      "{\"name\":\"nazwa posilku\",\"grams\":300,\"kcal\":500,\"protein\":35,\"fat\":25,\"carbs\":20,\"confidence\":\"niska/srednia/wysoka\",\"note\":\"krotka uwaga\"}"
-    ].join(" ");
-
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model,
-        input: [{
-          role: "user",
-          content: [
-            { type: "input_text", text: prompt },
-            { type: "input_image", image_url: image }
-          ]
-        }],
-        max_output_tokens: 350
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      let message = errorText;
-      try {
-        const parsed = JSON.parse(errorText);
-        message = parsed.error?.message || parsed.error?.code || errorText;
-      } catch (parseError) {
-        message = errorText;
-      }
-      const apiError = new Error(message);
-      apiError.status = response.status;
-      throw apiError;
-    }
-
-    const data = await response.json();
-    const estimate = extractJson(responseText(data));
-    document.getElementById("photoMealName").value = estimate.name || "Posilek ze zdjecia AI";
-    document.getElementById("photoMealGrams").value = Math.round(Number(estimate.grams || 0));
-    document.getElementById("photoMealKcal").value = Math.round(Number(estimate.kcal || 0));
-    document.getElementById("photoMealProtein").value = Math.round(Number(estimate.protein || 0));
-    document.getElementById("photoMealFat").value = Math.round(Number(estimate.fat || 0));
-    document.getElementById("photoMealCarbs").value = Math.round(Number(estimate.carbs || 0));
-    result.textContent = `AI: ${estimate.confidence || "szacunek"} pewnosc. ${estimate.note || "Sprawdz wage, jesli mozesz."}`;
-    showToast("AI wpisalo szacunek kcal.");
-  } catch (error) {
-    result.textContent = `Nie udalo sie wyliczyc ze zdjecia. ${explainOpenAiError(error)}`;
-    showToast("AI nie policzylo zdjecia.");
-  } finally {
-    button.disabled = false;
-  }
-}
-
 function readCustomForm() {
   return {
     mode: document.querySelector("input[name='customMode']:checked")?.value || "products",
     name: document.getElementById("customName").value.trim(),
     ingredients: Array.from(document.querySelectorAll(".custom-ingredient-row")).map(row => ({
       productId: row.querySelector(".custom-product-search").value,
-      amount: row.querySelector(".custom-amount").value
+      amount: row.querySelector(".custom-amount").value,
+      unit: row.querySelector(".custom-unit-choice").value
     })),
     readyName: document.getElementById("customReadySearch").value,
     readyGrams: document.getElementById("customReadyGrams").value,
@@ -1520,11 +1331,7 @@ function clearCustomForm() {
   document.getElementById("customName").value = "";
   document.getElementById("customReadySearch").value = "";
   document.getElementById("customReadyGrams").value = "250";
-  document.querySelectorAll(".custom-ingredient-row").forEach((row, index) => {
-    row.querySelector(".custom-product-search").value = "";
-    row.querySelector(".custom-amount").value = "";
-    row.querySelector(".custom-unit").textContent = index === 0 ? "ilosc" : "-";
-  });
+  renderCustomIngredients();
   updateReadyPreview();
 }
 
@@ -2260,17 +2067,6 @@ function renderSettings() {
   document.getElementById("drinkTime").value = settings.drinkTime;
   document.getElementById("waterStart").value = settings.waterStart;
   document.getElementById("waterEnd").value = settings.waterEnd;
-  document.getElementById("openaiKey").value = settings.openaiKey || "";
-  document.getElementById("openaiModel").value = settings.openaiModel || defaultSettings.openaiModel;
-}
-
-function persistOpenAiSettings() {
-  settings = {
-    ...settings,
-    openaiKey: document.getElementById("openaiKey").value.trim(),
-    openaiModel: document.getElementById("openaiModel").value.trim() || defaultSettings.openaiModel
-  };
-  localStorage.setItem("settings", JSON.stringify(settings));
 }
 
 function saveSettings() {
@@ -2285,9 +2081,7 @@ function saveSettings() {
     mealTimes: [0, 1, 2, 3].map(index => document.getElementById(`mealTime${index}`).value || defaultSettings.mealTimes[index]),
     drinkTime: document.getElementById("drinkTime").value || defaultSettings.drinkTime,
     waterStart: document.getElementById("waterStart").value || defaultSettings.waterStart,
-    waterEnd: document.getElementById("waterEnd").value || defaultSettings.waterEnd,
-    openaiKey: document.getElementById("openaiKey").value.trim(),
-    openaiModel: document.getElementById("openaiModel").value.trim() || defaultSettings.openaiModel
+    waterEnd: document.getElementById("waterEnd").value || defaultSettings.waterEnd
   };
   localStorage.setItem("settings", JSON.stringify(settings));
   const plan = getPlan();
@@ -2417,13 +2211,8 @@ function bindEvents() {
   });
   document.getElementById("customReadySearch").addEventListener("input", updateReadyPreview);
   document.getElementById("customReadyGrams").addEventListener("input", updateReadyPreview);
+  document.getElementById("addIngredientRow").addEventListener("click", addCustomIngredientRow);
   document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
-  document.getElementById("startMealCamera").addEventListener("click", startMealCamera);
-  document.getElementById("captureMealPhoto").addEventListener("click", captureMealPhoto);
-  document.getElementById("stopMealCamera").addEventListener("click", stopMealCamera);
-  document.getElementById("photoMealInput").addEventListener("change", handlePhotoMealInput);
-  document.getElementById("estimatePhotoMeal").addEventListener("click", estimatePhotoMealWithAI);
-  document.getElementById("addPhotoMeal").addEventListener("click", addPhotoMeal);
   document.getElementById("addResult").addEventListener("click", addResult);
 
   document.querySelectorAll("button[data-preset]").forEach(button => {
@@ -2431,10 +2220,6 @@ function bindEvents() {
   });
 
   document.getElementById("saveSettings").addEventListener("click", saveSettings);
-  ["input", "change"].forEach(eventName => {
-    document.getElementById("openaiKey").addEventListener(eventName, persistOpenAiSettings);
-    document.getElementById("openaiModel").addEventListener(eventName, persistOpenAiSettings);
-  });
   document.getElementById("enableNotifications").addEventListener("click", enableNotifications);
 
   window.addEventListener("beforeinstallprompt", event => {
@@ -2470,7 +2255,7 @@ function boot() {
       refreshing = true;
       window.location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=59").then(registration => {
+    navigator.serviceWorker.register("sw.js?v=60").then(registration => {
       registration.update();
       if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
       registration.addEventListener("updatefound", () => {
