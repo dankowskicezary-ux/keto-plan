@@ -1404,7 +1404,9 @@ async function estimatePhotoMealWithAI() {
     showToast("Najpierw zrob zdjecie posilku.");
     return;
   }
-  const apiKey = (settings.openaiKey || "").trim();
+  persistOpenAiSettings();
+  const apiKey = (document.getElementById("openaiKey").value || settings.openaiKey || "").trim();
+  const model = (document.getElementById("openaiModel").value || settings.openaiModel || defaultSettings.openaiModel).trim();
   if (!apiKey) {
     showToast("Wpisz OpenAI API key w Ustawieniach.");
     return;
@@ -1432,7 +1434,7 @@ async function estimatePhotoMealWithAI() {
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: settings.openaiModel || defaultSettings.openaiModel,
+        model,
         input: [{
           role: "user",
           content: [
@@ -2229,6 +2231,15 @@ function renderSettings() {
   document.getElementById("openaiModel").value = settings.openaiModel || defaultSettings.openaiModel;
 }
 
+function persistOpenAiSettings() {
+  settings = {
+    ...settings,
+    openaiKey: document.getElementById("openaiKey").value.trim(),
+    openaiModel: document.getElementById("openaiModel").value.trim() || defaultSettings.openaiModel
+  };
+  localStorage.setItem("settings", JSON.stringify(settings));
+}
+
 function saveSettings() {
   settings = {
     ...settings,
@@ -2252,7 +2263,7 @@ function saveSettings() {
   renderMeals();
   renderWeek();
   renderShopping();
-  showToast("Godziny zapisane.");
+  showToast("Ustawienia zapisane.");
 }
 
 function applyShiftPreset(presetId) {
@@ -2387,6 +2398,10 @@ function bindEvents() {
   });
 
   document.getElementById("saveSettings").addEventListener("click", saveSettings);
+  ["input", "change"].forEach(eventName => {
+    document.getElementById("openaiKey").addEventListener(eventName, persistOpenAiSettings);
+    document.getElementById("openaiModel").addEventListener(eventName, persistOpenAiSettings);
+  });
   document.getElementById("enableNotifications").addEventListener("click", enableNotifications);
 
   window.addEventListener("beforeinstallprompt", event => {
@@ -2422,7 +2437,7 @@ function boot() {
       refreshing = true;
       window.location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=57").then(registration => {
+    navigator.serviceWorker.register("sw.js?v=58").then(registration => {
       registration.update();
       if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
       registration.addEventListener("updatefound", () => {
