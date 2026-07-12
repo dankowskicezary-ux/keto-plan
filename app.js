@@ -237,7 +237,30 @@ const extraMealOptions = [
   { name: "Keto chleb z jajecznica", text: "Keto chleb 60 g + jajecznica z 2 jaj", kcal: 390, protein: 25, fat: 27, carbs: 8 },
   { name: "Twarozek lagodny", text: "Twarog/serek 180 g + jogurt + ogorek; bez cebuli", kcal: 260, protein: 32, fat: 10, carbs: 8 },
   { name: "Mozzarella + szynka", text: "Mozzarella 125 g + szynka 80 g + ogorek", kcal: 430, protein: 42, fat: 26, carbs: 4 },
-  { name: "Feta + kurczak salatka", text: "Kurczak 150 g + feta 60 g + salata + ogorek", kcal: 460, protein: 52, fat: 24, carbs: 7 }
+  { name: "Feta + kurczak salatka", text: "Kurczak 150 g + feta 60 g + salata + ogorek", kcal: 460, protein: 52, fat: 24, carbs: 7 },
+  { name: "Jajka sadzone + pomidor + mozzarella", text: "3 jajka sadzone + pomidor 150 g + mozzarella 80 g", portion: "jajka sadzone 150 g + pomidor 150 g + mozzarella 80 g", grams: 380, components: [{ name: "jajka sadzone", grams: 150 }, { name: "pomidor", grams: 150 }, { name: "mozzarella", grams: 80 }], kcal: 450, protein: 34, fat: 31, carbs: 8 },
+  { name: "2 jajka sadzone + caprese", text: "2 jajka sadzone + pomidor 150 g + mozzarella 60 g", portion: "jajka sadzone 100 g + pomidor 150 g + mozzarella 60 g", grams: 310, components: [{ name: "jajka sadzone", grams: 100 }, { name: "pomidor", grams: 150 }, { name: "mozzarella", grams: 60 }], kcal: 350, protein: 25, fat: 24, carbs: 7 },
+  { name: "Jajka sadzone + szynka + pomidor", text: "3 jajka sadzone + szynka 80 g + pomidor", portion: "jajka sadzone 150 g + szynka 80 g + pomidor 120 g", grams: 350, components: [{ name: "jajka sadzone", grams: 150 }, { name: "szynka", grams: 80 }, { name: "pomidor", grams: 120 }], kcal: 370, protein: 37, fat: 22, carbs: 7 },
+  { name: "Jajka sadzone + awokado", text: "2 jajka sadzone + awokado 80 g + ogorek", portion: "jajka sadzone 100 g + awokado 80 g + ogorek 100 g", grams: 280, components: [{ name: "jajka sadzone", grams: 100 }, { name: "awokado", grams: 80 }, { name: "ogorek", grams: 100 }], kcal: 330, protein: 16, fat: 27, carbs: 10 },
+  { name: "Caprese keto", text: "Mozzarella 125 g + pomidor 180 g + oliwa 10 g", portion: "mozzarella 125 g + pomidor 180 g + oliwa 10 g", grams: 315, components: [{ name: "mozzarella", grams: 125 }, { name: "pomidor", grams: 180 }, { name: "oliwa", grams: 10 }], kcal: 435, protein: 24, fat: 34, carbs: 10 },
+  { name: "Caprese z jajkiem", text: "Mozzarella 100 g + pomidor 150 g + 2 jajka", portion: "mozzarella 100 g + pomidor 150 g + jajka 100 g", grams: 350, components: [{ name: "mozzarella", grams: 100 }, { name: "pomidor", grams: 150 }, { name: "jajka", grams: 100 }], kcal: 430, protein: 34, fat: 29, carbs: 8 },
+  { name: "Serek wiejski + pomidor + jajko", text: "Serek wiejski 150 g + pomidor 150 g + 2 jajka", portion: "serek wiejski 150 g + pomidor 150 g + jajka 100 g", grams: 400, components: [{ name: "serek wiejski", grams: 150 }, { name: "pomidor", grams: 150 }, { name: "jajka", grams: 100 }], kcal: 330, protein: 34, fat: 17, carbs: 11 },
+  { name: "Talerz sniadaniowy keto", text: "2 jajka + mozzarella 60 g + szynka 60 g + ogorek", portion: "jajka 100 g + mozzarella 60 g + szynka 60 g + ogorek 100 g", grams: 320, components: [{ name: "jajka", grams: 100 }, { name: "mozzarella", grams: 60 }, { name: "szynka", grams: 60 }, { name: "ogorek", grams: 100 }], kcal: 385, protein: 38, fat: 23, carbs: 6 },
+  { name: "Jajka sadzone + kielbasa", text: "2 jajka sadzone + kielbasa 80 g + ogorek", portion: "jajka sadzone 100 g + kielbasa 80 g + ogorek 100 g", grams: 280, components: [{ name: "jajka sadzone", grams: 100 }, { name: "kielbasa", grams: 80 }, { name: "ogorek", grams: 100 }], kcal: 470, protein: 25, fat: 39, carbs: 5 },
+  { name: "Mozzarella + tunczyk + ogorek", text: "Tunczyk 120 g + mozzarella 80 g + ogorek", portion: "tunczyk 120 g + mozzarella 80 g + ogorek 120 g", grams: 320, components: [{ name: "tunczyk", grams: 120 }, { name: "mozzarella", grams: 80 }, { name: "ogorek", grams: 120 }], kcal: 345, protein: 46, fat: 16, carbs: 6 },
+  { name: "Makaron z cukinii + bitki + szpinak", text: "Bitki/wolowina 180 g + makaron z cukinii 250 g + sos szpinakowy", portion: "wolowina 180 g + makaron z cukinii 250 g + sos szpinakowy 100 g", grams: 530, components: [{ name: "wolowina", grams: 180 }, { name: "makaron z cukinii", grams: 250 }, { name: "sos szpinakowy", grams: 100 }], kcal: 560, protein: 50, fat: 34, carbs: 14 },
+  { name: "Makaron z cukinii + kurczak", text: "Kurczak 180 g + makaron z cukinii 300 g + sos jogurtowy", portion: "kurczak 180 g + makaron z cukinii 300 g + sos jogurtowy 80 g", grams: 560, components: [{ name: "kurczak", grams: 180 }, { name: "makaron z cukinii", grams: 300 }, { name: "sos jogurtowy", grams: 80 }], kcal: 430, protein: 62, fat: 13, carbs: 17 },
+  { name: "Makaron z cukinii + losos", text: "Losos 150 g + makaron z cukinii + sos szpinakowy", portion: "losos 150 g + makaron z cukinii 250 g + sos szpinakowy 100 g", grams: 500, components: [{ name: "losos", grams: 150 }, { name: "makaron z cukinii", grams: 250 }, { name: "sos szpinakowy", grams: 100 }], kcal: 540, protein: 38, fat: 36, carbs: 14 },
+  { name: "Kurczak + mozzarella + pomidor", text: "Kurczak 180 g + mozzarella 80 g + pomidor, wersja caprese", portion: "kurczak 180 g + mozzarella 80 g + pomidor 150 g", grams: 410, components: [{ name: "kurczak", grams: 180 }, { name: "mozzarella", grams: 80 }, { name: "pomidor", grams: 150 }], kcal: 520, protein: 67, fat: 24, carbs: 8 },
+  { name: "Schab + mozzarella + salata", text: "Schab 180 g + mozzarella 60 g + salata/ogorek", portion: "schab 180 g + mozzarella 60 g + salata 100 g", grams: 340, components: [{ name: "schab", grams: 180 }, { name: "mozzarella", grams: 60 }, { name: "salata", grams: 100 }], kcal: 575, protein: 62, fat: 32, carbs: 5 },
+  { name: "Mielone + cukinia + mozzarella", text: "Mieso mielone 180 g + cukinia 250 g + mozzarella 60 g", portion: "mieso mielone 180 g + cukinia 250 g + mozzarella 60 g", grams: 490, components: [{ name: "mieso mielone", grams: 180 }, { name: "cukinia", grams: 250 }, { name: "mozzarella", grams: 60 }], kcal: 650, protein: 45, fat: 48, carbs: 11 },
+  { name: "Omlet caprese", text: "3 jajka + mozzarella 60 g + pomidor 120 g", portion: "jajka 150 g + mozzarella 60 g + pomidor 120 g", grams: 330, components: [{ name: "jajka", grams: 150 }, { name: "mozzarella", grams: 60 }, { name: "pomidor", grams: 120 }], kcal: 430, protein: 34, fat: 30, carbs: 7 },
+  { name: "Omlet szpinak mozzarella", text: "3 jajka + szpinak + mozzarella 60 g", portion: "jajka 150 g + szpinak 100 g + mozzarella 60 g", grams: 310, components: [{ name: "jajka", grams: 150 }, { name: "szpinak", grams: 100 }, { name: "mozzarella", grams: 60 }], kcal: 415, protein: 35, fat: 29, carbs: 5 },
+  { name: "Zapiekanka jajka pomidor mozzarella", text: "3 jajka + pomidor + mozzarella, lagodnie przyprawione", portion: "jajka 150 g + pomidor 150 g + mozzarella 80 g", grams: 380, components: [{ name: "jajka", grams: 150 }, { name: "pomidor", grams: 150 }, { name: "mozzarella", grams: 80 }], kcal: 450, protein: 34, fat: 31, carbs: 8 },
+  { name: "Salatka mozzarella jajko", text: "Mozzarella 100 g + 2 jajka + salata + ogorek", portion: "mozzarella 100 g + jajka 100 g + salata 80 g + ogorek 100 g", grams: 380, components: [{ name: "mozzarella", grams: 100 }, { name: "jajka", grams: 100 }, { name: "salata", grams: 80 }, { name: "ogorek", grams: 100 }], kcal: 430, protein: 35, fat: 29, carbs: 7 },
+  { name: "Salatka kurczak mozzarella", text: "Kurczak 160 g + mozzarella 80 g + salata + ogorek", portion: "kurczak 160 g + mozzarella 80 g + salata 80 g + ogorek 100 g", grams: 420, components: [{ name: "kurczak", grams: 160 }, { name: "mozzarella", grams: 80 }, { name: "salata", grams: 80 }, { name: "ogorek", grams: 100 }], kcal: 500, protein: 65, fat: 22, carbs: 7 },
+  { name: "Kantyna: bitki + surowka", text: "Bitki/mieso w sosie 110 g + surowka 150 g, bez skrobi", portion: "mieso w sosie 110 g + surowka 150 g", grams: 260, components: [{ name: "mieso w sosie", grams: 110 }, { name: "surowka", grams: 150 }], kcal: 285, protein: 22, fat: 16, carbs: 14 },
+  { name: "Kantyna: kotlet + surowka", text: "Kotlet panierowany 110 g + surowka 150 g, bez ziemniakow", portion: "kotlet panierowany 110 g + surowka 150 g", grams: 260, components: [{ name: "kotlet panierowany", grams: 110 }, { name: "surowka", grams: 150 }], kcal: 385, protein: 27, fat: 21, carbs: 21 }
 ];
 
 function buildCatalog() {
@@ -374,6 +397,8 @@ const customProductCatalog = [
 
 const expandedProductCatalog = [
   { id: "egg_boiled", name: "Jajko gotowane", unit: "szt.", gramsPerUnit: 50, kcal: 75, protein: 6.5, fat: 5, carbs: 0.5 },
+  { id: "egg_fried", name: "Jajko sadzone", unit: "szt.", gramsPerUnit: 55, kcal: 95, protein: 6.7, fat: 7.3, carbs: 0.5 },
+  { id: "fried_eggs", name: "Jajka sadzone", unit: "g", kcal100: 175, protein100: 12, fat100: 14, carbs100: 1 },
   { id: "egg_scrambled_fat", name: "Jajecznica na masle", unit: "g", kcal100: 190, protein100: 11, fat100: 15, carbs100: 2 },
   { id: "keto_bread_home", name: "Chleb keto domowy", unit: "g", kcal100: 260, protein100: 17, fat100: 18, carbs100: 7 },
   { id: "keto_bread_seed", name: "Chleb keto ziarnisty", unit: "g", kcal100: 310, protein100: 16, fat100: 24, carbs100: 8 },
@@ -423,6 +448,10 @@ const expandedProductCatalog = [
   { id: "pickles_mix", name: "Warzywa konserwowe", unit: "g", kcal100: 25, protein100: 1, fat100: 0, carbs100: 5 },
   { id: "salsa_mild", name: "Sos pomidorowy lagodny", unit: "g", kcal100: 55, protein100: 2, fat100: 1, carbs100: 10 },
   { id: "tomato_passata", name: "Passata pomidorowa", unit: "g", kcal100: 35, protein100: 2, fat100: 0, carbs100: 6 },
+  { id: "cherry_tomato", name: "Pomidor koktajlowy", unit: "g", kcal100: 18, protein100: 1, fat100: 0, carbs100: 4 },
+  { id: "spinach_sauce", name: "Sos szpinakowy", unit: "g", kcal100: 120, protein100: 4, fat100: 10, carbs100: 4 },
+  { id: "spinach_cream_sauce", name: "Sos szpinakowy ze smietanka", unit: "g", kcal100: 165, protein100: 4, fat100: 15, carbs100: 4 },
+  { id: "zucchini_tomato_sauce", name: "Sos cukinia pomidor", unit: "g", kcal100: 55, protein100: 2, fat100: 3, carbs100: 6 },
   { id: "pesto", name: "Pesto", unit: "g", kcal100: 430, protein100: 5, fat100: 42, carbs100: 6 },
   { id: "guacamole", name: "Guacamole", unit: "g", kcal100: 160, protein100: 2, fat100: 14, carbs100: 8 },
   { id: "yogurt_sauce", name: "Sos jogurtowy", unit: "g", kcal100: 80, protein100: 4, fat100: 5, carbs100: 5 },
@@ -1053,12 +1082,13 @@ function renderCustomIngredients() {
   holder.innerHTML = "";
   addCustomIngredientRow();
   addCustomIngredientRow();
+  renderReadyAddonRows();
   fillCustomDatalists();
   updateCustomMode();
 }
 
-function addCustomIngredientRow() {
-  const holder = document.getElementById("customIngredientRows");
+function addIngredientRow(holderId, canRemoveFirst = false) {
+  const holder = document.getElementById(holderId);
   const index = holder.children.length;
   const row = document.createElement("div");
   row.className = "custom-ingredient-row";
@@ -1071,10 +1101,26 @@ function addCustomIngredientRow() {
     </select>
     <button class="remove-ingredient" type="button" aria-label="Usun produkt" ${index < 2 ? "disabled" : ""}>x</button>
   `;
+  if (canRemoveFirst || index >= 2) row.querySelector(".remove-ingredient").disabled = false;
   row.querySelector(".custom-product-search").addEventListener("input", () => updateCustomUnit(row));
   row.querySelector(".remove-ingredient").addEventListener("click", () => row.remove());
   holder.append(row);
   updateCustomUnit(row);
+}
+
+function addCustomIngredientRow() {
+  addIngredientRow("customIngredientRows");
+}
+
+function addReadyAddonRow() {
+  addIngredientRow("readyAddonRows", true);
+}
+
+function renderReadyAddonRows() {
+  const holder = document.getElementById("readyAddonRows");
+  if (!holder) return;
+  holder.innerHTML = "";
+  addReadyAddonRow();
 }
 
 function updateCustomUnit(row) {
@@ -1239,16 +1285,19 @@ function addCustomMeal(meal) {
       return;
     }
     const portion = portionFromGrams(item, grams);
+    const additions = calculateCustomIngredients(meal.readyAddons, true);
+    if (!additions) return;
+    const additionText = additions.items.length ? ` + ${additions.componentText}` : "";
     const nextMeal = {
       name: meal.name || item.name,
-      text: item.text,
-      kcal: Math.round(item.kcal * portion),
-      protein: Math.round(item.protein * portion),
-      fat: Math.round(item.fat * portion),
-      carbs: Math.round(item.carbs * portion),
-      grams,
-      portion: `${item.name} ${grams} g`,
-      components: [{ name: item.name, grams }]
+      text: `${item.text}${additionText}`,
+      kcal: Math.round(item.kcal * portion + additions.kcal),
+      protein: Math.round(item.protein * portion + additions.protein),
+      fat: Math.round(item.fat * portion + additions.fat),
+      carbs: Math.round(item.carbs * portion + additions.carbs),
+      grams: grams + additions.grams,
+      portion: `${item.name} ${grams} g${additionText}`,
+      components: [{ name: item.name, grams }].concat(additions.components)
     };
     saveCustomMeal(nextMeal);
     if (meal.slot !== "list") {
@@ -1261,32 +1310,9 @@ function addCustomMeal(meal) {
     return;
   }
 
-  const ingredients = [];
-  for (const ingredient of meal.ingredients) {
-    const product = findProductByInput(ingredient.productId);
-    const amount = Number(ingredient.amount || 0);
-    if (!product || !amount) continue;
-    const calculated = productMacrosForAmount(product, amount, ingredient.unit);
-    if (!calculated) {
-      showToast(`Dla "${product.name}" wybierz gramy, bo nie znam wagi 1 sztuki.`);
-      return;
-    }
-    ingredients.push({
-      product,
-      amount,
-      unit: ingredient.unit,
-      ...calculated
-    });
-  }
-  const grams = ingredients.reduce((sum, item) => sum + item.grams, 0);
-  const kcal = Math.round(ingredients.reduce((sum, item) => sum + item.kcal, 0));
-  const protein = Math.round(ingredients.reduce((sum, item) => sum + item.protein, 0));
-  const fat = Math.round(ingredients.reduce((sum, item) => sum + item.fat, 0));
-  const carbs = Math.round(ingredients.reduce((sum, item) => sum + item.carbs, 0));
-  const components = ingredients.map(item => item.component);
-  const componentText = ingredients.map(item =>
-    item.unit === "szt" ? `${item.amount} x ${item.product.name}` : `${item.product.name} ${item.amount} g`
-  ).join(" + ");
+  const calculated = calculateCustomIngredients(meal.ingredients, false);
+  if (!calculated) return;
+  const { items: ingredients, grams, kcal, protein, fat, carbs, components, componentText } = calculated;
   const nextMeal = {
     name: meal.name || "Wlasny posilek",
     text: componentText,
@@ -1312,17 +1338,56 @@ function addCustomMeal(meal) {
   showToast(`Dodano: ${nextMeal.kcal} kcal.`);
 }
 
+function calculateCustomIngredients(rows, allowEmpty) {
+  const ingredients = [];
+  for (const ingredient of rows) {
+    const product = findProductByInput(ingredient.productId);
+    const amount = Number(ingredient.amount || 0);
+    if (!product || !amount) continue;
+    const calculated = productMacrosForAmount(product, amount, ingredient.unit);
+    if (!calculated) {
+      showToast(`Dla "${product.name}" wybierz gramy, bo nie znam wagi 1 sztuki.`);
+      return;
+    }
+    ingredients.push({
+      product,
+      amount,
+      unit: ingredient.unit,
+      ...calculated
+    });
+  }
+  const grams = ingredients.reduce((sum, item) => sum + item.grams, 0);
+  const kcal = Math.round(ingredients.reduce((sum, item) => sum + item.kcal, 0));
+  const protein = Math.round(ingredients.reduce((sum, item) => sum + item.protein, 0));
+  const fat = Math.round(ingredients.reduce((sum, item) => sum + item.fat, 0));
+  const carbs = Math.round(ingredients.reduce((sum, item) => sum + item.carbs, 0));
+  const components = ingredients.map(item => item.component);
+  const componentText = ingredients.map(item =>
+    item.unit === "szt" ? `${item.amount} x ${item.product.name}` : `${item.product.name} ${item.amount} g`
+  ).join(" + ");
+  if (!ingredients.length && !allowEmpty) {
+    showToast("Wybierz produkt i wpisz ilosc.");
+    return null;
+  }
+  return { items: ingredients, grams, kcal, protein, fat, carbs, components, componentText };
+}
+
 function readCustomForm() {
   return {
     mode: document.querySelector("input[name='customMode']:checked")?.value || "products",
     name: document.getElementById("customName").value.trim(),
-    ingredients: Array.from(document.querySelectorAll(".custom-ingredient-row")).map(row => ({
+    ingredients: Array.from(document.querySelectorAll("#customIngredientRows .custom-ingredient-row")).map(row => ({
       productId: row.querySelector(".custom-product-search").value,
       amount: row.querySelector(".custom-amount").value,
       unit: row.querySelector(".custom-unit-choice").value
     })),
     readyName: document.getElementById("customReadySearch").value,
     readyGrams: document.getElementById("customReadyGrams").value,
+    readyAddons: Array.from(document.querySelectorAll("#readyAddonRows .custom-ingredient-row")).map(row => ({
+      productId: row.querySelector(".custom-product-search").value,
+      amount: row.querySelector(".custom-amount").value,
+      unit: row.querySelector(".custom-unit-choice").value
+    })),
     slot: document.getElementById("customSlot").value
   };
 }
@@ -2212,6 +2277,7 @@ function bindEvents() {
   document.getElementById("customReadySearch").addEventListener("input", updateReadyPreview);
   document.getElementById("customReadyGrams").addEventListener("input", updateReadyPreview);
   document.getElementById("addIngredientRow").addEventListener("click", addCustomIngredientRow);
+  document.getElementById("addReadyAddonRow").addEventListener("click", addReadyAddonRow);
   document.getElementById("addCustomMeal").addEventListener("click", () => addCustomMeal(readCustomForm()));
   document.getElementById("addResult").addEventListener("click", addResult);
 
@@ -2255,7 +2321,7 @@ function boot() {
       refreshing = true;
       window.location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=60").then(registration => {
+    navigator.serviceWorker.register("sw.js?v=61").then(registration => {
       registration.update();
       if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
       registration.addEventListener("updatefound", () => {

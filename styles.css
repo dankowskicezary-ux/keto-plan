@@ -632,6 +632,19 @@ button.primary {
   gap: 8px;
 }
 
+.ready-addons {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fffaf0;
+}
+
+.ready-addons strong {
+  color: var(--primary-dark);
+}
+
 .ready-preview {
   min-height: 40px;
   border: 1px solid var(--line);
